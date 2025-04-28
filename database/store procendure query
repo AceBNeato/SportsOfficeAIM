@@ -191,3 +191,17 @@ END //
 DELIMITER ;
 
 
+
+
+
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE DeleteUserIfAllowed(IN userId INT)
+BEGIN
+    DELETE FROM users WHERE id = userId;
+END //
+
+DELIMITER ;
