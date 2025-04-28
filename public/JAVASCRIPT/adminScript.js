@@ -150,22 +150,59 @@ function closeEditModal() {
     document.getElementById('editUserModal').classList.add('hidden');
 }
 
+// Function to open modal and pass user ID to the form
 
+function confirmDeleteUser(studentId, userId) {
+    // Use the actual primary key for deletion
+    document.getElementById('deleteUserId').value = userId;
 
-    function openDeleteModal(id) {
-    const modal = document.getElementById('deleteUserModal');
-    const userIdInput = document.getElementById('deleteUserId');
+    // Debug to confirm the ID is set
+    console.log("Setting user ID for deletion:", userId);
+    console.log("Student ID (for reference):", studentId);
 
-    if (modal && userIdInput) {
-    userIdInput.value = id;  // Set user ID into hidden input
-    modal.classList.remove('hidden');  // Show modal
+    // Show the modal
+    document.getElementById('deleteUserModal').classList.remove('hidden');
 }
+function closeDeleteModal() {
+    // Hide the modal
+    document.getElementById('deleteUserModal').classList.add('hidden');
 }
 
-    function closeDeleteModal() {
-    const modal = document.getElementById('deleteUserModal');
-    if (modal) {
-    modal.classList.add('hidden');  // Hide modal
-}
+// For debugging, add a submit listener to the form
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('deleteUserForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            // Uncomment this line for debugging only
+            // e.preventDefault();
+
+            const studentId = document.getElementById('deleteUserId').value;
+            console.log("Submitting form to delete student ID:", studentId);
+
+            // Let the form submit normally after logging
+        });
+    }
+});
+
+
+function openEditModal(button) {
+    // Fetch data from button attributes
+    var studentId = button.getAttribute('data-student-id');
+    var fullName = button.getAttribute('data-full-name');
+    var address = button.getAttribute('data-address');
+    var status = button.getAttribute('data-status');
+
+    // Set values into the modal fields
+    document.getElementById('edit-student-id').value = studentId;
+    document.getElementById('edit-full-name').value = fullName;
+    document.getElementById('edit-address').value = address;
+
+    var statusSelect = document.getElementById('edit-status');
+    if (statusSelect) {
+        statusSelect.value = status; // Automatically set selected option
+    }
+
+    // Show the modal
+    document.getElementById('editUserModal').classList.remove('hidden');
 }
 

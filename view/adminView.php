@@ -148,18 +148,30 @@
                 <div class="bg-white p-4 rounded-lg shadow-sm space-y-2 sm:space-y-0 sm:grid sm:grid-cols-12 sm:items-center">
 
 
+
                     <div class="text-center text-xl text-gray-600 sm:col-span-1">
-                        <button onclick="openModal('editUserModal')"
-                                class="text-blue-500 hover:text-blue-700">
+                        <button
+                                type="button"
+                                class="text-blue-500 hover:text-blue-700 focus:outline-none"
+                                title="Edit User"
+                                data-student-id="<?= htmlspecialchars($row['student_id'], ENT_QUOTES, 'UTF-8') ?>"
+                                data-full-name="<?= htmlspecialchars($row['full_name'], ENT_QUOTES, 'UTF-8') ?>"
+                                data-address="<?= htmlspecialchars($row['address'], ENT_QUOTES, 'UTF-8') ?>"
+                                data-status="<?= isset($row['status']) ? htmlspecialchars($row['status'], ENT_QUOTES, 'UTF-8') : '' ?>"
+                                onclick="openEditModal(this)"
+                        >
                             <i class="fas fa-edit"></i>
                         </button>
+
                     </div>
+
 
 
                     <div class="text-gray-800 font-medium sm:col-span-3">
                         <span class="block sm:hidden font-semibold text-gray-600">Student ID:</span>
                         <?= htmlspecialchars($row['student_id']) ?>
                     </div>
+
                     <div class="text-gray-800 sm:col-span-4">
                         <span class="block sm:hidden font-semibold text-gray-600">Name:</span>
                         <?= htmlspecialchars($row['full_name']) ?>
@@ -171,11 +183,10 @@
 
 
 
-
                     <!-- Delete Button -->
                     <div class="text-center text-xl text-gray-600 sm:col-span-1">
-                        
-                        <button onclick="openModal('deleteUserModal')"
+                        <button
+                                    onclick="confirmDeleteUser('<?= htmlspecialchars($row['student_id']) ?>', '<?= htmlspecialchars($row['id'] ?? $row['student_id']) ?>')"
                                 class="text-red-500 hover:text-red-700">
                             <i class="fas fa-trash"></i>
                         </button>
@@ -186,7 +197,6 @@
 
 
 
-                    
                 </div>
             <?php endforeach; ?>
         </div>
@@ -265,63 +275,8 @@
     <?php endif; ?>
 </div>
 
-<!-- Logout Modal -->
-<div id="logoutModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 hidden">
-    <div class="bg-white rounded-lg shadow-lg p-6 w-80 text-center">
-        <h2 class="text-lg font-semibold mb-4">Are you sure you want to logout?</h2>
-        <div class="flex justify-center gap-4">
-            <button id="cancelLogout" class="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400">No</button>
-            <button id="confirmLogout" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Yes</button>
-        </div>
-    </div>
-</div>
 
-
-
-
-
-<!-- delete Modal Here -->
-
-<!-- Delete Modal -->
-<div id="deleteUserModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50">
-    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative animate-fadeIn">
-
-        <!-- Close Button -->
-        <button
-                onclick="closeDeleteModal()"
-                class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl font-bold"
-                aria-label="Close">
-            &times;
-        </button>
-
-        <h2 class="text-2xl font-bold text-center mb-4">DELETE USER</h2>
-
-        <h3 class="text-lg text-center text-gray-700 mb-4">
-            Are you sure you want to delete this account?
-        </h3>
-
-        <!-- Delete Form -->
-        <form method="POST" action="../controller/deleteUsers.php" class="flex flex-col gap-4">
-
-            <!-- Hidden input to carry user id -->
-            <input type="hidden" id="deleteUserId" name="id">
-
-            <!-- Submit Button -->
-            <button
-                    type="submit"
-                    class="bg-red-500 hover:bg-red-600 text-white py-3 rounded-lg font-semibold w-full">
-                Delete Account
-            </button>
-        </form>
-    </div>
-</div>
-
-
-
-
-<!-- Edit User Modal -->
-
-
+<!-- Edit Modal - Place this OUTSIDE the loop -->
 <div id="editUserModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50">
     <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative animate-fadeIn">
         <button onclick="document.getElementById('editUserModal').classList.add('hidden')" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl font-bold">&times;</button>
@@ -336,7 +291,7 @@
 
             <input type="text" name="address" id="edit-address" placeholder="Address" required class="p-3 border rounded-lg w-full">
 
-            <select name="status" required class="p-3 border rounded-lg w-full">
+            <select name="status" id="edit-status" required class="p-3 border rounded-lg w-full">
                 <option value="" disabled>Select Status</option>
                 <option value="undergraduate">Undergraduate</option>
                 <option value="alumni">Alumni</option>
@@ -355,17 +310,52 @@
 
 
 
+<!-- Delete Modal - Ensure this is outside the loop -->
+<div id="deleteUserModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative animate-fadeIn">
+
+        <!-- Close Button -->
+        <button
+                onclick="closeDeleteModal()"
+                class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl font-bold"
+                aria-label="Close">
+            &times;
+        </button>
+
+        <h2 class="text-2xl font-bold text-center mb-4">DELETE USER</h2>
+
+        <h3 class="text-lg text-center text-gray-700 mb-4">
+            Are you sure you want to delete this account?
+        </h3>
+
+        <!-- Delete Form -->
+        <form id="deleteUserForm" method="POST" action="../controller/deleteUsers.php" class="flex flex-col gap-4">
+
+            <!-- Hidden input to carry user id -->
+            <input type="hidden" id="deleteUserId" name="id">
+
+            <!-- Submit Button -->
+            <button
+                    type="submit"
+                    class="bg-red-500 hover:bg-red-600 text-white py-3 rounded-lg font-semibold w-full">
+                Delete Account
+            </button>
+        </form>
+    </div>
+</div>
 
 
 
-
-
-
-
-
-
-
-
+<!-- Logout Modal -->
+<div id="logoutModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 hidden">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-80 text-center">
+        <h2 class="text-lg font-semibold mb-4">Are you sure you want to logout?</h2>
+        <div class="flex justify-center gap-4">
+            <button id="cancelLogout" class="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400">No</button>
+            <button id="confirmLogout" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Yes</button>
+        </div>
+    </div>
+</div>
 
 <!-- Add User Modal -->
 <div id="addUserModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50">

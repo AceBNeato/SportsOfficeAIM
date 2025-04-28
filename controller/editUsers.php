@@ -1,9 +1,15 @@
 <?php
 // editUsers.php
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "SportOfficeDB";
 
-// Include your database connection
-global $conn;
-require_once '../database/config.php'; // adjust path if needed
+// --- Reconnect properly (don't trust old $conn) ---
+$conn = new mysqli($servername , $username, $password, $dbname);
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Get and sanitize input values
@@ -14,35 +20,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Simple validation
     if (empty($student_id) || empty($full_name) || empty($address) || empty($status)) {
-        die('Please fill out all required fields.');
+        header("Location: ../view/adminView.php?message=" . urlencode("Please fill out all required fields"));
+        exit();
     }
 
     try {
         // Prepare the UPDATE query
         $sql = "UPDATE users 
-                SET full_name = :full_name, address = :address, status = :status 
-                WHERE student_id = :student_id";
+                SET full_name = ?, address = ?, status = ? 
+                WHERE student_id = ?";
 
-        $stmt = $conn->prepare($sql); // ✅ Prepare the statement
-
-        // Bind parameters
-        $stmt->bindParam(':full_name', $full_name, PDO::PARAM_STR);
-        $stmt->bindParam(':address', $address, PDO::PARAM_STR);
-        $stmt->bindParam(':status', $status, PDO::PARAM_STR);
-        $stmt->bindParam(':student_id', $student_id, PDO::PARAM_STR);
-
-        // Execute the query
-        if ($stmt->execute()) {
-            header('Location: ../admin/Users.php?success=UserUpdated');
+        $stmt = $conn->prepare($sql);
+        if (!$stmt) {
+            header("Location: ../view/adminView.php?message=" . urlencode("Prepare failed: " . $conn->error));
             exit();
-        } else {
-            echo "Failed to update user.";
         }
 
-    } catch (PDOException $e) {
-        echo "Error: " . $e->getMessage();
+        // Bind parameters (ssss = all strings)
+        $stmt->bind_param('ssss', $full_name, $address, $status, $student_id);
+
+        // Execute
+        if ($stmt->execute()) {
+            // Redirect after successful update
+            header("Location: ../view/adminView.php?page=Users&message=" . urlencode("User updated successfully."));
+            exit();
+        } else {
+            // Error executing statement
+            header("Location: ../view/adminView.php?message=" . urlencode("Failed to update user."));
+            exit();
+        }
+
+    } catch (Exception $e) {
+        // Catch any exceptions
+        header("Location: ../view/adminView.php?message=" . urlencode("Error: " . $e->getMessage()));
+        exit();
     }
 } else {
-    echo "Invalid Request.";
+    // If the request method is not POST
+    header("Location: ../view/adminView.php?message=" . urlencode("Invalid request method."));
+    exit();
 }
+
+// Always clean up
+$conn->close();
 ?>

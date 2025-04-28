@@ -21,30 +21,25 @@ if (empty($_POST['id'])) {
     exit();
 }
 
-$user_id = intval($_POST['id']);
+$student_id = $_POST['id']; // This is the student_id, not converting to int
 
-// Prevent self-deletion (optional based on your session)
-if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $user_id) {
-    header("Location: ../view/adminView.php?message=" . urlencode("You cannot delete your own account"));
-    exit();
-}
+// Direct deletion query instead of stored procedure
+$delete_query = "DELETE FROM users WHERE student_id = ?";
+$stmt = $conn->prepare($delete_query);
 
-// Prepare the stored procedure call
-$stmt = $conn->prepare("CALL DeleteUserIfAllowed(?)");
 if (!$stmt) {
     header("Location: ../view/adminView.php?message=" . urlencode("Prepare failed: " . $conn->error));
     exit();
 }
 
-$stmt->bind_param("i", $user_id);
+$stmt->bind_param("s", $student_id); // Binding as string since student_id is likely a string
 
-// Execute and fetch result
 if ($stmt->execute()) {
-    $result = $stmt->get_result();
-    if ($result && $row = $result->fetch_assoc()) {
-        $message = $row['result'];
-    } else {
+    // Check if any rows were affected
+    if ($stmt->affected_rows > 0) {
         $message = "User deleted successfully.";
+    } else {
+        $message = "No user found with the given ID.";
     }
 
     header("Location: ../view/adminView.php?page=Users&message=" . urlencode($message));
