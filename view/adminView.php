@@ -99,19 +99,20 @@
 
         <?php if ($currentPage === 'Users'): ?>
 
-            <div class="w-full bg-red-500 text-white font-semibold rounded-t-lg px-5 mt-2 mb-4">
+            <div class="hidden sm:block w-full bg-red-500 text-white font-semibold rounded-t-lg px-5 mt-2 mb-4">
                 <div class="flex sm:hidden flex-col p-4 space-y-4 text-sm">
                     <div>Student ID</div>
                     <div>Student Name</div>
                     <div>Student Address</div>
                 </div>
-                <div class="hidden sm:flex items-center px-4 py-6"> <!-- updated line -->
+                <div class="hidden sm:flex items-center px-4 py-6">
                     <div class="w-1/12 text-center"></div>
                     <div class="w-3/12">Student ID</div>
                     <div class="w-4/12">Student Name</div>
                     <div class="w-4/12">Student Address</div>
                 </div>
             </div>
+
 
         <?php endif; ?>
     </div>
@@ -170,7 +171,7 @@
 
 
 
-                    <!-- Delete Button -->
+
                     <!-- Delete Button -->
                     <div class="text-center text-xl text-gray-600 sm:col-span-1">
                         
