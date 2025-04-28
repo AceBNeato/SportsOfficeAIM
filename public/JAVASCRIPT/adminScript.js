@@ -149,3 +149,23 @@ function editUserModal(user) {
 function closeEditModal() {
     document.getElementById('editUserModal').classList.add('hidden');
 }
+
+
+
+    function openDeleteModal(id) {
+    const modal = document.getElementById('deleteUserModal');
+    const userIdInput = document.getElementById('deleteUserId');
+
+    if (modal && userIdInput) {
+    userIdInput.value = id;  // Set user ID into hidden input
+    modal.classList.remove('hidden');  // Show modal
+}
+}
+
+    function closeDeleteModal() {
+    const modal = document.getElementById('deleteUserModal');
+    if (modal) {
+    modal.classList.add('hidden');  // Hide modal
+}
+}
+

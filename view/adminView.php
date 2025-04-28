@@ -171,7 +171,9 @@
 
 
                     <!-- Delete Button -->
+                    <!-- Delete Button -->
                     <div class="text-center text-xl text-gray-600 sm:col-span-1">
+                        
                         <button onclick="openModal('deleteUserModal')"
                                 class="text-red-500 hover:text-red-700">
                             <i class="fas fa-trash"></i>
@@ -273,12 +275,13 @@
 
 <!-- delete Modal Here -->
 
-
+<!-- Delete Modal -->
 <div id="deleteUserModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50">
     <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative animate-fadeIn">
+
         <!-- Close Button -->
         <button
-                onclick="document.getElementById('deleteUserModal').classList.add('hidden')"
+                onclick="closeDeleteModal()"
                 class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl font-bold"
                 aria-label="Close">
             &times;
@@ -286,11 +289,16 @@
 
         <h2 class="text-2xl font-bold text-center mb-4">DELETE USER</h2>
 
-        <!-- Confirmation Message -->
-        <h3 class="text-lg text-center text-gray-700 mb-4">Are you sure you want to delete this account?</h3>
+        <h3 class="text-lg text-center text-gray-700 mb-4">
+            Are you sure you want to delete this account?
+        </h3>
 
         <!-- Delete Form -->
         <form method="POST" action="../controller/deleteUsers.php" class="flex flex-col gap-4">
+
+            <!-- Hidden input to carry user id -->
+            <input type="hidden" id="deleteUserId" name="id">
+
             <!-- Submit Button -->
             <button
                     type="submit"
@@ -300,7 +308,6 @@
         </form>
     </div>
 </div>
-
 
 
 
