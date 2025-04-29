@@ -206,3 +206,25 @@ function openEditModal(button) {
     document.getElementById('editUserModal').classList.remove('hidden');
 }
 
+
+
+    function showUserDocuments(studentId, fullName) {
+    const modal = document.getElementById('documentsModal');
+    document.getElementById('modalStudentId').textContent = studentId;
+    modal.classList.remove('hidden');
+
+    // Here you could also make an AJAX call to fetch specific document status for this user
+    // and update the checkboxes accordingly
+}
+
+    function closeModal() {
+    document.getElementById('documentsModal').classList.add('hidden');
+}
+
+    // Close modal when clicking outside of it
+    window.addEventListener('click', function(event) {
+    const modal = document.getElementById('documentsModal');
+    if (event.target === modal) {
+    closeModal();
+}
+});

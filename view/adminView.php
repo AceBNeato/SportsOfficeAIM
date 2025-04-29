@@ -63,12 +63,13 @@
 
 <!-- Main Content -->
 <div id="mainContent" class="main-content px-1 sm:px-4 lg:px-0">
-    <div class="sticky top-0 z-30 bg-gray w-full px-1 sm:px-4 lg:px-3">
-        <div class="border-b-4 border-red-500 px-5 pt-2 pb-1 flex justify-between items-center bg-gray">
 
-            <h1 class="text-3xl font-semibold text-gray-900 tracking-tight">
-                <?php echo htmlspecialchars($currentPage); ?>
-            </h1>
+    <div class="sticky top-0 z-30 bg-gray-100 w-full px-1 sm:px-4 lg:px-3">
+
+            <div class="border-b-4 border-red-500 px-5 pt-2 pb-1 flex justify-between items-center">
+                <h1 class="text-2xl sm:text-3xl font-semibold text-gray-900 tracking-tight">
+                    <?php echo htmlspecialchars($currentPage); ?>
+                </h1>
 
 
             <?php if ($currentPage === 'Users'): ?>
@@ -97,6 +98,8 @@
             <?php endif; ?>
 
 
+
+
         </div>
 
         <?php if ($currentPage === 'Users'): ?>
@@ -117,7 +120,32 @@
 
 
         <?php endif; ?>
+
+        <?php if ($currentPage === 'Documents'): ?>
+            <!-- Documents Table Header -->
+            <div class="w-full bg-red-500 text-white font-semibold rounded-t-lg my-4">
+                <div class="hidden sm:grid grid-cols-12 gap-4 items-center px-5 py-4">
+                    <!-- Avatar column (empty) -->
+                    <div class="col-span-1"></div>
+
+                    <!-- Adjusted Student ID column -->
+                    <div class="col-span-5 pl-3">Student ID</div>
+
+                    <!-- Student Name column -->
+                    <div class="col-span-6">Student Name</div>
+                </div>
+            </div>
+        <?php endif; ?>
     </div>
+
+
+
+
+
+
+
+
+
 
 
     <?php if ($currentPage === 'Users'): ?>
@@ -299,140 +327,102 @@
 
 
 
+
+
+
+
+
+
+
     <?php elseif ($currentPage === 'Documents'): ?>
 
-        <style>
-            .student-table {
-                width: 100%;
-                max-width: 800px;
-                margin: 0 auto;
-            }
+    <?php
+    $conn = new mysqli("localhost", "root", "", "SportOfficeDB");
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
 
-            .table-header {
-                background-color: #f44336;
-                color: white;
-                text-align: center;
-                padding: 12px 24px;
-                font-weight: bold;
-                border-radius: 6px;
-                display: flex;
-                justify-content: space-between;
-            }
-            .student-card {
-                display: flex;
-                flex-direction: column; /* Mobile first: vertical stack */
-                width: 100%;
-                align-items: center;
-                border: 1px solid #ddd;
-                border-radius: 10px;
-                padding: 10px 20px;
-                margin: 10px auto;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-                max-width: 800px;
-                background-color: #fff;
-                gap: 12px; /* Optional spacing between items */
-            }
+    $searchTerm = isset($_GET['search']) ? trim($_GET['search']) : '';
+    $searchTerm = strtolower($searchTerm);
 
-            @media (min-width: 640px) {
-                .student-card {
-                    flex-direction: row; /* Desktop: horizontal alignment */
-                    align-items: center;
-                    justify-content: flex-start;
-                }
-            }
+    $stmt = $conn->prepare("CALL SearchUsers(?)");
+    if (!$stmt) {
+        die("Prepare failed: " . $conn->error);
+    }
 
+    $stmt->bind_param("s", $searchTerm);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
+    $users = $result->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+    $conn->close();
+    ?>
 
-            .student-avatar {
-                width: 50px;
-                height: 50px;
-                border-radius: 50%;
-                margin-right: 20px;
-            }
-
-            .student-info {
-                display: flex;
-                flex-direction: column;
-            }
-
-            .student-id {
-                font-weight: bold;
-            }
-
-            .student-name {
-                font-size: 16px;
-            }
-
-            .student-address {
-                font-size: 14px;
-                color: #555;
-            }
-        </style>
-
-
-
-
-
-
-
-        <?php
-            $conn = new mysqli("localhost", "root", "", "SportOfficeDB");
-            if ($conn->connect_error) {
-                die("Connection failed: " . $conn->connect_error);
-            }
-
-            $searchTerm = isset($_GET['search']) ? trim($_GET['search']) : '';
-            $searchTerm = strtolower($searchTerm);
-
-            $stmt = $conn->prepare("CALL SearchUsers(?)");
-            if (!$stmt) {
-                die("Prepare failed: " . $conn->error);
-            }
-
-            $stmt->bind_param("s", $searchTerm);
-            $stmt->execute();
-            $result = $stmt->get_result();
-
-            $users = $result->fetch_all(MYSQLI_ASSOC);
-            $stmt->close();
-            $conn->close();
-            ?>
-
-        <div class="student-table w-full max-w-6xl px-9 sm:px-6 lg:px-9 mx-auto">
-
-        <!-- Header -->
-        <div class="hidden sm:grid sm:grid-cols-12 bg-red-500 text-white font-semibold rounded-t-lg px-5 py-4 mt-2 mb-4">
-            <div class="col-span-2"></div>
-            <div class="col-span-5">Student ID</div>
-            <div class="col-span-5">Student Name</div>
-        </div>
-
+        <div class="w-full px-4 sm:px-8 lg:px-25 mx-auto">
             <?php if (count($users) > 0): ?>
-            <?php foreach ($users as $user): ?>
-            <!-- Student Card -->
-            <div class="grid grid-cols-12 items-center bg-white shadow-md border rounded-lg px-5 py-4 mb-4">
-                <div class="col-span-12 sm:col-span-2 flex justify-center sm:justify-start mb-2 sm:mb-0">
-                    <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Avatar" class="w-12 h-12 rounded-full">
-                </div>
-                <div class="col-span-12 sm:col-span-5 text-gray-800">
-                    <span class="block sm:hidden text-sm font-semibold text-gray-600">Student ID:</span>
-                    <div class="font-semibold"><?= htmlspecialchars($user['student_id']) ?></div>
-                </div>
-                <div class="col-span-12 sm:col-span-5 text-gray-800">
-                    <span class="block sm:hidden text-sm font-semibold text-gray-600">Name:</span>
-                    <div class="text-base"><?= htmlspecialchars($user['full_name']) ?></div>
-                </div>
-            </div>
-        <?php endforeach; ?>
-    </div>
+                <div class="space-y-4">
+                    <?php foreach ($users as $user): ?>
 
-
-
+                        <div class="userFile cursor-pointer" onclick="showUserDocuments('<?= $user['student_id'] ?>', '<?= htmlspecialchars($user['full_name']) ?>')">
+                            <div class="grid grid-cols-12 gap-4 items-center bg-white shadow-md rounded-lg px-5 py-4">
+                                <div class="col-span-12 sm:col-span-1 flex justify-center sm:justify-start">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                                         alt="Avatar"
+                                         class="w-10 h-10 rounded-full">
+                                </div>
+                                <div class="col-span-12 sm:col-span-5">
+                                    <div class="block sm:hidden text-xs font-semibold text-gray-500">Student ID</div>
+                                    <div class="font-medium text-gray-800"><?= htmlspecialchars($user['student_id']) ?></div>
+                                </div>
+                                <div class="col-span-12 sm:col-span-6">
+                                    <div class="block sm:hidden text-xs font-semibold text-gray-500">Name</div>
+                                    <div class="text-gray-800"><?= htmlspecialchars($user['full_name']) ?></div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
             <?php else: ?>
-                <div class="text-center text-gray-500 py-6 font-semibold">
-                    No users found matching your search.
+                <div class="text-center py-10">
+                    <div class="text-gray-500 font-semibold mb-2">
+                        No documents found
+                    </div>
+                    <div class="text-sm text-gray-400">
+                        Try adjusting your search criteria
+                    </div>
                 </div>
             <?php endif; ?>
+        </div>
+
+
+
+        <script>
+            function showUserDocuments(studentId, fullName) {
+                const modal = document.getElementById('documentsModal');
+                document.getElementById('modalStudentId').textContent = studentId;
+                modal.classList.remove('hidden');
+
+                // Here you could also make an AJAX call to fetch specific document status for this user
+                // and update the checkboxes accordingly
+            }
+
+            function closeModal() {
+                document.getElementById('documentsModal').classList.add('hidden');
+            }
+
+            // Close modal when clicking outside of it
+            window.addEventListener('click', function(event) {
+                const modal = document.getElementById('documentsModal');
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+        </script>
+
+
+
+
 
             <?php else: ?>
         <p class="text-center">This is the <?php echo htmlspecialchars($currentPage); ?> content area.</p>
@@ -445,14 +435,110 @@
 
 
 
+<!-- Documents Modal -->
+<div id="documentsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+        <div class="p-6">
+            <!-- Close button -->
+            <button onclick="closeModal('documentsModal')" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
 
+            <!-- Centered Student Info Section -->
+            <div class="flex flex-col items-center text-center mb-6">
+                <!-- Student Icon -->
+                <div class="bg-blue-100 p-3 rounded-full mb-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                </div>
 
+                <!-- Student Name and ID -->
+                <h2 class="text-xl font-semibold text-gray-800" id="modalStudentName">Jane Smith</h2>
+                <p class="text-gray-600" id="modalStudentId">2023-00002</p>
 
+                <!-- Student Document Title -->
+                <div class="mt-4 pt-4 border-t border-gray-200 w-full">
+                    <h3 class="text-lg font-medium text-gray-700">Student Document</h3>
+                </div>
+            </div>
 
+            <!-- Document List -->
+            <div class="space-y-4">
+                <!-- Medical Certificate -->
+                <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg">
+                    <div class="flex items-center">
+                        <div class="bg-green-100 p-2 rounded-lg mr-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                        </div>
+                        <span class="font-medium text-gray-800">Medical Certificate</span>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button class="px-3 py-1 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 text-sm font-medium">View</button>
+                        <button class="px-3 py-1 bg-gray-50 text-gray-600 rounded-md hover:bg-gray-100 text-sm font-medium">Download</button>
+                    </div>
+                </div>
 
+                <!-- Birth Certificate -->
+                <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg">
+                    <div class="flex items-center">
+                        <div class="bg-purple-100 p-2 rounded-lg mr-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                        </div>
+                        <span class="font-medium text-gray-800">Birth Certificate</span>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button class="px-3 py-1 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 text-sm font-medium">View</button>
+                        <button class="px-3 py-1 bg-gray-50 text-gray-600 rounded-md hover:bg-gray-100 text-sm font-medium">Download</button>
+                    </div>
+                </div>
 
+                <!-- Certificate of Enrolment -->
+                <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg">
+                    <div class="flex items-center">
+                        <div class="bg-amber-100 p-2 rounded-lg mr-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                        </div>
+                        <span class="font-medium text-gray-800">Certificate of Enrolment</span>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button class="px-3 py-1 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 text-sm font-medium">View</button>
+                        <button class="px-3 py-1 bg-gray-50 text-gray-600 rounded-md hover:bg-gray-100 text-sm font-medium">Download</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
+<script>
+    function showUserDocuments(studentId, fullName) {
+        const modal = document.getElementById('documentsModal');
+        document.getElementById('modalStudentId').textContent = studentId;
+        document.getElementById('modalStudentName').textContent = fullName;
+        modal.classList.remove('hidden');
+    }
 
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.add('hidden');
+    }
+
+    // Close modal when clicking outside of it
+    window.addEventListener('click', function(event) {
+        const modal = document.getElementById('documentsModal');
+        if (event.target === modal) {
+            closeModal('documentsModal');
+        }
+    });
+</script>
 
 
 
