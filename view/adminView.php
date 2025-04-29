@@ -400,7 +400,7 @@
         <script>
             function showUserDocuments(studentId, fullName) {
                 const modal = document.getElementById('documentsModal');
-                document.getElementById('modalStudentId').textContent = studentId;
+                document.getElementById('modalStudentId').textContent = studentId,fullName;
                 modal.classList.remove('hidden');
 
                 // Here you could also make an AJAX call to fetch specific document status for this user
@@ -421,10 +421,158 @@
         </script>
 
 
+    <?php elseif ($currentPage === 'Evaluation'): ?>
+    <?php
+    $conn = new mysqli("localhost", "root", "", "SportOfficeDB");
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+
+    $searchTerm = isset($_GET['search']) ? trim($_GET['search']) : '';
+    $searchTerm = strtolower($searchTerm);
+
+    $stmt = $conn->prepare("CALL SearchUsers(?)");
+    if (!$stmt) {
+        die("Prepare failed: " . $conn->error);
+    }
+
+    $stmt->bind_param("s", $searchTerm);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $users = $result->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+    $conn->close();
+    ?>
+
+    <div class="w-full px-4 sm:px-8 lg:px-25 mx-auto">
+        <?php if (count($users) > 0): ?>
+            <div class="space-y-4">
+                <?php foreach ($users as $user): ?>
+                    <div class="userFile cursor-pointer" onclick="showEvaluationModal('<?= $user['student_id'] ?>', '<?= htmlspecialchars($user['full_name']) ?>', 'Medical Certificate')">
+                        <div class="flex items-center bg-white shadow-md rounded-lg px-5 py-4 hover:bg-gray-50 transition-colors duration-200">
+                            <!-- Document Icon -->
+                            <div class="bg-blue-100 p-3 rounded-lg mr-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </div>
+
+                            <div class="flex-grow">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <div class="text-xs font-semibold text-gray-500">Name</div>
+                                        <div class="text-gray-800 font-medium"><?= htmlspecialchars($user['full_name']) ?></div>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-semibold text-gray-500">Date of Submission</div>
+                                        <div class="text-gray-800">07-21-2025</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php else: ?>
+            <div class="text-center py-10">
+                <div class="text-gray-500 font-semibold mb-2">
+                    No evaluations found
+                </div>
+                <div class="text-sm text-gray-400">
+                    Try adjusting your search criteria
+                </div>
+            </div>
+        <?php endif; ?>
+    </div>
+
+    <!-- Evaluation Modal -->
+    <div id="evaluationsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+            <div class="p-6 relative">
+                <!-- Close button -->
+                <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+
+                <!-- Student Info Section -->
+                <div class="mb-6">
+                    <!-- Student Name (Large and bold) -->
+                    <h2 id="modalStudentName" class="text-2xl font-bold text-gray-800 mb-1">Christian Doong</h2>
+
+                    <!-- Student ID -->
+                    <p id="modalStudentId" class="text-gray-600 mb-6">2023-00023</p>
+
+                    <!-- Document Type -->
+                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+                        <div class="text-sm font-medium text-gray-500 mb-1">Document Type</div>
+                        <div id="modalDocumentType" class="text-lg font-semibold text-blue-600">Medical Certificate</div>
+                    </div>
+
+                    <!-- Report Section -->
+                    <div class="mb-6">
+                        <div class="text-sm font-medium text-gray-500 mb-2">Report</div>
+                        <textarea class="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" rows="4" placeholder="Enter evaluation notes..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex justify-end space-x-3">
+                    <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors duration-200 font-medium">
+                        Report
+                    </button>
+                    <button class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-200 font-medium">
+                        Approve
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showEvaluationModal(studentId, fullName, docType = "Medical Certificate") {
+            const modal = document.getElementById('evaluationsModal');
+            document.getElementById('modalStudentId').textContent = studentId;
+            document.getElementById('modalStudentName').textContent = fullName;
+            document.getElementById('modalDocumentType').textContent = docType;
+            document.body.style.overflow = 'hidden';
+            modal.classList.remove('hidden');
+
+            // Here you could make an AJAX call to fetch evaluation details
+            // fetch(`get_evaluation.php?student_id=${studentId}`)
+            //     .then(response => response.json())
+            //     .then(data => {
+            //         // Update evaluation details in modal
+            //     });
+        }
+
+        function closeModal() {
+            document.getElementById('evaluationsModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside of it
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('evaluationsModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Close with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+   
 
 
 
-            <?php else: ?>
+    <?php else: ?>
         <p class="text-center">This is the <?php echo htmlspecialchars($currentPage); ?> content area.</p>
     <?php endif; ?>
 </div>
@@ -433,6 +581,111 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Evaluation Modal -->
+<div id="evaluationsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+        <div class="p-6 relative">
+            <!-- Close button -->
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+
+            <!-- Student Info Section -->
+            <div class="mb-6">
+                <!-- Student Name (Large and bold) -->
+                <h2 id="modalStudentName" class="text-2xl font-bold text-gray-800 mb-1">Christian Doong</h2>
+
+                <!-- Student ID -->
+                <p id="modalStudentId" class="text-gray-600 mb-6">2023-00023</p>
+
+                <!-- Document Type -->
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+                    <div class="text-sm font-medium text-gray-500 mb-1">Document Type</div>
+                    <div class="text-lg font-semibold text-blue-600">Medical Certificate</div>
+                </div>
+
+                <!-- Report Section -->
+                <div class="mb-6">
+                    <div class="text-sm font-medium text-gray-500 mb-2">Report</div>
+                    <textarea class="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" rows="4" placeholder="Enter evaluation notes..."></textarea>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex justify-end space-x-3">
+                <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors duration-200 font-medium">
+                    Report
+                </button>
+                <button class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-200 font-medium">
+                    Approve
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showEvaluationModal(studentId, fullName, docType = "Medical Certificate") {
+        const modal = document.getElementById('evaluationsModal');
+        document.getElementById('modalStudentId').textContent = studentId;
+        document.getElementById('modalStudentName').textContent = fullName;
+        document.querySelector('.text-blue-600').textContent = docType;
+        document.body.style.overflow = 'hidden';
+        modal.classList.remove('hidden');
+    }
+
+    function closeModal() {
+        document.getElementById('evaluationsModal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+
+    // Close modal when clicking outside
+    window.addEventListener('click', function(event) {
+        const modal = document.getElementById('evaluationsModal');
+        if (event.target === modal) {
+            closeModal();
+        }
+    });
+
+    // Close with Escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeModal();
+        }
+    });
+</script>
 
 
 <!-- Documents Modal -->
@@ -456,9 +709,8 @@
                 </div>
 
                 <!-- Student Name and ID -->
-                <h2 class="text-xl font-semibold text-gray-800" id="modalStudentName">Jane Smith</h2>
-                <p class="text-gray-600" id="modalStudentId">2023-00002</p>
-
+                <h2 class="text-xl font-semibold text-gray-800" id="modalStudentName"><?= htmlspecialchars($user['full_name'] ?? '') ?></h2>
+                <p class="text-gray-600" id="modalStudentId"><?= htmlspecialchars($user['student_id'] ?? '2023-00002') ?></p>
                 <!-- Student Document Title -->
                 <div class="mt-4 pt-4 border-t border-gray-200 w-full">
                     <h3 class="text-lg font-medium text-gray-700">Student Document</h3>
