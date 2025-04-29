@@ -190,13 +190,6 @@ END //
 
 DELIMITER ;
 
-
-
-
-
-
-
-
 DELIMITER //
 
 CREATE PROCEDURE DeleteUserIfAllowed(IN userId INT)
@@ -205,3 +198,44 @@ BEGIN
 END //
 
 DELIMITER ;
+]
+DELIMITER $$
+
+CREATE PROCEDURE DeleteUserById(IN studentId VARCHAR(255))
+BEGIN
+    DELETE FROM users WHERE student_id = studentId;
+END$$
+
+DELIMITER ;
+
+
+DELIMITER //
+
+CREATE PROCEDURE UpdateUserByStudentID(
+    IN sid VARCHAR(50),
+    IN fname VARCHAR(255),
+    IN addr TEXT,
+    IN stat VARCHAR(50)
+)
+BEGIN
+    UPDATE users
+    SET full_name = fname,
+        address = addr,
+        status = stat
+    WHERE student_id = sid;
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE GetUserByStudentID(IN sid VARCHAR(50))
+BEGIN
+    SELECT student_id, full_name, address, status
+    FROM users
+    WHERE student_id = sid;
+END //
+
+DELIMITER ;
+
+

@@ -21,18 +21,18 @@ if (empty($_POST['id'])) {
     exit();
 }
 
-$student_id = $_POST['id']; // This is the student_id, not converting to int
+$student_id = $_POST['id']; // This is the student_id
 
-// Direct deletion query instead of stored procedure
-$delete_query = "DELETE FROM users WHERE student_id = ?";
-$stmt = $conn->prepare($delete_query);
+// Call stored procedure instead of direct delete query
+$call_query = "CALL DeleteUserById(?)";
+$stmt = $conn->prepare($call_query);
 
 if (!$stmt) {
     header("Location: ../view/adminView.php?message=" . urlencode("Prepare failed: " . $conn->error));
     exit();
 }
 
-$stmt->bind_param("s", $student_id); // Binding as string since student_id is likely a string
+$stmt->bind_param("s", $student_id); // 's' for string
 
 if ($stmt->execute()) {
     // Check if any rows were affected

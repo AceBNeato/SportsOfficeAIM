@@ -25,19 +25,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     try {
-        // Prepare the UPDATE query
-        $sql = "UPDATE users 
-                SET full_name = ?, address = ?, status = ? 
-                WHERE student_id = ?";
-
+        $sql = "CALL UpdateUserByStudentID(?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
+
         if (!$stmt) {
             header("Location: ../view/adminView.php?message=" . urlencode("Prepare failed: " . $conn->error));
             exit();
         }
 
-        // Bind parameters (ssss = all strings)
-        $stmt->bind_param('ssss', $full_name, $address, $status, $student_id);
+// Bind parameters (ssss = all strings)
+        $stmt->bind_param('ssss', $student_id, $full_name, $address, $status);
+
+
 
         // Execute
         if ($stmt->execute()) {

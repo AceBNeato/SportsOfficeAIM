@@ -65,9 +65,11 @@
 <div id="mainContent" class="main-content px-1 sm:px-4 lg:px-0">
     <div class="sticky top-0 z-30 bg-gray w-full px-1 sm:px-4 lg:px-3">
         <div class="border-b-4 border-red-500 px-5 pt-2 pb-1 flex justify-between items-center bg-gray">
+
             <h1 class="text-3xl font-semibold text-gray-900 tracking-tight">
                 <?php echo htmlspecialchars($currentPage); ?>
             </h1>
+
 
             <?php if ($currentPage === 'Users'): ?>
                 <div class="w-full px-4 sm:px-0 flex flex-col items-center sm:items-end space-y-2 sm:space-y-4">
@@ -117,6 +119,7 @@
         <?php endif; ?>
     </div>
 
+
     <?php if ($currentPage === 'Users'): ?>
     <?php
     $conn = new mysqli("localhost", "root", "", "SportOfficeDB");
@@ -145,9 +148,8 @@
     <div class="max-h-[calc(100vh-10rem)] overflow-y-auto overflow-x-hidden scroll-thin">
         <div class="w-full px-4 sm:px-8 lg:px-8 space-y-2">
             <?php foreach ($users as $row): ?>
+
                 <div class="bg-white p-4 rounded-lg shadow-sm space-y-2 sm:space-y-0 sm:grid sm:grid-cols-12 sm:items-center">
-
-
 
                     <div class="text-center text-xl text-gray-600 sm:col-span-1">
                         <button
@@ -206,6 +208,29 @@
         No users found matching your search.
     </div>
     <?php endif; ?>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     <?php elseif ($currentPage === 'Reports'): ?>
@@ -270,10 +295,182 @@
         </div>
 
 
-    <?php else: ?>
+
+
+
+
+    <?php elseif ($currentPage === 'Documents'): ?>
+
+        <style>
+            .student-table {
+                width: 100%;
+                max-width: 800px;
+                margin: 0 auto;
+            }
+
+            .table-header {
+                background-color: #f44336;
+                color: white;
+                text-align: center;
+                padding: 12px 24px;
+                font-weight: bold;
+                border-radius: 6px;
+                display: flex;
+                justify-content: space-between;
+            }
+            .student-card {
+                display: flex;
+                flex-direction: column; /* Mobile first: vertical stack */
+                width: 100%;
+                align-items: center;
+                border: 1px solid #ddd;
+                border-radius: 10px;
+                padding: 10px 20px;
+                margin: 10px auto;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                max-width: 800px;
+                background-color: #fff;
+                gap: 12px; /* Optional spacing between items */
+            }
+
+            @media (min-width: 640px) {
+                .student-card {
+                    flex-direction: row; /* Desktop: horizontal alignment */
+                    align-items: center;
+                    justify-content: flex-start;
+                }
+            }
+
+
+
+            .student-avatar {
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                margin-right: 20px;
+            }
+
+            .student-info {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .student-id {
+                font-weight: bold;
+            }
+
+            .student-name {
+                font-size: 16px;
+            }
+
+            .student-address {
+                font-size: 14px;
+                color: #555;
+            }
+        </style>
+
+
+
+
+
+
+
+        <?php
+            $conn = new mysqli("localhost", "root", "", "SportOfficeDB");
+            if ($conn->connect_error) {
+                die("Connection failed: " . $conn->connect_error);
+            }
+
+            $searchTerm = isset($_GET['search']) ? trim($_GET['search']) : '';
+            $searchTerm = strtolower($searchTerm);
+
+            $stmt = $conn->prepare("CALL SearchUsers(?)");
+            if (!$stmt) {
+                die("Prepare failed: " . $conn->error);
+            }
+
+            $stmt->bind_param("s", $searchTerm);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            $users = $result->fetch_all(MYSQLI_ASSOC);
+            $stmt->close();
+            $conn->close();
+            ?>
+
+        <div class="student-table w-full max-w-6xl px-9 sm:px-6 lg:px-9 mx-auto">
+
+        <!-- Header -->
+        <div class="hidden sm:grid sm:grid-cols-12 bg-red-500 text-white font-semibold rounded-t-lg px-5 py-4 mt-2 mb-4">
+            <div class="col-span-2"></div>
+            <div class="col-span-5">Student ID</div>
+            <div class="col-span-5">Student Name</div>
+        </div>
+
+            <?php if (count($users) > 0): ?>
+            <?php foreach ($users as $user): ?>
+            <!-- Student Card -->
+            <div class="grid grid-cols-12 items-center bg-white shadow-md border rounded-lg px-5 py-4 mb-4">
+                <div class="col-span-12 sm:col-span-2 flex justify-center sm:justify-start mb-2 sm:mb-0">
+                    <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Avatar" class="w-12 h-12 rounded-full">
+                </div>
+                <div class="col-span-12 sm:col-span-5 text-gray-800">
+                    <span class="block sm:hidden text-sm font-semibold text-gray-600">Student ID:</span>
+                    <div class="font-semibold"><?= htmlspecialchars($user['student_id']) ?></div>
+                </div>
+                <div class="col-span-12 sm:col-span-5 text-gray-800">
+                    <span class="block sm:hidden text-sm font-semibold text-gray-600">Name:</span>
+                    <div class="text-base"><?= htmlspecialchars($user['full_name']) ?></div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+
+
+
+            <?php else: ?>
+                <div class="text-center text-gray-500 py-6 font-semibold">
+                    No users found matching your search.
+                </div>
+            <?php endif; ?>
+
+            <?php else: ?>
         <p class="text-center">This is the <?php echo htmlspecialchars($currentPage); ?> content area.</p>
     <?php endif; ?>
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 <!-- Edit Modal - Place this OUTSIDE the loop -->

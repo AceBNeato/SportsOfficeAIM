@@ -10,11 +10,14 @@ if (isset($_GET['student_id'])) {
     $student_id = trim($_GET['student_id']);
 
     try {
-        $stmt = $conn->prepare("SELECT student_id, full_name, address, status FROM users WHERE student_id = :student_id");
+        $stmt = $conn->prepare("CALL GetUserByStudentID(:student_id)");
         $stmt->bindParam(':student_id', $student_id, PDO::PARAM_STR);
         $stmt->execute();
 
+
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt->closeCursor(); // Important when using stored procedures
+
 
         if ($user) {
             echo json_encode([
