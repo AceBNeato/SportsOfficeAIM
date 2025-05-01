@@ -238,4 +238,67 @@ END //
 
 DELIMITER ;
 
+DELIMITER //
+CREATE PROCEDURE AddAdminIfAllowed(
+    IN p_full_name VARCHAR(255),
+    IN p_address VARCHAR(255),
+    IN p_email VARCHAR(255),
+    IN p_password VARCHAR(255),
+    IN p_status ENUM('undergraduate', 'alumni')
+)
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM admins WHERE email = p_email) THEN
+        INSERT INTO admins (full_name, address, email, password, status)
+        VALUES (p_full_name, p_address, p_email, p_password, p_status);
+        SELECT 'Admin added successfully' AS result;
+    ELSE
+        SELECT 'Admin already exists' AS result;
+    END IF;
+END //
+DELIMITER ;
+
+
+DELIMITER //
+CREATE PROCEDURE find_user_by_email(IN user_email VARCHAR(255))
+BEGIN
+    SELECT
+        id, email, password, 'user' AS role, NULL AS first_name, NULL AS last_name
+    FROM users
+    WHERE email = user_email
+
+    UNION
+
+    SELECT
+        id, email, password, 'admin' AS role, NULL AS first_name, NULL AS last_name
+    FROM admins
+    WHERE email = user_email;
+END //
+DELIMITER ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

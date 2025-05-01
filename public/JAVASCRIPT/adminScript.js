@@ -152,12 +152,13 @@ document.addEventListener('DOMContentLoaded', () => {
             closeModal('editUserModal');
             closeModal('documentsModal');
             closeModal('evaluationsModal');
+            closeModal('deleteUserModal')
         }
     });
 
     // Close modals when clicking outside
     window.addEventListener('click', function(event) {
-        ['documentsModal', 'evaluationsModal'].forEach(modalId => {
+        ['documentsModal', 'evaluationsModal', 'deleteUserModal'].forEach(modalId => {
             const modal = document.getElementById(modalId);
             if (modal && event.target === modal) {
                 closeModal(modalId);

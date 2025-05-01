@@ -548,18 +548,6 @@
 </div>
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 <!-- Documents Modal -->
 <div id="documentsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
     <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
@@ -808,12 +796,8 @@
     <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative animate-fadeIn">
 
         <!-- Close Button -->
-        <button
-                onclick="closeDeleteModal()"
-                class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl font-bold"
-                aria-label="Close">
-            &times;
-        </button>
+        <button onclick="document.getElementById('deleteUserModal').classList.add('hidden')" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl font-bold">&times;</button>
+
 
         <h2 class="text-2xl font-bold text-center mb-4">DELETE USER</h2>
 

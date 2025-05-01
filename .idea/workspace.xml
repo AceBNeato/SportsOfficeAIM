@@ -5,10 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="61353cad-d58b-4648-9192-e39f980708fe" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/controller/get_documents.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/controller/logout.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/controller/upload_profile_pic.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/public/CSS/userStyle.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/public/JAVASCRIPT/userScript.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controller/auth.php" beforeDir="false" afterPath="$PROJECT_DIR$/controller/auth.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/store procendure query" beforeDir="false" afterPath="$PROJECT_DIR$/database/store procendure query" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/JAVASCRIPT/adminScript.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/JAVASCRIPT/adminScript.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/JAVASCRIPT/loginScript.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/JAVASCRIPT/loginScript.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/view/adminView.php" beforeDir="false" afterPath="$PROJECT_DIR$/view/adminView.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/view/userView.php" beforeDir="false" afterPath="$PROJECT_DIR$/view/userView.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -87,8 +95,8 @@
       <recent name="C:\Users\Deru\PhpstormProjects\SportsOfficeAIM\sportsofficedb\admin" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\xampp\htdocs\SportsOfficeAIM\database" />
       <recent name="C:\xampp\htdocs\SportsOfficeAIM\view" />
+      <recent name="C:\xampp\htdocs\SportsOfficeAIM\database" />
       <recent name="C:\xampp\htdocs\SportsOfficeAIM" />
       <recent name="C:\xampp\htdocs\SportsOfficeAIM\sportsofficedb\controller" />
       <recent name="C:\xampp\htdocs\SportsOfficeAIM\sportsofficedb" />
@@ -161,7 +169,8 @@
       <workItem from="1745850895872" duration="11327000" />
       <workItem from="1745904471516" duration="20217000" />
       <workItem from="1745939758970" duration="16376000" />
-      <workItem from="1746074709147" duration="8434000" />
+      <workItem from="1746074709147" duration="30466000" />
+      <workItem from="1746114569144" duration="3730000" />
     </task>
     <servers />
   </component>
