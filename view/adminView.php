@@ -86,15 +86,27 @@
                         Add users
                     </button>
 
+                    <!-- Compact Search Form - Far Right Aligned -->
+                    <div class="w-full px-4">
+                        <div class="flex justify-end">
+                            <form method="GET" action="" class="flex items-center gap-2 -mr-2">
+                                <input type="hidden" name="page" value="Users"/>
+                                <input type="text" name="search" placeholder="Search..."
+                                       class="w-40 border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white">
 
-                    <!-- Search Field -->
-                    <form method="GET" action=""
-                          class="sm:self-end w-auto">
-                        <input type="hidden" name="page" value="Users"/>
-                        <input type="text" name="search" placeholder="Search user..."
-                               class="border border-gray-300 rounded px-3 py-1 text-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-400"/>
-                    </form>
+                                <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-lg whitespace-nowrap flex items-center justify-center text-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                    <span class="ml-1 hidden sm:inline">Search</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+
                 </div>
+
             <?php endif; ?>
 
 
@@ -134,9 +146,63 @@
                     <!-- Student Name column -->
                     <div class="col-span-6">Student Name</div>
                 </div>
+
             </div>
+
+            <!-- Search Form - Always Horizontal Layout -->
+            <div class="w-full px-4">
+                <form method="GET" action="" class="flex flex-row items-center gap-2 w-full">
+                    <input type="hidden" name="page" value="Documents"/>
+                    <input type="text" name="search" placeholder="Search Student..."
+                           class="flex-1 min-w-0 border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded whitespace-nowrap flex items-center justify-center">
+                        <span class="hidden sm:inline">Search</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </button>
+                </form>
+            </div>
+
         <?php endif; ?>
+
+
+        <?php if ($currentPage === 'Evaluation'): ?>
+
+            <!-- Search Form - Always Horizontal Layout with Top Spacing -->
+            <div class="w-full px-4 mt-4">  <!-- Added mt-4 for top margin -->
+                <form method="GET" action="" class="flex flex-row items-center gap-2 w-full">
+                    <input type="hidden" name="page" value="Evaluation"/>
+                    <input type="text" name="search" placeholder="Search Student..."
+                           class="flex-1 min-w-0 border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded whitespace-nowrap flex items-center justify-center">
+                        <span class="hidden sm:inline">Search</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </button>
+                </form>
+            </div>
+
+        <?php endif; ?>
+
+
     </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -359,7 +425,8 @@
     $conn->close();
     ?>
 
-        <div class="w-full px-4 sm:px-8 lg:px-25 mx-auto">
+        <div class="w-full px-4 sm:px-8 lg:px-25 mx-auto mt-6">
+
             <?php if (count($users) > 0): ?>
                 <div class="space-y-4">
                     <?php foreach ($users as $user): ?>
@@ -397,28 +464,7 @@
 
 
 
-        <script>
-            function showUserDocuments(studentId, fullName) {
-                const modal = document.getElementById('documentsModal');
-                document.getElementById('modalStudentId').textContent = studentId,fullName;
-                modal.classList.remove('hidden');
 
-                // Here you could also make an AJAX call to fetch specific document status for this user
-                // and update the checkboxes accordingly
-            }
-
-            function closeModal() {
-                document.getElementById('documentsModal').classList.add('hidden');
-            }
-
-            // Close modal when clicking outside of it
-            window.addEventListener('click', function(event) {
-                const modal = document.getElementById('documentsModal');
-                if (event.target === modal) {
-                    closeModal();
-                }
-            });
-        </script>
 
 
     <?php elseif ($currentPage === 'Evaluation'): ?>
@@ -445,130 +491,54 @@
     $conn->close();
     ?>
 
-    <div class="w-full px-4 sm:px-8 lg:px-25 mx-auto">
-        <?php if (count($users) > 0): ?>
-            <div class="space-y-4">
-                <?php foreach ($users as $user): ?>
-                    <div class="userFile cursor-pointer" onclick="showEvaluationModal('<?= $user['student_id'] ?>', '<?= htmlspecialchars($user['full_name']) ?>', 'Medical Certificate')">
-                        <div class="flex items-center bg-white shadow-md rounded-lg px-5 py-4 hover:bg-gray-50 transition-colors duration-200">
-                            <!-- Document Icon -->
-                            <div class="bg-blue-100 p-3 rounded-lg mr-4">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
-                            </div>
+        <div class="w-full px-4 sm:px-8 lg:px-25 mx-auto mt-6">  <!-- Added mt-6 for margin-top -->
+            <?php if (count($users) > 0): ?>
+                <div class="space-y-4">
+                    <?php foreach ($users as $user): ?>
+                        <div class="userFile cursor-pointer" onclick="showEvaluationModal('<?= $user['student_id'] ?>', '<?= htmlspecialchars($user['full_name']) ?>', 'Medical Certificate')">
+                            <div class="flex items-center bg-white shadow-md rounded-lg px-5 py-4 hover:bg-gray-50 transition-colors duration-200">
+                                <!-- Document Icon -->
+                                <div class="bg-blue-100 p-3 rounded-lg mr-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                </div>
 
-                            <div class="flex-grow">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <div class="text-xs font-semibold text-gray-500">Name</div>
-                                        <div class="text-gray-800 font-medium"><?= htmlspecialchars($user['full_name']) ?></div>
-                                    </div>
-                                    <div>
-                                        <div class="text-xs font-semibold text-gray-500">Date of Submission</div>
-                                        <div class="text-gray-800">07-21-2025</div>
+                                <div class="flex-grow">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <div class="text-xs font-semibold text-gray-500">Name</div>
+                                            <div class="text-gray-800 font-medium"><?= htmlspecialchars($user['full_name']) ?></div>
+                                        </div>
+                                        <div>
+                                            <div class="text-xs font-semibold text-gray-500">Date of Submission</div>
+                                            <div class="text-gray-800">07-21-2025</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-        <?php else: ?>
-            <div class="text-center py-10">
-                <div class="text-gray-500 font-semibold mb-2">
-                    No evaluations found
+                    <?php endforeach; ?>
                 </div>
-                <div class="text-sm text-gray-400">
-                    Try adjusting your search criteria
-                </div>
-            </div>
-        <?php endif; ?>
-    </div>
-
-    <!-- Evaluation Modal -->
-    <div id="evaluationsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
-            <div class="p-6 relative">
-                <!-- Close button -->
-                <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-
-                <!-- Student Info Section -->
-                <div class="mb-6">
-                    <!-- Student Name (Large and bold) -->
-                    <h2 id="modalStudentName" class="text-2xl font-bold text-gray-800 mb-1">Christian Doong</h2>
-
-                    <!-- Student ID -->
-                    <p id="modalStudentId" class="text-gray-600 mb-6">2023-00023</p>
-
-                    <!-- Document Type -->
-                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
-                        <div class="text-sm font-medium text-gray-500 mb-1">Document Type</div>
-                        <div id="modalDocumentType" class="text-lg font-semibold text-blue-600">Medical Certificate</div>
+            <?php else: ?>
+                <div class="text-center py-10">
+                    <div class="text-gray-500 font-semibold mb-2">
+                        No evaluations found
                     </div>
-
-                    <!-- Report Section -->
-                    <div class="mb-6">
-                        <div class="text-sm font-medium text-gray-500 mb-2">Report</div>
-                        <textarea class="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" rows="4" placeholder="Enter evaluation notes..."></textarea>
+                    <div class="text-sm text-gray-400">
+                        Try adjusting your search criteria
                     </div>
                 </div>
-
-                <!-- Action Buttons -->
-                <div class="flex justify-end space-x-3">
-                    <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors duration-200 font-medium">
-                        Report
-                    </button>
-                    <button class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-200 font-medium">
-                        Approve
-                    </button>
-                </div>
-            </div>
+            <?php endif; ?>
         </div>
-    </div>
 
-    <script>
-        function showEvaluationModal(studentId, fullName, docType = "Medical Certificate") {
-            const modal = document.getElementById('evaluationsModal');
-            document.getElementById('modalStudentId').textContent = studentId;
-            document.getElementById('modalStudentName').textContent = fullName;
-            document.getElementById('modalDocumentType').textContent = docType;
-            document.body.style.overflow = 'hidden';
-            modal.classList.remove('hidden');
 
-            // Here you could make an AJAX call to fetch evaluation details
-            // fetch(`get_evaluation.php?student_id=${studentId}`)
-            //     .then(response => response.json())
-            //     .then(data => {
-            //         // Update evaluation details in modal
-            //     });
-        }
 
-        function closeModal() {
-            document.getElementById('evaluationsModal').classList.add('hidden');
-            document.body.style.overflow = 'auto';
-        }
 
-        // Close modal when clicking outside of it
-        window.addEventListener('click', function(event) {
-            const modal = document.getElementById('evaluationsModal');
-            if (event.target === modal) {
-                closeModal();
-            }
-        });
 
-        // Close with Escape key
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                closeModal();
-            }
-        });
-    </script>
-   
+
+
+
 
 
 
@@ -590,104 +560,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- Evaluation Modal -->
-<div id="evaluationsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
-        <div class="p-6 relative">
-            <!-- Close button -->
-            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-
-            <!-- Student Info Section -->
-            <div class="mb-6">
-                <!-- Student Name (Large and bold) -->
-                <h2 id="modalStudentName" class="text-2xl font-bold text-gray-800 mb-1">Christian Doong</h2>
-
-                <!-- Student ID -->
-                <p id="modalStudentId" class="text-gray-600 mb-6">2023-00023</p>
-
-                <!-- Document Type -->
-                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
-                    <div class="text-sm font-medium text-gray-500 mb-1">Document Type</div>
-                    <div class="text-lg font-semibold text-blue-600">Medical Certificate</div>
-                </div>
-
-                <!-- Report Section -->
-                <div class="mb-6">
-                    <div class="text-sm font-medium text-gray-500 mb-2">Report</div>
-                    <textarea class="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" rows="4" placeholder="Enter evaluation notes..."></textarea>
-                </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="flex justify-end space-x-3">
-                <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors duration-200 font-medium">
-                    Report
-                </button>
-                <button class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-200 font-medium">
-                    Approve
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-    function showEvaluationModal(studentId, fullName, docType = "Medical Certificate") {
-        const modal = document.getElementById('evaluationsModal');
-        document.getElementById('modalStudentId').textContent = studentId;
-        document.getElementById('modalStudentName').textContent = fullName;
-        document.querySelector('.text-blue-600').textContent = docType;
-        document.body.style.overflow = 'hidden';
-        modal.classList.remove('hidden');
-    }
-
-    function closeModal() {
-        document.getElementById('evaluationsModal').classList.add('hidden');
-        document.body.style.overflow = 'auto';
-    }
-
-    // Close modal when clicking outside
-    window.addEventListener('click', function(event) {
-        const modal = document.getElementById('evaluationsModal');
-        if (event.target === modal) {
-            closeModal();
-        }
-    });
-
-    // Close with Escape key
-    document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') {
-            closeModal();
-        }
-    });
-</script>
-
-
 <!-- Documents Modal -->
 <div id="documentsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
     <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
@@ -699,18 +571,34 @@
                 </svg>
             </button>
 
+
+
             <!-- Centered Student Info Section -->
             <div class="flex flex-col items-center text-center mb-6">
-                <!-- Student Icon -->
-                <div class="bg-blue-100 p-3 rounded-full mb-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
+                <!-- Student Info Row (icon + name + ID) -->
+                <div class="flex items-center gap-4 mb-4">
+                    <!-- Profile Picture Container -->
+                    <div class="bg-blue-100 p-3 rounded-full w-14 h-14 flex items-center justify-center overflow-hidden">
+                        <?php if (!empty($user['profile_picture'])): ?>
+                            <!-- Display uploaded profile picture -->
+                            <img src="<?= htmlspecialchars($user['profile_picture']) ?>"
+                                 alt="Profile Picture"
+                                 class="w-full h-full object-cover rounded-full">
+                        <?php else: ?>
+                            <!-- Fallback to default icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Name and ID -->
+                    <div class="text-left">
+                        <h2 class="text-xl font-semibold text-gray-800" id="modalStudentName"><?= htmlspecialchars($user['full_name'] ?? '') ?></h2>
+                        <p class="text-gray-600" id="modalStudentId"><?= htmlspecialchars($user['student_id'] ?? '2023-00002') ?></p>
+                    </div>
                 </div>
 
-                <!-- Student Name and ID -->
-                <h2 class="text-xl font-semibold text-gray-800" id="modalStudentName"><?= htmlspecialchars($user['full_name'] ?? '') ?></h2>
-                <p class="text-gray-600" id="modalStudentId"><?= htmlspecialchars($user['student_id'] ?? '2023-00002') ?></p>
                 <!-- Student Document Title -->
                 <div class="mt-4 pt-4 border-t border-gray-200 w-full">
                     <h3 class="text-lg font-medium text-gray-700">Student Document</h3>
@@ -771,26 +659,96 @@
     </div>
 </div>
 
-<script>
-    function showUserDocuments(studentId, fullName) {
-        const modal = document.getElementById('documentsModal');
-        document.getElementById('modalStudentId').textContent = studentId;
-        document.getElementById('modalStudentName').textContent = fullName;
-        modal.classList.remove('hidden');
-    }
 
-    function closeModal(modalId) {
-        document.getElementById(modalId).classList.add('hidden');
-    }
 
-    // Close modal when clicking outside of it
-    window.addEventListener('click', function(event) {
-        const modal = document.getElementById('documentsModal');
-        if (event.target === modal) {
-            closeModal('documentsModal');
-        }
-    });
-</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Evaluation Modal -->
+<div id="evaluationsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+        <div class="p-6 relative">
+
+            <!-- Close button -->
+            <button onclick="closeModal('evaluationsModal')" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+
+            <div class="flex flex-col items-center text-center mb-6">
+                <!-- Student Info Row (icon + name + ID) -->
+                <div class="flex items-center gap-4 mb-4">
+                    <!-- Profile Picture Container -->
+                    <div class="bg-blue-100 p-3 rounded-full w-14 h-14 flex items-center justify-center overflow-hidden">
+                        <?php if (!empty($user['profile_picture'])): ?>
+                            <!-- Display uploaded profile picture -->
+                            <img src="<?= htmlspecialchars($user['profile_picture']) ?>"
+                                 alt="Profile Picture"
+                                 class="w-full h-full object-cover rounded-full">
+                        <?php else: ?>
+                            <!-- Fallback to default icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Name and ID -->
+                    <div class="text-left">
+                        <h2 class="text-xl font-semibold text-gray-800" id="modalStudentNames"><?= htmlspecialchars($user['full_name'] ?? '') ?></h2>
+                        <p class="text-gray-600" id="modalStudentIds"><?= htmlspecialchars($user['student_id'] ?? '2023-00002') ?></p>
+                    </div>
+                </div>
+
+                <!-- Student Document Title -->
+                <div class="mt-4 pt-4 border-t border-gray-200 w-full">
+                    <h3 class="text-lg font-medium text-gray-700">Student Document</h3>
+                </div>
+            </div>
+
+            <!-- Student Info Section -->
+            <div class="mb-6">
+
+                <!-- Document Type -->
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+                    <div class="text-sm font-medium text-gray-500 mb-1">Document Type</div>
+                    <div class="text-lg font-semibold text-blue-600">Medical Certificate</div>
+                </div>
+
+
+            </div>
+
+            <div class="flex justify-center space-x-3">
+                <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors duration-200 font-medium">
+                    Reject
+                </button>
+                <button class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-200 font-medium">
+                    Approve
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 
 

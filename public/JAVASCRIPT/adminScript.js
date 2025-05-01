@@ -1,3 +1,9 @@
+
+
+
+
+
+
 // File: public/JAVASCRIPT/adminScript.js
 
 // Utility functions
@@ -16,12 +22,18 @@ function setSidebarCollapsed(collapsed) {
 
 function openModal(modalId) {
     const modal = document.getElementById(modalId);
-    if (modal) modal.classList.remove('hidden');
+    if (modal) {
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
 }
 
 function closeModal(modalId) {
     const modal = document.getElementById(modalId);
-    if (modal) modal.classList.add('hidden');
+    if (modal) {
+        modal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
 }
 
 function togglePasswordVisibility(inputId) {
@@ -56,27 +68,28 @@ let logoutBtn, logoutModal, confirmLogout, cancelLogout;
 let messageModal;
 
 // Unified DOMContentLoaded event
-
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize elements
     sidebar = document.getElementById('sidebar');
     mainContent = document.getElementById('mainContent');
     collapseBoxIcon = document.getElementById('collapseBoxIcon');
-
     logoutBtn = document.getElementById('logoutBtn');
     logoutModal = document.getElementById('logoutModal');
     confirmLogout = document.getElementById('confirmLogout');
     cancelLogout = document.getElementById('cancelLogout');
-
     messageModal = document.getElementById('messageModal');
 
+    // Initialize sidebar state
     let isCollapsed = JSON.parse(localStorage.getItem('sidebarCollapsed')) || false;
     setSidebarCollapsed(isCollapsed);
 
+    // Event listeners
     document.getElementById('collapseBtn')?.addEventListener('click', () => {
         isCollapsed = !isCollapsed;
         setSidebarCollapsed(isCollapsed);
     });
 
+    // Logout functionality
     if (logoutBtn && logoutModal) {
         logoutBtn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -84,31 +97,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         cancelLogout?.addEventListener('click', () => closeModal('logoutModal'));
-
         confirmLogout?.addEventListener('click', () => {
             window.location.href = '../view/loginView.php';
         });
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                closeModal('logoutModal');
-                closeModal('messageModal');
-                closeModal('addUserModal');
-                closeModal('editUserModal');
-            }
-        });
     }
 
+    // Handle URL parameters for modals
     const urlParams = new URLSearchParams(window.location.search);
-
     if (urlParams.has('message') && messageModal) {
         openModal('messageModal');
-
         const okButton = messageModal.querySelector('button');
         if (okButton) {
             okButton.addEventListener('click', () => {
                 closeModal('messageModal');
-
                 if (urlParams.get('reopenAddUser') === '1') {
                     openModal('addUserModal');
                 }
@@ -120,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
         openModal('addUserModal');
     }
 
-    // Replace edit link clicks with opening edit modal
+    // Edit user buttons
     document.querySelectorAll('.edit-user-btn').forEach(button => {
         button.addEventListener('click', (e) => {
             e.preventDefault();
@@ -132,7 +133,73 @@ document.addEventListener('DOMContentLoaded', () => {
             populateEditUserModal(studentId, fullName, address, email, status);
         });
     });
+
+    // Delete user functionality
+    const deleteForm = document.getElementById('deleteUserForm');
+    if (deleteForm) {
+        deleteForm.addEventListener('submit', function(e) {
+            const studentId = document.getElementById('deleteUserId').value;
+            console.log("Submitting form to delete student ID:", studentId);
+        });
+    }
+
+    // Close modals on ESC key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeModal('logoutModal');
+            closeModal('messageModal');
+            closeModal('addUserModal');
+            closeModal('editUserModal');
+            closeModal('documentsModal');
+            closeModal('evaluationsModal');
+        }
+    });
+
+    // Close modals when clicking outside
+    window.addEventListener('click', function(event) {
+        ['documentsModal', 'evaluationsModal'].forEach(modalId => {
+            const modal = document.getElementById(modalId);
+            if (modal && event.target === modal) {
+                closeModal(modalId);
+            }
+        });
+    });
 });
+
+// Document modal functions
+function showUserDocuments(studentId, fullName) {
+    document.getElementById('modalStudentId').textContent = studentId;
+    document.getElementById('modalStudentName').textContent = fullName;
+    openModal('documentsModal');
+}
+
+// Evaluation modal functions
+function showEvaluationModal(studentId, fullName, docType = "Medical Certificate") {
+    document.getElementById('modalStudentIds').textContent = studentId;
+    document.getElementById('modalStudentNames').textContent = fullName;
+    const docTypeElement = document.querySelector('#evaluationsModal .text-blue-600');
+    if (docTypeElement) docTypeElement.textContent = docType;
+    openModal('evaluationsModal');
+}
+
+// Delete user functions
+function confirmDeleteUser(studentId, userId) {
+    document.getElementById('deleteUserId').value = userId;
+    console.log("Setting user ID for deletion:", userId);
+    console.log("Student ID (for reference):", studentId);
+    openModal('deleteUserModal');
+}
+
+
+
+
+
+
+
+
+
+
+
 
 
 function editUserModal(user) {
@@ -149,41 +216,6 @@ function editUserModal(user) {
 function closeEditModal() {
     document.getElementById('editUserModal').classList.add('hidden');
 }
-
-// Function to open modal and pass user ID to the form
-
-function confirmDeleteUser(studentId, userId) {
-    // Use the actual primary key for deletion
-    document.getElementById('deleteUserId').value = userId;
-
-    // Debug to confirm the ID is set
-    console.log("Setting user ID for deletion:", userId);
-    console.log("Student ID (for reference):", studentId);
-
-    // Show the modal
-    document.getElementById('deleteUserModal').classList.remove('hidden');
-}
-function closeDeleteModal() {
-    // Hide the modal
-    document.getElementById('deleteUserModal').classList.add('hidden');
-}
-
-// For debugging, add a submit listener to the form
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('deleteUserForm');
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            // Uncomment this line for debugging only
-            // e.preventDefault();
-
-            const studentId = document.getElementById('deleteUserId').value;
-            console.log("Submitting form to delete student ID:", studentId);
-
-            // Let the form submit normally after logging
-        });
-    }
-});
-
 
 function openEditModal(button) {
     // Fetch data from button attributes
@@ -206,25 +238,3 @@ function openEditModal(button) {
     document.getElementById('editUserModal').classList.remove('hidden');
 }
 
-
-
-    function showUserDocuments(studentId, fullName) {
-    const modal = document.getElementById('documentsModal');
-    document.getElementById('modalStudentId').textContent = studentId;
-    modal.classList.remove('hidden');
-
-    // Here you could also make an AJAX call to fetch specific document status for this user
-    // and update the checkboxes accordingly
-}
-
-    function closeModal() {
-    document.getElementById('documentsModal').classList.add('hidden');
-}
-
-    // Close modal when clicking outside of it
-    window.addEventListener('click', function(event) {
-    const modal = document.getElementById('documentsModal');
-    if (event.target === modal) {
-    closeModal();
-}
-});
