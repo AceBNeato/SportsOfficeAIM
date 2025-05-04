@@ -114,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $query = ($role === 'admin')
         ? "SELECT full_name FROM admins WHERE email = ?"
-        : "SELECT full_name, student_id FROM users WHERE email = ?";
+        : "SELECT full_name, student_id, address FROM users WHERE email = ?";  // Add address here
 
     $stmt = $conn->prepare($query);
     if ($stmt) {
@@ -124,25 +124,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($role === 'admin') {
             $stmt->bind_result($full_name);
         } else {
-            $stmt->bind_result($full_name, $student_id);
+            $stmt->bind_result($full_name, $student_id, $address);  // Add address binding here
         }
 
         $stmt->fetch();
         $stmt->close();
     }
-
     // Secure session configuration
     ini_set('session.cookie_httponly', 1);
     ini_set('session.cookie_secure', 1);
     ini_set('session.cookie_samesite', 'Strict');
     session_regenerate_id(true);
 
-    // Set session data
-    $_SESSION['logged_in'] = true;
     $_SESSION['user'] = [
         'id' => $user['id'],
         'student_id' => $student_id ?? $user['student_id'] ?? null,
+        'address' => $address ?? $user['address'] ?? null,
         'email' => $user['email'],
+        'password' => $user['password'],  // Fixed formatting
         'role' => $role,
         'full_name' => $full_name ?: $user['full_name'] ?? '',
         'last_activity' => time(),

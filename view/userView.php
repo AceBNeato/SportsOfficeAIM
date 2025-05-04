@@ -384,6 +384,21 @@ if (!isset($_SESSION['user'])) {
 </div>
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <!-- Edit Profile Modal -->
 <div id="edit-profile-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
     <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl mx-4 overflow-y-auto max-h-screen">
@@ -394,53 +409,61 @@ if (!isset($_SESSION['user'])) {
                 <div class="relative group mb-4 md:mb-6">
                     <div class="w-24 h-24 md:w-32 md:h-32 rounded-full bg-white/20 overflow-hidden border-4 border-white/30">
                         <div id="modal-profile-initials" class="w-full h-full flex items-center justify-center text-center text-white text-2xl md:text-4xl font-bold">
-                            U
+                            <?php
+                            $initials = '';
+                            if (isset($_SESSION['user']['first_name']) && isset($_SESSION['user']['last_name'])) {
+                                $initials = substr($_SESSION['user']['first_name'], 0, 1) . substr($_SESSION['user']['last_name'], 0, 1);
+                            }
+                            echo $initials ?: 'U';
+                            ?>
                         </div>
-                        <img id="modal-profile-image" src="" alt="Profile" class="w-full h-full object-cover hidden">
+                        <img id="modal-profile-image" src="<?php echo $_SESSION['user']['profile_pic'] ?? ''; ?>" alt="Profile" class="w-full h-full object-cover <?php echo isset($_SESSION['user']['profile_pic']) ? '' : 'hidden'; ?>">
                     </div>
                     <label for="modal-profile-upload" class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-full bg-black/50 cursor-pointer">
                         <span class="text-white text-xs md:text-sm font-medium bg-blue-600 px-2 py-1 rounded">Change Photo</span>
                         <input id="modal-profile-upload" type="file" accept="image/*" class="hidden">
                     </label>
                 </div>
-                <h3 class="text-lg md:text-xl font-semibold mb-1">User1234</h3>
-                <p class="text-blue-100 text-sm md:text-base"><?php echo htmlspecialchars($_SESSION['user']['student_id'] ?? '2025-91721'); ?></p>
+                <h3 class="text-lg md:text-xl font-semibold mb-1"><?php echo htmlspecialchars($_SESSION['user']['full_name'] ?? 'User'); ?></h3>
+                <p class="text-blue-100 text-sm md:text-base"><?php echo htmlspecialchars($_SESSION['user']['student_id'] ?? ''); ?></p>
             </div>
 
             <!-- Form Section - Full width on mobile, 2/3 on desktop -->
-            <div class="p-4 md:p-6 md:w-2/3">
+            <div class="p-4 md:p-6 md:w-4/5 lg:w-3/4 xl:w-2/3">
                 <div class="flex justify-between items-center mb-4 md:mb-6">
                     <h3 class="text-lg md:text-xl font-semibold text-gray-800">Edit Profile</h3>
-                    <button id="close-modal" class="text-gray-500 hover:text-gray-700">
+                    <button onclick="closeModal('edit-profile-modal')" class="text-gray-500 hover:text-gray-700">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
                 </div>
 
-                <form id="profile-edit-form" class="space-y-3 md:space-y-4">
+                <form id="profile-edit-form" class="space-y-3 md:space-y-4" method="post" action="../controller/update_profile.php" enctype="multipart/form-data">
                     <!-- Single column on mobile, two columns on desktop -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                         <!-- Left Column -->
-                        <div class="space-y-3 md:space-y-4">
+
+
+                        <div class="grid grid-cols-1 gap-3 md:gap-4"> <!-- Single column layout -->
                             <div>
                                 <label for="full_name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                                <input type="text" id="full_name" name="full_name" value="User1234"
+                                <input type="text" id="full_name" name="full_name"
+                                       value="<?php echo htmlspecialchars($_SESSION['user']['full_name'] ?? 'N/A'); ?>"
+                                       class="w-full px-3 py-2 md:px-4 md:py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+
+                            <div>
+                                <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                                <input type="text" id="address" name="address"
+                                       value="<?php echo htmlspecialchars($_SESSION['user']['address'] ?? 'N/A'); ?>"
                                        class="w-full px-3 py-2 md:px-4 md:py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                             </div>
 
                             <div>
                                 <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                                <input type="email" id="email" name="email" value="user1234@example.com"
-                                       class="w-64 px-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            </div>
-                        </div>
-
-                        <!-- Right Column -->
-                        <div class="space-y-3 md:space-y-4">
-                            <div>
-                                <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                                <input type="text" id="address" name="address" value="123 Main Street"
+                                <input type="email" id="email" name="email"
+                                       value="<?php echo htmlspecialchars($_SESSION['user']['email'] ?? 'N/A'); ?>"
                                        class="w-full px-3 py-2 md:px-4 md:py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                             </div>
                         </div>
@@ -483,12 +506,16 @@ if (!isset($_SESSION['user'])) {
                         </div>
                     </div>
 
+                    <!-- Hidden field for profile picture path from upload -->
+                    <input type="hidden" id="profile_pic_path" name="profile_pic_path" value="">
+
                     <!-- Footer buttons - Stacked on mobile, side by side on desktop -->
                     <div class="pt-3 md:pt-4 flex flex-col-reverse sm:flex-row justify-end gap-3">
-                        <button type="button" id="cancel-edit"
+                        <button type="button" onclick="closeModal('edit-profile-modal')"
                                 class="px-4 py-2 md:px-5 md:py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
                             Cancel
                         </button>
+
                         <button type="submit"
                                 class="px-4 py-2 md:px-5 md:py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors mb-2 sm:mb-0">
                             Save Changes
@@ -500,46 +527,72 @@ if (!isset($_SESSION['user'])) {
     </div>
 </div>
 
+<!-- JavaScript to handle profile image upload and preview -->
 <script>
-    // Logout modal handling
-    document.getElementById('logoutBtn').addEventListener('click', function(e) {
-        e.preventDefault();
-        document.getElementById('logoutModal').classList.remove('hidden');
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle profile image upload
+        const profileUpload = document.getElementById('modal-profile-upload');
+        const profileImage = document.getElementById('modal-profile-image');
+        const profileInitials = document.getElementById('modal-profile-initials');
+        const profilePicPath = document.getElementById('profile_pic_path');
+
+        if (profileUpload) {
+            profileUpload.addEventListener('change', function(e) {
+                if (e.target.files && e.target.files[0]) {
+                    const reader = new FileReader();
+
+                    reader.onload = function(e) {
+                        profileImage.src = e.target.result;
+                        profileImage.classList.remove('hidden');
+                        profileInitials.classList.add('hidden');
+
+                        // We would normally upload the file to the server here
+                        // and update the hidden field with the path
+                        // For now, we'll just set a placeholder
+                        profilePicPath.value = 'uploaded_image.jpg';
+                    };
+
+                    reader.readAsDataURL(e.target.files[0]);
+                }
+            });
+        }
     });
 
-    document.getElementById('cancelLogout').addEventListener('click', function() {
-        document.getElementById('logoutModal').classList.add('hidden');
-    });
+    // Function to toggle password visibility
+    function togglePassword(inputId) {
+        const passwordInput = document.getElementById(inputId);
+        const eyeIcon = passwordInput.nextElementSibling.querySelector('.eye-icon');
+        const eyeSlashIcon = passwordInput.nextElementSibling.querySelector('.eye-slash-icon');
 
-    // Close edit profile modal
-    document.getElementById('close-modal').addEventListener('click', function() {
-        document.getElementById('edit-profile-modal').classList.add('hidden');
-    });
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            eyeIcon.classList.add('hidden');
+            eyeSlashIcon.classList.remove('hidden');
+        } else {
+            passwordInput.type = 'password';
+            eyeIcon.classList.remove('hidden');
+            eyeSlashIcon.classList.add('hidden');
+        }
+    }
 
-    // Show message modal if there's a message
+    // Function to close modal
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.add('hidden');
+    }
+</script>
+
+
+
     <?php if (isset($_GET['message'])): ?>
     document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('messageModal').classList.remove('hidden');
     });
     <?php endif; ?>
-</script>
 
 
 
-<?php if (isset($_GET['message'])): ?>
 
-    <!-- Message Modal -->
-    <div id="messageModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 hidden">
-        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm animate-fadeIn">
-            <p class="text-center text-lg font-semibold mb-4">
-                <?php echo isset($_GET['message']) ? htmlspecialchars($_GET['message']) : ''; ?>
-            </p>
-            <button class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg w-full"
-                    onclick="document.getElementById('messageModal').classList.add('hidden')">
-                OK
-            </button>
-        </div>
-    </div>
-<?php endif; ?>
+
+
 </body>
 </html>

@@ -213,11 +213,6 @@ function editUserModal(user) {
 
     document.getElementById('editUserModal').classList.remove('hidden');
 }
-
-function closeEditModal() {
-    document.getElementById('editUserModal').classList.add('hidden');
-}
-
 function openEditModal(button) {
     // Fetch data from button attributes
     var studentId = button.getAttribute('data-student-id');

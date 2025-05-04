@@ -5,7 +5,6 @@ function toggleClass(element, className, condition) {
     if (!element) return;
     element.classList.toggle(className, condition);
 }
-
 function setSidebarCollapsed(collapsed) {
     if (!sidebar || !mainContent || !collapseBoxIcon) return;
     toggleClass(sidebar, 'collapsed', collapsed);
@@ -13,8 +12,6 @@ function setSidebarCollapsed(collapsed) {
     collapseBoxIcon.setAttribute('name', collapsed ? 'collapse-vertical' : 'collapse-horizontal');
     localStorage.setItem('sidebarCollapsed', JSON.stringify(collapsed));
 }
-
-
 function openModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
@@ -22,7 +19,6 @@ function openModal(modalId) {
         document.body.style.overflow = 'hidden';
     }
 }
-
 function closeModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
@@ -103,28 +99,6 @@ document.getElementById('profile-upload').addEventListener('change', function(e)
     }
 });
 
-
-function uploadProfileImage(file) {
-    const formData = new FormData();
-    formData.append('profileImage', file);
-
-    fetch('/api/upload-profile', {
-        method: 'POST',
-        body: formData
-    })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Upload successful:', data);
-        })
-        .catch(error => {
-            console.error('Upload error:', error);
-        });
-}
-
-
-
-
-
 document.addEventListener('DOMContentLoaded', function() {
     // Get elements
     const editButton = document.querySelector('.flex.justify-between.items-start button');
@@ -167,8 +141,7 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener('submit', function(e) {
         e.preventDefault();
 
-        // Get form values
-        const student_id = document.getElementById('student-id').value;
+
         const fullName = document.getElementById('full-name').value;
         const email = document.getElementById('email').value;
 
@@ -235,40 +208,6 @@ function togglePassword(fieldId) {
     }
 }
 
-
-
-<!-- JavaScript for Image Preview and Auto-upload -->
-
-    // Preview image before upload
-    function previewImage(input) {
-    if (input.files && input.files[0]) {
-    const reader = new FileReader();
-
-    reader.onload = function(e) {
-    // Show the image preview
-    const imgElement = document.getElementById('modal-profile-image');
-    imgElement.src = e.target.result;
-    imgElement.classList.remove('hidden');
-
-    // Hide the initials
-    document.getElementById('modal-profile-initials').classList.add('hidden');
-
-    // Auto-submit the form
-    document.getElementById('profile-pic-form').submit();
-}
-
-    reader.readAsDataURL(input.files[0]);
-}
-}
-
-    // Show loading state during upload
-    document.getElementById('profile-pic-form').addEventListener('submit', function() {
-    const uploadBtn = document.querySelector('#modal-profile-upload + label span');
-    if (uploadBtn) {
-    uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Uploading...';
-}
-});
-
 // Make sure this is in your existing sidebar collapse/expand logic
 document.getElementById('collapseBtn').addEventListener('click', function() {
     const sidebar = document.getElementById('sidebar');
@@ -297,3 +236,58 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Logout modal handling
+document.getElementById('logoutBtn').addEventListener('click', function(e) {
+    e.preventDefault();
+    document.getElementById('logoutModal').classList.remove('hidden');
+});
+
+document.getElementById('cancelLogout').addEventListener('click', function() {
+    document.getElementById('logoutModal').classList.add('hidden');
+});
+
+// Close edit profile modal
+document.getElementById('close-modal').addEventListener('click', function() {
+    document.getElementById('edit-profile-modal').classList.add('hidden');
+});
+
+
+
+    function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+    modal.classList.add('hidden');
+}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
