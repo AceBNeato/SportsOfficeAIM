@@ -477,11 +477,22 @@ $_SESSION['user']['last_activity'] = time();
                                class="w-96 px-3 py-2 md:px-4 md:py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     </div>
 
+
+
+
+
+
+
+
+
+
                     <div class="pt-3 md:pt-4 flex flex-col-reverse sm:flex-row justify-end gap-3">
                         <div class="relative">
                             <label for="password" class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
                             <div class="relative">
                                 <input type="password" id="password" name="password"
+                                       value="<?php echo htmlspecialchars($_SESSION['user']['password'] ?? 'N/A'); ?>"
+
                                        class="w-full px-3 py-2 md:px-4 md:py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10">
                                 <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700" onclick="togglePassword('password')">
                                     <svg class="h-4 w-4 md:h-5 md:w-5 eye-icon" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
@@ -499,6 +510,8 @@ $_SESSION['user']['last_activity'] = time();
                             <label for="confirm_password" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
                             <div class="relative">
                                 <input type="password" id="confirm_password" name="confirm_password"
+                                       value="<?php echo htmlspecialchars($_SESSION['user']['password'] ?? 'N/A'); ?>"
+
                                        class="w-full px-3 py-2 md:px-4 md:py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10">
                                 <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700" onclick="togglePassword('confirm_password')">
                                     <svg class="h-4 w-4 md:h-5 md:w-5 eye-icon" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
@@ -588,6 +601,68 @@ $_SESSION['user']['last_activity'] = time();
     }
 </script>
 
+<!-- Add this modal at the end of the body tag, before the closing </body> -->
+
+<!-- Success Modal -->
+<div id="success-modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 hidden">
+    <div class="bg-white rounded-lg shadow-lg p-6 max-w-md text-center">
+        <div class="mb-4 flex justify-center">
+            <div class="rounded-full bg-green-100 p-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
+        </div>
+        <h2 class="text-lg font-semibold mb-2">Success!</h2>
+        <p id="success-message" class="text-gray-600 mb-4">Your profile has been updated successfully.</p>
+        <button id="close-success-modal" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors">
+            OK
+        </button>
+    </div>
+</div>
+
+<!-- Add this script at the end of the body tag, before the closing </body> -->
+<script>
+    // Function to show success modal
+    function showSuccessModal(message) {
+        const modal = document.getElementById('success-modal');
+        const messageElement = document.getElementById('success-message');
+
+        if (messageElement && message) {
+            messageElement.textContent = message;
+        }
+
+        if (modal) {
+            modal.classList.remove('hidden');
+        }
+    }
+
+    // Function to close success modal
+    function closeSuccessModal() {
+        const modal = document.getElementById('success-modal');
+        if (modal) {
+            modal.classList.add('hidden');
+        }
+    }
+
+    // Add event listener to close button
+    document.addEventListener('DOMContentLoaded', function() {
+        const closeButton = document.getElementById('close-success-modal');
+        if (closeButton) {
+            closeButton.addEventListener('click', closeSuccessModal);
+        }
+
+        // Check for success message in PHP session
+        <?php if (isset($_SESSION['profile_update_success']) && $_SESSION['profile_update_success'] === true): ?>
+        showSuccessModal(<?php echo json_encode($_SESSION['profile_message'] ?? 'Profile updated successfully.'); ?>);
+        <?php
+        // Clear the message from session so it doesn't show again on refresh
+        unset($_SESSION['profile_update_success']);
+        unset($_SESSION['profile_message']);
+        ?>
+        <?php endif; ?>
+    });
+</script>
 
 
     <?php if (isset($_GET['message'])): ?>

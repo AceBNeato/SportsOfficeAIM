@@ -181,6 +181,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'id' => $id,
         'student_id' => $student_id,
         'email' => $email,
+        'password' => $password,
         'address' => $address,
         'role' => $role,
         'full_name' => $full_name,
