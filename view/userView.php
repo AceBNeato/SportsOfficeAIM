@@ -3,19 +3,15 @@ session_start();
 
 // Check if user is logged in, redirect to login if not
 if (!isset($_SESSION['user'])) {
-    header("Location: ../view/loginView.php");
-    exit;
+    header("Location: loginView.php");
+    exit();
 }
 
-// Only allow regular users (not admins)
-if ($_SESSION['user']['role'] !== 'user') {
-    header("Location: ../view/loginView.php");
-    exit;
-}
-
-// Get current page from query parameter
-$currentPage = isset($_GET['page']) ? $_GET['page'] : 'Dashboard';
+// Get current page from query parameter with security validation
+$allowedPages = ['Dashboard', 'Submissions', 'Track', 'Log-out'];
+$currentPage = isset($_GET['page']) && in_array($_GET['page'], $allowedPages) ? $_GET['page'] : 'Dashboard';
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -149,11 +145,13 @@ $currentPage = isset($_GET['page']) ? $_GET['page'] : 'Dashboard';
                     <!-- Track Card -->
                     <div class="bg-white rounded-lg shadow p-6 relative">
                         <!-- Edit button positioned top right -->
-                        <button class="absolute top-4 right-4 text-gray-500 hover:text-blue-500 transition" onclick="document.getElementById('edit-profile-modal').classList.remove('hidden')">
+                        <button class="absolute top-4 right-4 text-gray-500 hover:text-blue-500 transition"
+                                onclick="window.location.href='?page=Submissions'">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                 <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
                             </svg>
                         </button>
+
 
                         <div class="flex justify-between items-start mb-6">
                             <h2 class="text-xl font-bold">Track</h2>

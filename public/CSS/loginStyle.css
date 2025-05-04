@@ -241,5 +241,17 @@ body, html {
     text-decoration: underline;
 }
 
+.password-container {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
 
 

@@ -36,8 +36,8 @@
                 <input type="email" name="email" placeholder="Email" required autocomplete="email">
 
                 <div class="password-container">
-                    <input type="password" id="password" name="password" placeholder="Enter Password" required autocomplete="new-password">
-                    <i class="bx bx-show toggle-password" onclick="togglePasswordVisibility()"></i>
+                    <input type="password" id="password" name="password" placeholder="Enter Password" required>
+                    <i class="bx bx-show toggle-password" aria-label="Show password" role="button"></i>
                 </div>
 
                 <select name="status" required>

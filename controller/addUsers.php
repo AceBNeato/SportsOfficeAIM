@@ -27,7 +27,8 @@ $full_name = trim($_POST['full_name']);
 $address = trim($_POST['address']);
 $email = trim($_POST['email']);
 $password = $_POST['password'];
-$status = trim($_POST['status']);
+$status = isset($_POST['status']) && !empty(trim($_POST['status'])) ? trim($_POST['status']) : 'User';
+
 $page = isset($_POST['page']) ? trim($_POST['page']) : '';
 $currentPage = isset($_POST['currentPage']) ? trim($_POST['currentPage']) : '';
 

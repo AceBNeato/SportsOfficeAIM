@@ -1,5 +1,41 @@
+<?php
+session_start();
+
+// 1. Check if user is logged in
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    $_SESSION['login_error'] = "      Please log in first";
+    header("Location: ../view/loginView.php");
+    exit;
+}
+
+// 2. Check if user has admin role
+if (!isset($_SESSION['user']['role']) || $_SESSION['user']['role'] !== 'admin') {
+    $_SESSION['login_error'] = "Unauthorized access - Admin privileges required";
+    header("Location: ../view/loginView.php");
+    exit;
+}
+
+// 3. Check session activity timeout (30 minutes)
+if (isset($_SESSION['user']['last_activity']) && (time() - $_SESSION['user']['last_activity'] > 1800)) {
+    session_unset();
+    session_destroy();
+    header("Location: ../view/loginView.php?timeout=1");
+    exit;
+}
+
+// 4. Update last activity time
+$_SESSION['user']['last_activity'] = time();
+
+// Get current page from query parameter
+$currentPage = isset($_GET['page']) ? htmlspecialchars($_GET['page']) : 'Documents';
+?>
+
+
+
 
 <!DOCTYPE html>
+
+
 <html lang="en">
 
 <head>
@@ -829,10 +865,23 @@
         <h2 class="text-lg font-semibold mb-4">Are you sure you want to logout?</h2>
         <div class="flex justify-center gap-4">
             <button id="cancelLogout" class="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400">No</button>
-            <button id="confirmLogout" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Yes</button>
+            <a href="../controller/logout.php" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Yes</a>
         </div>
     </div>
 </div>
+</div>
+
+<script>
+    // Logout confirmation handling
+    document.getElementById('logoutBtn')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('logoutModal').classList.remove('hidden');
+    });
+
+    document.getElementById('cancelLogout')?.addEventListener('click', function() {
+        document.getElementById('logoutModal').classList.add('hidden');
+    });
+</script>
 
 <!-- Add User Modal -->
 <div id="addUserModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50">
