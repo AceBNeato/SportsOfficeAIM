@@ -47,9 +47,10 @@ error_log("Login page loaded. Error message: " . ($errorMessage ?: 'none'));
             margin: 10px 0;
             padding: 10px;
             border-radius: 4px;
-            font-weight: bold;
+            font-weight: bold;  /* Changed from 500 to bold */
         }
     </style>
+
 </head>
 <body>
 <div class="container">
@@ -97,54 +98,5 @@ error_log("Login page loaded. Error message: " . ($errorMessage ?: 'none'));
         </div>
     </div>
 </div>
-
-<script>
-    // Add this to help debug login issues
-    console.log('Login page loaded');
-
-    function validateForm(event) {
-        console.log('Form submission attempted');
-        const email = document.querySelector('input[name="email"]').value;
-        const password = document.querySelector('input[name="password"]').value;
-        const errorDiv = document.getElementById('error-messages');
-
-        let isValid = true;
-        let errorMessages = [];
-
-        // Validate email
-        if (!email || !email.includes('@')) {
-            errorMessages.push('Please enter a valid email address');
-            isValid = false;
-        }
-
-        // Validate password
-        if (!password || password.length < 8) {
-            errorMessages.push('Password must be at least 8 characters');
-            isValid = false;
-        }
-
-        if (!isValid) {
-            errorDiv.innerHTML = errorMessages.join('<br>');
-            errorDiv.hidden = false;
-            event.preventDefault();
-            return false;
-        }
-
-        console.log('Form validated successfully');
-        return true;
-    }
-
-    // Toggle password visibility
-    document.querySelector('.toggle-password').addEventListener('click', function() {
-        const passwordInput = document.getElementById('password');
-        if (passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-            this.classList.replace('bx-show', 'bx-hide');
-        } else {
-            passwordInput.type = 'password';
-            this.classList.replace('bx-hide', 'bx-show');
-        }
-    });
-</script>
 </body>
 </html>
