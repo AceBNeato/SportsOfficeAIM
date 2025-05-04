@@ -276,7 +276,32 @@ END //
 DELIMITER ;
 
 
+DELIMITER //
 
+DROP PROCEDURE IF EXISTS find_user_by_email //
+
+CREATE PROCEDURE find_user_by_email(IN user_email VARCHAR(255))
+BEGIN
+    -- First check in admins table
+    SELECT
+        id, email, password, 'admin' AS role, full_name, address
+    FROM
+        admins
+    WHERE
+        email = user_email
+
+    UNION
+
+    -- Then check in users table
+    SELECT
+        id, email, password, 'user' AS role, full_name, address
+    FROM
+        users
+    WHERE
+        email = user_email;
+END //
+
+DELIMITER ;
 
 
 

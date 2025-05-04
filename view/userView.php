@@ -456,52 +456,26 @@ $_SESSION['user']['last_activity'] = time();
 
                 <form id="profile-edit-form" class="space-y-3 md:space-y-4" method="post" action="../controller/update_profile.php" enctype="multipart/form-data">
                     <!-- Single column on mobile, two columns on desktop -->
+                    <div>
+                        <label for="full_name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                        <input type="text" id="full_name" name="full_name"
+                               value="<?php echo htmlspecialchars($_SESSION['user']['full_name'] ?? 'N/A'); ?>"
+                               class="w-96 px-3 py-2 md:px-4 md:py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
 
-                            <div>
-                                <label for="full_name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                                <input type="text" id="full_name" name="full_name"
-                                       value="<?php echo htmlspecialchars($_SESSION['user']['full_name'] ?? 'N/A'); ?>"
-                                       class="w-96 px-3 py-2 md:px-4 md:py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" id="email" name="email"
+                               value="<?php echo htmlspecialchars($_SESSION['user']['email'] ?? 'N/A'); ?>"
+                               class="w-96 px-3 py-2 md:px-4 md:py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
 
-                            <div>
-                                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                                <input type="email" id="email" name="email"
-                                   value="<?php echo htmlspecialchars($_SESSION['user']['email'] ?? 'N/A'); ?>"
-                                   class="w-96 px-3 py-2 md:px-4 md:py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            </div>
-
-                            <div>
-                                <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                                <input type="text" id="address" name="address"
-                                       value="<?php echo htmlspecialchars($_SESSION['user']['address'] ?? 'N/A'); ?>"
-                                       class="w-96 px-3 py-2 md:px-4 md:py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                    <div>
+                        <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                        <input type="text" id="address" name="address"
+                               value="<?php echo htmlspecialchars($_SESSION['user']['address'] ?? 'N/A'); ?>"
+                               class="w-96 px-3 py-2 md:px-4 md:py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
 
                     <div class="pt-3 md:pt-4 flex flex-col-reverse sm:flex-row justify-end gap-3">
                         <div class="relative">
@@ -539,12 +513,9 @@ $_SESSION['user']['last_activity'] = time();
                         </div>
                     </div>
 
-
-                    <!-- Hidden field for profile picture path from upload -->
-                    <input type="hidden" id="profile_pic_path" name="profile_pic_path" value="">
-
-
-
+                    <!-- Remove the hidden profile_pic_path field which isn't working correctly -->
+                    <!-- Instead, use the file input directly in the form submission -->
+                    <!-- Hidden file input will be added by JavaScript -->
 
                     <div class="pt-3 md:pt-4 flex flex-col-reverse sm:flex-row justify-end gap-3">
                         <button type="button" onclick="closeModal('edit-profile-modal')"
@@ -557,11 +528,6 @@ $_SESSION['user']['last_activity'] = time();
                             Save Changes
                         </button>
                     </div>
-
-
-
-
-
                 </form>
             </div>
         </div>
