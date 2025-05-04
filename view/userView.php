@@ -405,8 +405,9 @@ if (!isset($_SESSION['user'])) {
         <!-- Flex direction changes based on screen size -->
         <div class="flex flex-col md:flex-row">
             <!-- Profile Picture Section - Full width on mobile, 1/3 on desktop -->
+            <!-- Profile Picture Section -->
             <div class="bg-blue-600 text-white p-6 md:w-1/3 flex flex-col items-center justify-center">
-                <div class="relative group mb-4 md:mb-6">
+                <div class="relative group mb-6">
                     <div class="w-24 h-24 md:w-32 md:h-32 rounded-full bg-white/20 overflow-hidden border-4 border-white/30">
                         <div id="modal-profile-initials" class="w-full h-full flex items-center justify-center text-center text-white text-2xl md:text-4xl font-bold">
                             <?php
@@ -420,12 +421,12 @@ if (!isset($_SESSION['user'])) {
                         <img id="modal-profile-image" src="<?php echo $_SESSION['user']['profile_pic'] ?? ''; ?>" alt="Profile" class="w-full h-full object-cover <?php echo isset($_SESSION['user']['profile_pic']) ? '' : 'hidden'; ?>">
                     </div>
                     <label for="modal-profile-upload" class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-full bg-black/50 cursor-pointer">
-                        <span class="text-white text-xs md:text-sm font-medium bg-blue-600 px-2 py-1 rounded">Change Photo</span>
+                        <span class="text-white text-sm font-medium bg-blue-600 px-2 py-1 rounded">Change Photo</span>
                         <input id="modal-profile-upload" type="file" accept="image/*" class="hidden">
                     </label>
                 </div>
-                <h3 class="text-lg md:text-xl font-semibold mb-1"><?php echo htmlspecialchars($_SESSION['user']['full_name'] ?? 'User'); ?></h3>
-                <p class="text-blue-100 text-sm md:text-base"><?php echo htmlspecialchars($_SESSION['user']['student_id'] ?? ''); ?></p>
+                <h3 class="text-xl font-semibold mb-1 text-center break-words"><?php echo htmlspecialchars($_SESSION['user']['full_name'] ?? 'User'); ?></h3>
+                <p class="text-blue-100 text-base text-center break-words"><?php echo htmlspecialchars($_SESSION['user']['student_id'] ?? ''); ?></p>
             </div>
 
             <!-- Form Section - Full width on mobile, 2/3 on desktop -->
@@ -441,36 +442,54 @@ if (!isset($_SESSION['user'])) {
 
                 <form id="profile-edit-form" class="space-y-3 md:space-y-4" method="post" action="../controller/update_profile.php" enctype="multipart/form-data">
                     <!-- Single column on mobile, two columns on desktop -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-                        <!-- Left Column -->
 
-
-                        <div class="grid grid-cols-1 gap-3 md:gap-4"> <!-- Single column layout -->
                             <div>
                                 <label for="full_name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
                                 <input type="text" id="full_name" name="full_name"
                                        value="<?php echo htmlspecialchars($_SESSION['user']['full_name'] ?? 'N/A'); ?>"
-                                       class="w-full px-3 py-2 md:px-4 md:py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                       class="w-96 px-3 py-2 md:px-4 md:py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+
+                            <div>
+                                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                <input type="email" id="email" name="email"
+                                   value="<?php echo htmlspecialchars($_SESSION['user']['email'] ?? 'N/A'); ?>"
+                                   class="w-96 px-3 py-2 md:px-4 md:py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                             </div>
 
                             <div>
                                 <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
                                 <input type="text" id="address" name="address"
                                        value="<?php echo htmlspecialchars($_SESSION['user']['address'] ?? 'N/A'); ?>"
-                                       class="w-full px-3 py-2 md:px-4 md:py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                       class="w-96 px-3 py-2 md:px-4 md:py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                             </div>
 
-                            <div>
-                                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                                <input type="email" id="email" name="email"
-                                       value="<?php echo htmlspecialchars($_SESSION['user']['email'] ?? 'N/A'); ?>"
-                                       class="w-full px-3 py-2 md:px-4 md:py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- Password fields - Stacked on mobile, side by side on desktop -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 pt-2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    <div class="pt-3 md:pt-4 flex flex-col-reverse sm:flex-row justify-end gap-3">
                         <div class="relative">
                             <label for="password" class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
                             <div class="relative">
@@ -506,21 +525,29 @@ if (!isset($_SESSION['user'])) {
                         </div>
                     </div>
 
+
                     <!-- Hidden field for profile picture path from upload -->
                     <input type="hidden" id="profile_pic_path" name="profile_pic_path" value="">
 
-                    <!-- Footer buttons - Stacked on mobile, side by side on desktop -->
+
+
+
                     <div class="pt-3 md:pt-4 flex flex-col-reverse sm:flex-row justify-end gap-3">
                         <button type="button" onclick="closeModal('edit-profile-modal')"
-                                class="px-4 py-2 md:px-5 md:py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+                                class="w-full sm:w-auto px-4 py-2 md:px-5 md:py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
                             Cancel
                         </button>
 
                         <button type="submit"
-                                class="px-4 py-2 md:px-5 md:py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors mb-2 sm:mb-0">
+                                class="w-full sm:w-auto px-4 py-2 md:px-5 md:py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
                             Save Changes
                         </button>
                     </div>
+
+
+
+
+
                 </form>
             </div>
         </div>
