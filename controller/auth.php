@@ -108,50 +108,96 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     unset($_SESSION['login_attempts']);
     unset($_SESSION['last_login_attempt']);
 
-    // Get user details
+    // Normalize role value
     $role = strtolower(trim($user['role'] ?? 'user'));
-    $full_name = '';
 
-    $query = ($role === 'admin')
-        ? "SELECT full_name FROM admins WHERE email = ?"
-        : "SELECT full_name, student_id, address FROM users WHERE email = ?";  // Add address here
-
-    $stmt = $conn->prepare($query);
-    if ($stmt) {
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-
-        if ($role === 'admin') {
-            $stmt->bind_result($full_name);
-        } else {
-            $stmt->bind_result($full_name, $student_id, $address);  // Add address binding here
+    // Get user details based on role
+    if ($role === 'admin') {
+        $query = "SELECT id, full_name, address, email FROM admins WHERE email = ?";
+        $stmt = $conn->prepare($query);
+        if (!$stmt) {
+            error_log("Database error: " . $conn->error);
+            $_SESSION['login_error'] = "System error. Please try again later.";
+            header("Location: ../view/loginView.php");
+            exit;
         }
 
-        $stmt->fetch();
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $user_details = $result->fetch_assoc();
         $stmt->close();
+
+        if (!$user_details) {
+            $_SESSION['login_error'] = "Admin account error. Please contact support.";
+            header("Location: ../view/loginView.php");
+            exit;
+        }
+
+        $full_name = $user_details['full_name'];
+        $address = $user_details['address'];
+        $id = $user_details['id'];
+        $student_id = null;
+    } else {
+        // Query for regular user
+        $query = "SELECT id, student_id, full_name, address, email FROM users WHERE email = ?";
+        $stmt = $conn->prepare($query);
+        if (!$stmt) {
+            error_log("Database error: " . $conn->error);
+            $_SESSION['login_error'] = "System error. Please try again later.";
+            header("Location: ../view/loginView.php");
+            exit;
+        }
+
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $user_details = $result->fetch_assoc();
+        $stmt->close();
+
+        if (!$user_details) {
+            $_SESSION['login_error'] = "User account error. Please contact support.";
+            header("Location: ../view/loginView.php");
+            exit;
+        }
+
+        $full_name = $user_details['full_name'];
+        $address = $user_details['address'];
+        $id = $user_details['id'];
+        $student_id = $user_details['student_id'];
     }
+
     // Secure session configuration
     ini_set('session.cookie_httponly', 1);
-    ini_set('session.cookie_secure', 1);
+    if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
+        ini_set('session.cookie_secure', 1);
+    }
     ini_set('session.cookie_samesite', 'Strict');
     session_regenerate_id(true);
 
+    // Set the session variables
+    $_SESSION['logged_in'] = true;
     $_SESSION['user'] = [
-        'id' => $user['id'],
-        'student_id' => $student_id ?? $user['student_id'] ?? null,
-        'address' => $address ?? $user['address'] ?? null,
-        'email' => $user['email'],
-        'password' => $user['password'],  // Fixed formatting
+        'id' => $id,
+        'student_id' => $student_id,
+        'email' => $email,
+        'address' => $address,
         'role' => $role,
-        'full_name' => $full_name ?: $user['full_name'] ?? '',
+        'full_name' => $full_name,
         'last_activity' => time(),
         'ip_address' => $_SERVER['REMOTE_ADDR'],
         'user_agent' => $_SERVER['HTTP_USER_AGENT']
     ];
 
+    // Debug log
+    error_log("User logged in - Email: $email, Role: $role, Redirecting to: " . ($role === 'admin' ? 'adminView.php' : 'userView.php'));
+
     // Redirect based on role
-    $redirect = ($role === 'admin') ? '../view/adminView.php' : '../view/userView.php';
-    header("Location: $redirect");
+    if ($role === 'admin') {
+        header("Location: ../view/adminView.php");
+    } else {
+        header("Location: ../view/userView.php");
+    }
     exit;
 }
 
