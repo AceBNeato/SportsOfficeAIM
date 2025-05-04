@@ -484,16 +484,14 @@ $_SESSION['user']['last_activity'] = time();
 
 
 
-
-
                     <div class="pt-3 md:pt-4 flex flex-col-reverse sm:flex-row justify-end gap-3">
                         <div class="relative">
                             <label for="password" class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
                             <div class="relative">
                                 <input type="password" id="password" name="password"
-                                       value="<?php echo htmlspecialchars($_SESSION['user']['password'] ?? 'N/A'); ?>"
-
-                                       class="w-full px-3 py-2 md:px-4 md:py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10">
+                                       value=""
+                                       class="w-full px-3 py-2 md:px-4 md:py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10"
+                                       placeholder="Enter new password">
                                 <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700" onclick="togglePassword('password')">
                                     <svg class="h-4 w-4 md:h-5 md:w-5 eye-icon" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -510,9 +508,9 @@ $_SESSION['user']['last_activity'] = time();
                             <label for="confirm_password" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
                             <div class="relative">
                                 <input type="password" id="confirm_password" name="confirm_password"
-                                       value="<?php echo htmlspecialchars($_SESSION['user']['password'] ?? 'N/A'); ?>"
-
-                                       class="w-full px-3 py-2 md:px-4 md:py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10">
+                                       value=""
+                                       class="w-full px-3 py-2 md:px-4 md:py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10"
+                                       placeholder="Confirm password">
                                 <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700" onclick="togglePassword('confirm_password')">
                                     <svg class="h-4 w-4 md:h-5 md:w-5 eye-icon" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />

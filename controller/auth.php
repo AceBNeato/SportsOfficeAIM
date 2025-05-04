@@ -113,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Get user details based on role
     if ($role === 'admin') {
-        $query = "SELECT id, full_name, address, email FROM admins WHERE email = ?";
+        $query = "SELECT id, full_name, address, email, password FROM admins WHERE email = ?";
         $stmt = $conn->prepare($query);
         if (!$stmt) {
             error_log("Database error: " . $conn->error);
@@ -140,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $student_id = null;
     } else {
         // Query for regular user
-        $query = "SELECT id, student_id, full_name, address, email FROM users WHERE email = ?";
+        $query = "SELECT id, student_id, full_name, address, email,password FROM users WHERE email = ?";
         $stmt = $conn->prepare($query);
         if (!$stmt) {
             error_log("Database error: " . $conn->error);
@@ -165,6 +165,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $address = $user_details['address'];
         $id = $user_details['id'];
         $student_id = $user_details['student_id'];
+        $password = $user_details['password'];
     }
 
     // Secure session configuration
