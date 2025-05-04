@@ -15,7 +15,6 @@ function setSidebarCollapsed(collapsed) {
 }
 
 
-
 function openModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
@@ -35,6 +34,7 @@ function closeModal(modalId) {
 // DOM elements
 let sidebar, mainContent, collapseBoxIcon;
 let logoutBtn, logoutModal, confirmLogout, cancelLogout;
+let messageModal;
 
 // Unified DOMContentLoaded event
 document.addEventListener('DOMContentLoaded', () => {
@@ -46,30 +46,15 @@ document.addEventListener('DOMContentLoaded', () => {
     logoutModal = document.getElementById('logoutModal');
     confirmLogout = document.getElementById('confirmLogout');
     cancelLogout = document.getElementById('cancelLogout');
-
-    // Set initial state - collapsed
-    const isCollapsed = localStorage.getItem('sidebarCollapsed') !== 'false';
-    setSidebarState(isCollapsed);
-
-    // Toggle function
-    collapseBtn.addEventListener('click', function() {
-        const currentlyCollapsed = sidebar.classList.contains('collapsed');
-        setSidebarState(!currentlyCollapsed);
+    messageModal = document.getElementById('messageModal');
+    // Initialize sidebar state
+    let isCollapsed = JSON.parse(localStorage.getItem('sidebarCollapsed')) || false;
+    setSidebarCollapsed(isCollapsed);
+    // Event listeners
+    document.getElementById('collapseBtn')?.addEventListener('click', () => {
+        isCollapsed = !isCollapsed;
+        setSidebarCollapsed(isCollapsed);
     });
-
-    function setSidebarState(collapsed) {
-        if (collapsed) {
-            sidebar.classList.add('collapsed');
-            mainContent.classList.add('collapsed');
-            collapseBoxIcon.setAttribute('name', 'expand-horizontal');
-            localStorage.setItem('sidebarCollapsed', 'true');
-        } else {
-            sidebar.classList.remove('collapsed');
-            mainContent.classList.remove('collapsed');
-            collapseBoxIcon.setAttribute('name', 'collapse-horizontal');
-            localStorage.setItem('sidebarCollapsed', 'false');
-        }
-    }
 
     // Logout functionality
     if (logoutBtn && logoutModal) {
@@ -183,10 +168,12 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
 
         // Get form values
+        const student_id = document.getElementById('student-id').value;
         const fullName = document.getElementById('full-name').value;
         const email = document.getElementById('email').value;
 
         // Update the profile card with new values
+        document.querySelector('.font-semibold:contains("0000-00000")').textContent = studentId;
         document.querySelector('.font-semibold:contains("User1234")').textContent = fullName;
         document.querySelector('.font-semibold:contains("user1234@example.com")').textContent = email;
 
@@ -280,4 +267,33 @@ function togglePassword(fieldId) {
     if (uploadBtn) {
     uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Uploading...';
 }
+});
+
+// Make sure this is in your existing sidebar collapse/expand logic
+document.getElementById('collapseBtn').addEventListener('click', function() {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.toggle('collapsed');
+
+    // Update the collapse icon
+    const collapseIcon = document.getElementById('collapseBoxIcon');
+    if (sidebar.classList.contains('collapsed')) {
+        collapseIcon.setAttribute('name', 'expand-horizontal');
+    } else {
+        collapseIcon.setAttribute('name', 'collapse-horizontal');
+    }
+});
+
+// This ensures the tooltips work even if JavaScript loads late
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebar = document.getElementById('sidebar');
+    const menuItems = document.querySelectorAll('.menu-item');
+
+    // Initialize based on current state
+    if (sidebar.classList.contains('collapsed')) {
+        menuItems.forEach(item => {
+            const text = item.querySelector('.menu-text');
+            text.style.opacity = '0';
+            text.style.transform = 'translateX(-20px)';
+        });
+    }
 });

@@ -6,11 +6,9 @@ if (!isset($_SESSION['user'])) {
     header("Location: loginView.php");
     exit();
 }
-
-// Get current page from query parameter with security validation
-$allowedPages = ['Dashboard', 'Submissions', 'Track', 'Log-out'];
-$currentPage = isset($_GET['page']) && in_array($_GET['page'], $allowedPages) ? $_GET['page'] : 'Dashboard';
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -28,6 +26,21 @@ $currentPage = isset($_GET['page']) && in_array($_GET['page'], $allowedPages) ? 
 </head>
 
 <body class="flex h-screen w-full relative bg-gray-100">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <!-- Sidebar -->
 <div id="sidebar" class="sidebar">
     <div class="flex flex-col items-center mt-6 space-y-4">
@@ -39,6 +52,10 @@ $currentPage = isset($_GET['page']) && in_array($_GET['page'], $allowedPages) ? 
 
         <nav class="space-y-2 w-full px-2 mt-4">
             <?php
+
+            // Get current page from query parameter with security validation
+
+            $currentPage = isset($_GET['page']) ? $_GET['page'] : 'Dashboard';
             $menu = ['Dashboard', 'Submissions', 'Track', 'Log-out'];
             $icon = [
                 'Dashboard' => "<box-icon type='solid' name='Dashboard' color='white'></box-icon>",
@@ -62,15 +79,37 @@ $currentPage = isset($_GET['page']) && in_array($_GET['page'], $allowedPages) ? 
         </nav>
     </div>
 
-    <!-- Collapse Button -->
+
     <!-- Collapse Button - Now only visible on desktop -->
-    <div class="w-full px-2 mb-4 desktop-only">
+    <div class="w-full px-2 mb-4 desktop-only hidden md:block">
         <button id="collapseBtn" class="menu-item w-full focus:outline-none">
             <box-icon id="collapseBoxIcon" name='collapse-horizontal' color='white'></box-icon>
             <span class="menu-text">Collapse Sidebar</span>
         </button>
     </div>
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <!-- Main Content -->
 <div id="mainContent" class="main-content px-1 sm:px-4 lg:px-0">
@@ -115,17 +154,15 @@ $currentPage = isset($_GET['page']) && in_array($_GET['page'], $allowedPages) ? 
                             <div class="space-y-4 flex-1">
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <p class="text-sm text-gray-500">ID Number</p>
-                                        <p class="font-semibold"><?php echo htmlspecialchars($_SESSION['user']['id_number'] ?? 'N/A'); ?></p>
+                                        <p class="text-sm text-gray-500">Student ID </p>
+                                        <p class="font-semibold"><?php echo htmlspecialchars($_SESSION['user']['student_id'] ?? 'N/A'); ?></p>
                                     </div>
                                     <div>
                                         <p class="text-sm text-gray-500">Full Name</p>
                                         <p class="font-semibold">
                                             <?php
                                             echo htmlspecialchars(
-                                                ($_SESSION['user']['first_name'] ?? '') . ' ' .
-                                                ($_SESSION['user']['last_name'] ?? '')
-                                            );
+                                                ($_SESSION['user']['full_name'] ?? 'N/A'));
                                             ?>
                                         </p>
                                     </div>
@@ -140,6 +177,49 @@ $currentPage = isset($_GET['page']) && in_array($_GET['page'], $allowedPages) ? 
                             </div>
                         </div>
                     </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
                     <!-- Track Card -->
@@ -200,6 +280,80 @@ $currentPage = isset($_GET['page']) && in_array($_GET['page'], $allowedPages) ? 
                 </div>
             </div>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         <?php elseif ($currentPage === 'Submissions'): ?>
             <!-- Submissions content would go here -->
             <div class="p-4">
@@ -250,7 +404,7 @@ $currentPage = isset($_GET['page']) && in_array($_GET['page'], $allowedPages) ? 
                     </label>
                 </div>
                 <h3 class="text-lg md:text-xl font-semibold mb-1">User1234</h3>
-                <p class="text-blue-100 text-sm md:text-base">2025-91721</p>
+                <p class="text-blue-100 text-sm md:text-base"><?php echo htmlspecialchars($_SESSION['user']['student_id'] ?? '2025-91721'); ?></p>
             </div>
 
             <!-- Form Section - Full width on mobile, 2/3 on desktop -->
@@ -369,5 +523,23 @@ $currentPage = isset($_GET['page']) && in_array($_GET['page'], $allowedPages) ? 
     });
     <?php endif; ?>
 </script>
+
+
+
+<?php if (isset($_GET['message'])): ?>
+
+    <!-- Message Modal -->
+    <div id="messageModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 hidden">
+        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm animate-fadeIn">
+            <p class="text-center text-lg font-semibold mb-4">
+                <?php echo isset($_GET['message']) ? htmlspecialchars($_GET['message']) : ''; ?>
+            </p>
+            <button class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg w-full"
+                    onclick="document.getElementById('messageModal').classList.add('hidden')">
+                OK
+            </button>
+        </div>
+    </div>
+<?php endif; ?>
 </body>
 </html>

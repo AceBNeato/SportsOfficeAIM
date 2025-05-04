@@ -5,16 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="61353cad-d58b-4648-9192-e39f980708fe" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/controller/check_auth.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controller/addUsers.php" beforeDir="false" afterPath="$PROJECT_DIR$/controller/addUsers.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/controller/auth.php" beforeDir="false" afterPath="$PROJECT_DIR$/controller/auth.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controller/logout.php" beforeDir="false" afterPath="$PROJECT_DIR$/controller/logout.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/CSS/loginStyle.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/CSS/loginStyle.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/CSS/signup.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/CSS/signup.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/CSS/userStyle.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/CSS/userStyle.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/JAVASCRIPT/loginScript.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/JAVASCRIPT/loginScript.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/view/adminView.php" beforeDir="false" afterPath="$PROJECT_DIR$/view/adminView.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/view/loginView.php" beforeDir="false" afterPath="$PROJECT_DIR$/view/loginView.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/JAVASCRIPT/userScript.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/JAVASCRIPT/userScript.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/view/signupView.php" beforeDir="false" afterPath="$PROJECT_DIR$/view/signupView.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/view/userView.php" beforeDir="false" afterPath="$PROJECT_DIR$/view/userView.php" afterDir="false" />
     </list>
@@ -95,11 +90,11 @@
       <recent name="C:\Users\Deru\PhpstormProjects\SportsOfficeAIM\sportsofficedb\admin" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\xampp\htdocs\SportsOfficeAIM" />
+      <recent name="C:\xampp\htdocs\SportsOfficeAIM\view\view" />
       <recent name="C:\xampp\htdocs\SportsOfficeAIM\view" />
       <recent name="C:\xampp\htdocs\SportsOfficeAIM\database" />
-      <recent name="C:\xampp\htdocs\SportsOfficeAIM" />
       <recent name="C:\xampp\htdocs\SportsOfficeAIM\sportsofficedb\controller" />
-      <recent name="C:\xampp\htdocs\SportsOfficeAIM\sportsofficedb" />
     </key>
   </component>
   <component name="SharedIndexes">
@@ -173,6 +168,7 @@
       <workItem from="1746114569144" duration="3730000" />
       <workItem from="1746284652225" duration="1710000" />
       <workItem from="1746286479451" duration="7812000" />
+      <workItem from="1746346564688" duration="9439000" />
     </task>
     <servers />
   </component>

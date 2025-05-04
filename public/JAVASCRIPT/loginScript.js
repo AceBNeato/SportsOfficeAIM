@@ -31,6 +31,7 @@ function validateForm(event) {
 
     const errors = [];
 
+    // Email validation
     if (!emailInput.value.trim()) {
         errors.push('Please enter your email');
         emailInput.classList.add('error');
@@ -41,13 +42,19 @@ function validateForm(event) {
         emailInput.classList.remove('error');
     }
 
-    if (!passwordInput.value.trim()) {
+    // Password validation
+    const passwordValue = passwordInput.value.trim();
+    if (!passwordValue) {
         errors.push('Please enter your password');
+        passwordInput.classList.add('error');
+    } else if (passwordValue.length < 8) {
+        errors.push('Password must be at least 8 characters long');
         passwordInput.classList.add('error');
     } else {
         passwordInput.classList.remove('error');
     }
 
+    // Display errors if any
     if (errors.length > 0) {
         if (errorContainer) {
             errorContainer.hidden = false;
@@ -82,3 +89,9 @@ document.addEventListener('DOMContentLoaded', () => {
         toggleButton.setAttribute('role', 'button');
     }
 });
+
+document.getElementById('messageModal').style.display = 'block';
+
+function closeModal() {
+    document.getElementById('messageModal').style.display = 'none';
+}
