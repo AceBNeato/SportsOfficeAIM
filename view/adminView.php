@@ -1,37 +1,3 @@
-<?php
-session_start();
-
-// 1. Check if user is logged in
-if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-    $_SESSION['login_error'] = "      Please log in first";
-    header("Location: ../view/loginView.php");
-    exit;
-}
-
-// 2. Check if user has admin role
-if (!isset($_SESSION['user']['role']) || $_SESSION['user']['role'] !== 'admin') {
-    $_SESSION['login_error'] = "Unauthorized access - Admin privileges required";
-    header("Location: ../view/loginView.php");
-    exit;
-}
-
-// 3. Check session activity timeout (30 minutes)
-if (isset($_SESSION['user']['last_activity']) && (time() - $_SESSION['user']['last_activity'] > 1800)) {
-    session_unset();
-    session_destroy();
-    header("Location: ../view/loginView.php?timeout=1");
-    exit;
-}
-
-// 4. Update last activity time
-$_SESSION['user']['last_activity'] = time();
-
-// Get current page from query parameter
-$currentPage = isset($_GET['page']) ? htmlspecialchars($_GET['page']) : 'Documents';
-?>
-
-
-
 
 <!DOCTYPE html>
 

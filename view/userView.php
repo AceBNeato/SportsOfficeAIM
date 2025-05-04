@@ -1,13 +1,3 @@
-<?php
-session_start();
-
-// Check if user is logged in, redirect to login if not
-if (!isset($_SESSION['user'])) {
-    header("Location: loginView.php");
-    exit();
-}
-?>
-
 
 
 <!DOCTYPE html>
