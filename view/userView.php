@@ -494,12 +494,6 @@ $_SESSION['user']['last_activity'] = time();
                     </div>
 
 
-
-
-
-
-
-
                     <div class="pt-3 md:pt-4 flex flex-col-reverse sm:flex-row justify-end gap-3">
                         <div class="relative">
                             <label for="password" class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
