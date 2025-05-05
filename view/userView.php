@@ -152,16 +152,22 @@ $_SESSION['user']['last_activity'] = time();
                         <div class="flex flex-col sm:flex-row items-start gap-6">
                             <div class="flex-shrink-0 relative group">
                                 <div class="w-24 h-24 rounded-full bg-gray-200 overflow-hidden border-4 border-blue-100">
-                                    <div id="profile-initials" class="w-full h-full flex items-center justify-center text-center bg-blue-500 text-white text-2xl font-bold">
+                                    <div id="profile-initials" class="w-full h-full flex items-center justify-center text-center bg-blue-500 text-white text-2xl font-bold <?php echo isset($_SESSION['user']['has_profile_image']) ? 'hidden' : ''; ?>">
                                         <?php
                                         $initials = '';
-                                        if (isset($_SESSION['user']['first_name']) && isset($_SESSION['user']['last_name'])) {
-                                            $initials = userView . phpsubstr($_SESSION['user']['first_name'], 0, 1) . substr($_SESSION['user']['last_name'], 0, 1);
+                                        $fullName = $_SESSION['user']['full_name'] ?? '';
+                                        $nameParts = explode(' ', $fullName);
+                                        if (count($nameParts) >= 2) {
+                                            $initials = substr($nameParts[0], 0, 1) . substr($nameParts[count($nameParts)-1], 0, 1);
+                                        } elseif (count($nameParts) === 1) {
+                                            $initials = substr($nameParts[0], 0, 1);
                                         }
-                                        echo $initials ?: 'U';
+                                        echo strtoupper($initials ?: 'U');
                                         ?>
                                     </div>
-                                    <img id="profile-image" src="<?php echo $_SESSION['user']['profile_pic'] ?? ''; ?>" alt="Profile" class="w-full h-full object-cover <?php echo isset($_SESSION['user']['profile_pic']) ? '' : 'hidden'; ?>">
+                                    <?php if (isset($_SESSION['user']['has_profile_image']) && $_SESSION['user']['has_profile_image']): ?>
+                                        <img id="profile-image" src="../controller/get_profile_image.php?id=<?php echo $_SESSION['user']['id']; ?>" alt="Profile" class="w-full h-full object-cover">
+                                    <?php endif; ?>
                                 </div>
                             </div>
 
@@ -187,10 +193,12 @@ $_SESSION['user']['last_activity'] = time();
                                         <p class="text-sm text-gray-500">Email</p>
                                         <p class="font-semibold"><?php echo htmlspecialchars($_SESSION['user']['email'] ?? 'N/A'); ?></p>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
                     </div>
+
 
 
 
