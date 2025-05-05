@@ -555,34 +555,196 @@ $_SESSION['user']['last_activity'] = time();
 
 <!-- JavaScript to handle profile image upload and preview -->
 <script>
+    // profile-image-handler.js
     document.addEventListener('DOMContentLoaded', function() {
-        // Handle profile image upload
+        // Handle profile image upload in the edit profile modal
         const profileUpload = document.getElementById('modal-profile-upload');
         const profileImage = document.getElementById('modal-profile-image');
         const profileInitials = document.getElementById('modal-profile-initials');
-        const profilePicPath = document.getElementById('profile_pic_path');
+        const profileForm = document.getElementById('profile-edit-form');
+
+        // Also handle the same functionality for the main profile view
+        const mainProfileImage = document.getElementById('profile-image');
+        const mainProfileInitials = document.getElementById('profile-initials');
 
         if (profileUpload) {
             profileUpload.addEventListener('change', function(e) {
                 if (e.target.files && e.target.files[0]) {
+                    const file = e.target.files[0];
+
+                    // Validate file size (max 2MB)
+                    if (file.size > 2 * 1024 * 1024) {
+                        alert('Image size exceeds 2MB. Please choose a smaller file.');
+                        return;
+                    }
+
+                    // Validate file type
+                    const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                    if (!validTypes.includes(file.type)) {
+                        alert('Only JPG, PNG and GIF images are allowed.');
+                        return;
+                    }
+
                     const reader = new FileReader();
 
                     reader.onload = function(e) {
+                        // Update the modal preview
                         profileImage.src = e.target.result;
                         profileImage.classList.remove('hidden');
                         profileInitials.classList.add('hidden');
 
-                        // We would normally upload the file to the server here
-                        // and update the hidden field with the path
-                        // For now, we'll just set a placeholder
-                        profilePicPath.value = 'uploaded_image.jpg';
+                        // Create a hidden file input if it doesn't exist
+                        let fileInput = profileForm.querySelector('input[name="profile_image"]');
+                        if (!fileInput) {
+                            fileInput = document.createElement('input');
+                            fileInput.type = 'file';
+                            fileInput.name = 'profile_image';
+                            fileInput.classList.add('hidden');
+                            profileForm.appendChild(fileInput);
+                        }
+
+                        // Create a new FileList-like object with our file
+                        const dataTransfer = new DataTransfer();
+                        dataTransfer.items.add(file);
+                        fileInput.files = dataTransfer.files;
                     };
 
-                    reader.readAsDataURL(e.target.files[0]);
+                    reader.readAsDataURL(file);
                 }
             });
         }
+
+        // Handle form submission validation
+        if (profileForm) {
+            profileForm.addEventListener('submit', function(e) {
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirm_password').value;
+
+                // If password fields are not empty, check if they match
+                if (password || confirmPassword) {
+                    if (password !== confirmPassword) {
+                        e.preventDefault();
+                        document.getElementById('passwordModal').classList.remove('hidden');
+                        return false;
+                    }
+
+                    // Check password length if provided
+                    if (password.length < 8) {
+                        e.preventDefault();
+                        alert('Password must be at least 8 characters long.');
+                        return false;
+                    }
+                }
+
+                // Add enctype attribute to ensure file upload works
+                profileForm.enctype = "multipart/form-data";
+            });
+        }
+
+        // Initialize direct upload functionality
+        initializeDirectImageUpload();
     });
+
+    // Function to initialize direct image upload without form submission
+    function initializeDirectImageUpload() {
+        const quickUploadBtn = document.getElementById('quick-upload-btn');
+        const quickFileInput = document.getElementById('quick-file-input');
+
+        if (quickUploadBtn && quickFileInput) {
+            quickUploadBtn.addEventListener('click', function() {
+                quickFileInput.click();
+            });
+
+            quickFileInput.addEventListener('change', function(e) {
+                if (e.target.files && e.target.files[0]) {
+                    const file = e.target.files[0];
+
+                    // Validate file
+                    if (file.size > 2 * 1024 * 1024) {
+                        alert('Image size exceeds 2MB. Please choose a smaller file.');
+                        return;
+                    }
+
+                    const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                    if (!validTypes.includes(file.type)) {
+                        alert('Only JPG, PNG and GIF images are allowed.');
+                        return;
+                    }
+
+                    // Create FormData and append file
+                    const formData = new FormData();
+                    formData.append('profile_image', file);
+
+                    // Display loading indicator
+                    document.getElementById('upload-loading').classList.remove('hidden');
+
+                    // Send AJAX request
+                    fetch('../controller/user_images.php', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            document.getElementById('upload-loading').classList.add('hidden');
+
+                            if (data.success) {
+                                // Update profile images both in modal and main view
+                                const profileImage = document.getElementById('profile-image');
+                                const profileInitials = document.getElementById('profile-initials');
+                                const modalProfileImage = document.getElementById('modal-profile-image');
+                                const modalProfileInitials = document.getElementById('modal-profile-initials');
+
+                                // Generate a cache-busting URL parameter
+                                const timestamp = new Date().getTime();
+                                const imageUrl = `../controller/get_profile_image.php?id=${getUserId()}&t=${timestamp}`;
+
+                                // Update images and toggle visibility
+                                if (profileImage) {
+                                    profileImage.src = imageUrl;
+                                    profileImage.classList.remove('hidden');
+                                }
+                                if (profileInitials) {
+                                    profileInitials.classList.add('hidden');
+                                }
+                                if (modalProfileImage) {
+                                    modalProfileImage.src = imageUrl;
+                                    modalProfileImage.classList.remove('hidden');
+                                }
+                                if (modalProfileInitials) {
+                                    modalProfileInitials.classList.add('hidden');
+                                }
+
+                                // Show success message
+                                showSuccessModal(data.message);
+                            } else {
+                                // Show error message
+                                alert(data.message || 'Failed to upload image.');
+                            }
+                        })
+                        .catch(error => {
+                            document.getElementById('upload-loading').classList.add('hidden');
+                            console.error('Error uploading image:', error);
+                            alert('An error occurred while uploading the image.');
+                        });
+                }
+            });
+        }
+    }
+
+    // Helper function to get user ID from the URL or data attribute
+    function getUserId() {
+        // Try to get from data attribute first
+        const userIdElement = document.querySelector('[data-user-id]');
+        if (userIdElement && userIdElement.dataset.userId) {
+            return userIdElement.dataset.userId;
+        }
+
+        // Default to session user ID (this should be set as a JS variable in your PHP)
+        return window.currentUserId || '';
+    }
 
     // Function to toggle password visibility
     function togglePassword(inputId) {
@@ -604,6 +766,20 @@ $_SESSION['user']['last_activity'] = time();
     // Function to close modal
     function closeModal(modalId) {
         document.getElementById(modalId).classList.add('hidden');
+    }
+
+    // Function to show success modal
+    function showSuccessModal(message) {
+        const modal = document.getElementById('success-modal');
+        const messageElement = document.getElementById('success-message');
+
+        if (messageElement && message) {
+            messageElement.textContent = message;
+        }
+
+        if (modal) {
+            modal.classList.remove('hidden');
+        }
     }
 </script>
 
