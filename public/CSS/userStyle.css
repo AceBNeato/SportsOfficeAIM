@@ -242,5 +242,365 @@ form select {
 }
 
 
+/* Base Styles */
+.submissions-container {
+    padding: 1rem;
+    max-width: 80rem;
+    margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+    .submissions-container {
+        padding: 1.5rem 2rem;
+    }
+}
+
+/* Header Styles */
+.submissions-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.header-icon {
+    display: inline-block;
+    padding: 0.75rem;
+    background-color: #fee2e2;
+    border-radius: 9999px;
+    margin-bottom: 0.75rem;
+}
+
+.header-icon svg {
+    height: 2.5rem;
+    width: 2.5rem;
+    color: #ef4444;
+    fill: none;
+}
+
+.submissions-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0;
+}
+
+@media (min-width: 768px) {
+    .submissions-header h2 {
+        font-size: 1.875rem;
+    }
+}
+
+.submissions-header p {
+    color: #4b5563;
+    margin-top: 0.5rem;
+}
+
+/* Card Styles */
+.submissions-card {
+    background-color: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
+    padding: 1.25rem;
+}
+
+@media (min-width: 768px) {
+    .submissions-card {
+        padding: 2rem;
+    }
+}
+
+/* Progress Indicator Styles */
+.progress-indicator {
+    margin-bottom: 2rem;
+}
+
+.progress-steps {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+}
+
+.step-number {
+    width: 2.5rem;
+    height: 2.5rem;
+    background-color: #ef4444;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+}
+
+.step-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-top: 0.5rem;
+    text-align: center;
+    color: #1f2937;
+}
+
+.progress-line {
+    flex: 1 1 0%;
+    height: 0.25rem;
+    margin: 0 0.5rem;
+    background-color: #fecaca;
+    position: relative;
+}
+
+.progress-completed {
+    height: 100%;
+    width: 100%;
+    background-color: #ef4444;
+}
+
+/* Form Styles */
+.submissions-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-section {
+    background-color: #f9fafb;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.section-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.section-title svg {
+    height: 1.25rem;
+    width: 1.25rem;
+    color: #ef4444;
+    fill: none;
+    margin-right: 0.5rem;
+}
+
+.form-grid {
+    display: grid;
+    gap: 1rem;
+}
+
+@media (min-width: 768px) {
+    .form-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.form-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.25rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #f87171;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+.form-group textarea {
+    height: 8rem;
+    resize: none;
+}
+
+.form-hint {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+/* File Upload Styles */
+.file-upload-area {
+    border: 2px dashed #d1d5db;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    text-align: center;
+    transition: border-color 0.2s ease;
+}
+
+.file-upload-area:hover {
+    border-color: #f87171;
+}
+
+.file-upload-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+}
+
+.file-upload-label svg {
+    height: 3rem;
+    width: 3rem;
+    color: #9ca3af;
+    fill: none;
+}
+
+.upload-instruction {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #374151;
+    margin-top: 0.5rem;
+}
+
+.upload-requirements {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+.file-info {
+    font-size: 0.875rem;
+    color: #4b5563;
+    margin-top: 0.75rem;
+}
+
+.file-info-label {
+    font-weight: 500;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Submit Button Styles */
+.form-submit {
+    text-align: center;
+    padding-top: 1rem;
+}
+
+.form-submit button {
+    background-color: #ef4444;
+    color: white;
+    font-weight: 700;
+    padding: 0.75rem 2rem;
+    border-radius: 9999px;
+    font-size: 1.125rem;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.form-submit button:hover {
+    background-color: #dc2626;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.form-submit button svg {
+    height: 1.25rem;
+    width: 1.25rem;
+    fill: none;
+    margin-right: 0.5rem;
+}
 
 
+/* Mobile-specific styles (under 768px) */
+@media (max-width: 767px) {
+    .sidebar {
+        width: 70px !important; /* Force collapsed on mobile */
+    }
+
+    .sidebar.collapsed {
+        width: 70px !important; /* Ensure it stays collapsed */
+    }
+
+    .main-content {
+        margin-left: 70px !important;
+    }
+
+    /* Hide all text elements in sidebar when collapsed */
+    .sidebar .text-xs,
+    .sidebar .menu-text,
+    .sidebar .text-center p {
+        display: none !important;
+    }
+
+    /* Center and resize logo */
+    .sidebar img {
+        width: 40px !important;
+        height: 40px !important;
+        margin: 1rem auto !important;
+    }
+
+    /* Center menu items */
+    .menu-item {
+        justify-content: center;
+        padding: 0.75rem 0 !important;
+    }
+
+    /* Hide collapse button completely on mobile */
+    #collapseBtn {
+        display: none !important;
+    }
+}
+
+/* Desktop styles (768px and up) */
+@media (min-width: 768px) {
+    .sidebar:not(.collapsed) {
+        width: 250px;
+    }
+
+    .sidebar.collapsed {
+        width: 70px;
+    }
+
+    .main-content {
+        margin-left: 250px;
+    }
+
+    .main-content.collapsed {
+        margin-left: 70px;
+    }
+
+    /* Show collapse button only on desktop */
+    #collapseBtn {
+        display: flex !important;
+    }
+}
