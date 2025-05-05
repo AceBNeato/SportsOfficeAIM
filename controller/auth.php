@@ -140,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $student_id = null;
     } else {
         // Query for regular user
-        $query = "SELECT id, student_id, full_name, address, email,password FROM users WHERE email = ?";
+        $query = "SELECT id, student_id, full_name, address, email, password FROM users WHERE email = ?";
         $stmt = $conn->prepare($query);
         if (!$stmt) {
             error_log("Database error: " . $conn->error);
@@ -168,6 +168,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $password = $user_details['password'];
     }
 
+    // Check if user has a profile image
+    $has_profile_image = false;
+    $image_stmt = $conn->prepare("SELECT 1 FROM user_images WHERE user_id = ?");
+    $image_stmt->bind_param("i", $id);
+    $image_stmt->execute();
+    $image_result = $image_stmt->get_result();
+    if ($image_result->num_rows > 0) {
+        $has_profile_image = true;
+    }
+    $image_stmt->close();
+
     // Secure session configuration
     ini_set('session.cookie_httponly', 1);
     if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
@@ -188,11 +199,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'full_name' => $full_name,
         'last_activity' => time(),
         'ip_address' => $_SERVER['REMOTE_ADDR'],
-        'user_agent' => $_SERVER['HTTP_USER_AGENT']
+        'user_agent' => $_SERVER['HTTP_USER_AGENT'],
+        'has_profile_image' => $has_profile_image  // Add this flag to session
     ];
 
     // Debug log
-    error_log("User logged in - Email: $email, Role: $role, Redirecting to: " . ($role === 'admin' ? 'adminView.php' : 'userView.php'));
+    error_log("User logged in - Email: $email, Role: $role, Has Image: " . ($has_profile_image ? 'Yes' : 'No') .
+        ", Redirecting to: " . ($role === 'admin' ? 'adminView.php' : 'userView.php'));
 
     // Redirect based on role
     if ($role === 'admin') {

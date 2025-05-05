@@ -2,6 +2,7 @@
 // Start the session if not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
+
 }
 
 // Check if user is logged in
@@ -151,25 +152,25 @@ $_SESSION['user']['last_activity'] = time();
 
                         <div class="flex flex-col sm:flex-row items-start gap-6">
                             <div class="flex-shrink-0 relative group">
-                                <div class="w-24 h-24 rounded-full bg-gray-200 overflow-hidden border-4 border-blue-100">
-
-                                    <div id="profile-initials" class="w-full h-full flex items-center justify-center text-center bg-blue-500 text-white text-2xl font-bold <?php echo isset($_SESSION['user']['has_profile_image']) ? 'hidden' : ''; ?>">
-                                        <?php
-                                        $initials = '';
-                                        $fullName = $_SESSION['user']['full_name'] ?? '';
-                                        $nameParts = explode(' ', $fullName);
-                                        if (count($nameParts) >= 2) {
-                                            $initials = substr($nameParts[0], 0, 1) . substr($nameParts[count($nameParts)-1], 0, 1);
-                                        } elseif (count($nameParts) === 1) {
-                                            $initials = substr($nameParts[0], 0, 1);
-                                        }
-                                        echo strtoupper($initials ?: 'U');
-                                        ?>
-                                    </div>
-
-
-
-
+                                <div class="w-32 h-32 rounded-full bg-gray-200 overflow-hidden border-4 border-blue-100">
+                                    <?php if ($_SESSION['user']['has_profile_image']): ?>
+                                        <img src="../controller/get_profile_image.php?id=<?php echo $_SESSION['user']['id']; ?>"
+                                             alt="Profile Image" class="profile-image">
+                                    <?php else: ?>
+                                        <div class="profile-initials">
+                                            <?php
+                                            $name = $_SESSION['user']['full_name'];
+                                            $initials = '';
+                                            $parts = explode(' ', $name);
+                                            if (count($parts) > 1) {
+                                                $initials = strtoupper(substr($parts[0], 0, 1) . substr(end($parts), 0, 1));
+                                            } else {
+                                                $initials = strtoupper(substr($name, 0, 1));
+                                            }
+                                            echo $initials;
+                                            ?>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
                             </div>
 
@@ -195,11 +196,10 @@ $_SESSION['user']['last_activity'] = time();
                                         <p class="text-sm text-gray-500">Email</p>
                                         <p class="font-semibold"><?php echo htmlspecialchars($_SESSION['user']['email'] ?? 'N/A'); ?></p>
                                     </div>
-
                                 </div>
+                             </div>
                             </div>
                         </div>
-                    </div>
 
 
 
@@ -277,6 +277,27 @@ $_SESSION['user']['last_activity'] = time();
                     </div>
                 </div>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 <!-- Right Column - Notifications -->
                 <div class="w-full md:w-1/2 h-[calc(100vh-150px)]">
                     <div class="bg-white rounded-lg shadow h-full flex flex-col">
@@ -287,22 +308,225 @@ $_SESSION['user']['last_activity'] = time();
                                 </svg>
                                 <h2 class="text-xl font-bold">Notifications</h2>
                             </div>
-                            <button class="text-blue-500 hover:text-blue-700 text-sm">
-                                <i class="fas fa-sync-alt mr-1"></i>Refresh
-                            </button>
+                            <div>
+                                <button id="refreshNotifications" class="text-blue-500 hover:text-blue-700 text-sm mr-3">
+                                    <i class="fas fa-sync-alt mr-1"></i>Refresh
+                                </button>
+                                <button id="clearNotifications" class="text-blue-500 hover:text-blue-700 text-sm">
+                                    <i class="fas fa-trash-alt mr-1"></i>Clear All
+                                </button>
+                            </div>
                         </div>
                         <div class="flex-1 overflow-y-auto">
-                            <div class="space-y-3 p-4">
-                                <!-- Sample notifications - you would replace with dynamic content -->
-                                <div class="p-3 bg-gray-50 rounded border-l-4 border-blue-500">
-                                    <p class="text-sm">Welcome to your dashboard!</p>
-                                    <p class="text-xs text-gray-500 mt-1">Just now</p>
-                                </div>
+                            <div id="notificationsContainer" class="space-y-3 p-4">
+                                <!-- Notifications will be dynamically inserted here -->
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        // Notification system elements
+                        const notificationsContainer = document.getElementById('notificationsContainer');
+                        const refreshBtn = document.getElementById('refreshNotifications');
+                        const clearBtn = document.getElementById('clearNotifications');
+
+                        // Load notifications from localStorage or initialize
+                        let notifications = JSON.parse(localStorage.getItem('notifications')) || [];
+                        let timestampUpdaters = {}; // Store interval IDs for timestamp updates
+
+                        // Display notifications from PHP session
+                        function displaySessionNotifications() {
+                            <?php if (!empty($_SESSION['notifications'])): ?>
+                            const sessionNotifications = <?php echo json_encode($_SESSION['notifications']); ?>;
+
+                            sessionNotifications.forEach(notification => {
+                                addNotification(notification.message, notification.timestamp, false); // Don't save to localStorage yet
+                            });
+
+                            // Save all new notifications to localStorage at once
+                            localStorage.setItem('notifications', JSON.stringify(notifications));
+
+                            // Clear notifications from session after displaying
+                            <?php unset($_SESSION['notifications']); ?>
+                            <?php endif; ?>
+                        }
+
+                        // Format time with real-time updates
+                        function formatTime(timestamp, element) {
+                            const updateTime = () => {
+                                const now = new Date();
+                                const notificationTime = new Date(timestamp);
+                                const diffInSeconds = Math.floor((now - notificationTime) / 1000);
+
+                                if (diffInSeconds < 60) {
+                                    element.textContent = 'Just now';
+                                } else if (diffInSeconds < 3600) {
+                                    const minutes = Math.floor(diffInSeconds / 60);
+                                    element.textContent = `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
+                                } else if (diffInSeconds < 86400) {
+                                    const hours = Math.floor(diffInSeconds / 3600);
+                                    element.textContent = `${hours} hour${hours !== 1 ? 's' : ''} ago`;
+                                } else {
+                                    element.textContent = notificationTime.toLocaleDateString();
+                                    // Stop updating if more than 1 day old
+                                    clearInterval(timestampUpdaters[timestamp]);
+                                    delete timestampUpdaters[timestamp];
+                                }
+                            };
+
+                            // Initial update
+                            updateTime();
+
+                            // Set up interval for updates (every minute for recent notifications)
+                            if (!timestampUpdaters[timestamp]) {
+                                timestampUpdaters[timestamp] = setInterval(updateTime, 60000);
+                            }
+                        }
+
+                        // Display notifications in the UI
+                        function displayNotifications() {
+                            notificationsContainer.innerHTML = '';
+
+                            if (notifications.length === 0) {
+                                notificationsContainer.innerHTML = '<p class="text-gray-500 text-center py-4">No notifications</p>';
+                                return;
+                            }
+
+                            notifications.forEach((notification, index) => {
+                                const notificationElement = document.createElement('div');
+                                notificationElement.className = 'p-3 bg-gray-50 rounded border-l-4 border-blue-500 flex justify-between items-start';
+                                notificationElement.innerHTML = `
+                <div>
+                    <p class="text-sm">${notification.message}</p>
+                    <p class="text-xs text-gray-500 mt-1 timestamp" data-timestamp="${notification.timestamp}"></p>
+                </div>
+                <button class="text-gray-400 hover:text-gray-600 delete-notification" data-index="${index}">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+                                notificationsContainer.appendChild(notificationElement);
+
+                                // Initialize timestamp with auto-updating
+                                const timestampElement = notificationElement.querySelector('.timestamp');
+                                formatTime(notification.timestamp, timestampElement);
+                            });
+
+                            // Add event listeners to delete buttons
+                            document.querySelectorAll('.delete-notification').forEach(btn => {
+                                btn.addEventListener('click', function() {
+                                    const index = parseInt(this.getAttribute('data-index'));
+
+                                    // Clear the timestamp updater for this notification
+                                    const timestamp = notifications[index].timestamp;
+                                    if (timestampUpdaters[timestamp]) {
+                                        clearInterval(timestampUpdaters[timestamp]);
+                                        delete timestampUpdaters[timestamp];
+                                    }
+
+                                    notifications.splice(index, 1);
+                                    localStorage.setItem('notifications', JSON.stringify(notifications));
+                                    displayNotifications();
+                                });
+                            });
+                        }
+
+                        // Add a new notification
+                        function addNotification(message, timestamp = null, saveToStorage = true) {
+                            const newTimestamp = timestamp || new Date().toISOString();
+                            notifications.unshift({
+                                message: message,
+                                timestamp: newTimestamp
+                            });
+
+                            // Keep only the last 50 notifications
+                            if (notifications.length > 50) {
+                                const removed = notifications.pop();
+                                // Clean up timestamp updater for removed notification
+                                if (timestampUpdaters[removed.timestamp]) {
+                                    clearInterval(timestampUpdaters[removed.timestamp]);
+                                    delete timestampUpdaters[removed.timestamp];
+                                }
+                            }
+
+                            if (saveToStorage) {
+                                localStorage.setItem('notifications', JSON.stringify(notifications));
+                            }
+                            displayNotifications();
+                        }
+
+                        // Clear all notifications
+                        clearBtn.addEventListener('click', function() {
+                            if (confirm('Are you sure you want to clear all notifications?')) {
+                                // Clear all timestamp updaters
+                                Object.values(timestampUpdaters).forEach(interval => clearInterval(interval));
+                                timestampUpdaters = {};
+
+                                notifications = [];
+                                localStorage.setItem('notifications', JSON.stringify(notifications));
+                                displayNotifications();
+                            }
+                        });
+
+                        // Refresh notifications - now fetches from server if needed
+                        refreshBtn.addEventListener('click', function() {
+                            // Add loading indicator
+                            refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Refreshing';
+
+                            // Simulate fetching new notifications from server
+                            fetch('/api/notifications')
+                                .then(response => response.json())
+                                .then(newNotifications => {
+                                    if (newNotifications && newNotifications.length > 0) {
+                                        newNotifications.forEach(notification => {
+                                            addNotification(notification.message, notification.timestamp);
+                                        });
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error refreshing notifications:', error);
+                                })
+                                .finally(() => {
+                                    // Restore refresh button
+                                    refreshBtn.innerHTML = '<i class="fas fa-sync-alt mr-1"></i>Refresh';
+                                });
+                        });
+
+                        // Initial setup
+                        displaySessionNotifications();
+                        displayNotifications();
+
+                        // Listen for custom events (like profile updates)
+                        document.addEventListener('profileUpdated', function(e) {
+                            const changes = e.detail.changes;
+                            let message = 'Profile updated: ';
+                            const changesList = [];
+
+                            if (changes.name) changesList.push('name');
+                            if (changes.email) changesList.push('email');
+                            if (changes.photo) changesList.push('profile photo');
+                            if (changes.address) changesList.push('address');
+                            if (changes.password) changesList.push('password');
+
+                            if (changesList.length > 0) {
+                                message += changesList.join(', ');
+                                addNotification(message);
+                            }
+                        });
+
+                        // Make the function available globally
+                        window.addNotification = addNotification;
+
+                        // Clean up intervals when page unloads
+                        window.addEventListener('beforeunload', function() {
+                            Object.values(timestampUpdaters).forEach(interval => clearInterval(interval));
+                        });
+                    });
+                </script>
+
+
+
 
 
 
@@ -431,30 +655,123 @@ $_SESSION['user']['last_activity'] = time();
             <!-- Profile Picture Section - Full width on mobile, 1/3 on desktop -->
             <!-- Profile Picture Section -->
             <div class="bg-blue-600 text-white p-6 md:w-1/3 flex flex-col items-center justify-center">
+
                 <div class="relative group mb-6">
-                    <div class="w-24 h-24 md:w-32 md:h-32 rounded-full bg-white/20 overflow-hidden border-4 border-white/30">
-                        <div id="modal-profile-initials" class="w-full h-full flex items-center justify-center text-center text-white text-2xl md:text-4xl font-bold">
-                            <?php
-                            $initials = '';
-                            if (isset($_SESSION['user']['first_name']) && isset($_SESSION['user']['last_name'])) {
-                                $initials = substr($_SESSION['user']['first_name'], 0, 1) . substr($_SESSION['user']['last_name'], 0, 1);
-                            }
-                            echo $initials ?: 'U';
-                            ?>
-
-                        </div>
-                        <img id="modal-profile-image" src="<?php echo $_SESSION['user']['profile_pic'] ?? ''; ?>" alt="Profile" class="w-full h-full object-cover <?php echo isset($_SESSION['user']['profile_pic']) ? '' : 'hidden'; ?>">
+                    <div class="w-40 h-40 rounded-full bg-gray-200 overflow-hidden border-[6px] border-blue-100 relative">
+                        <?php if (isset($_SESSION['user']['has_profile_image'])): ?>
+                            <img id="profile-image"
+                                 src="../controller/get_profile_image.php?id=<?php echo $_SESSION['user']['id']; ?>&t=<?php echo time(); ?>"
+                                 alt="Profile"
+                                 class="w-full h-full object-cover">
+                            <div id="profile-initials" class="hidden"></div>
+                        <?php else: ?>
+                            <div id="profile-initials" class="w-full h-full flex items-center justify-center text-center bg-blue-500 text-white text-5xl font-bold">
+                                <?php
+                                $initials = '';
+                                $fullName = $_SESSION['user']['full_name'] ?? '';
+                                $nameParts = explode(' ', $fullName);
+                                if (count($nameParts) >= 2) {
+                                    $initials = substr($nameParts[0], 0, 1) . substr($nameParts[count($nameParts)-1], 0, 1);
+                                } elseif (count($nameParts) === 1) {
+                                    $initials = substr($nameParts[0], 0, 1);
+                                }
+                                echo strtoupper($initials ?: 'U');
+                                ?>
+                            </div>
+                            <img id="profile-image" src="" alt="Profile" class="hidden w-full h-full object-cover">
+                        <?php endif; ?>
                     </div>
-
-
-
-
 
                     <label for="modal-profile-upload" class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-full bg-black/50 cursor-pointer">
                         <span class="text-white text-sm font-medium bg-blue-600 px-2 py-1 rounded">Change Photo</span>
                         <input id="modal-profile-upload" type="file" accept="image/*" class="hidden">
                     </label>
                 </div>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const profileUpload = document.getElementById('modal-profile-upload');
+                        const profileImage = document.getElementById('profile-image');
+                        const profileInitials = document.getElementById('profile-initials');
+                        const maxSizeMB = 2; // Maximum allowed size in MB
+                        const maxSizeBytes = maxSizeMB * 1024 * 1024; // Convert to bytes
+
+                        profileUpload.addEventListener('change', function(e) {
+                            if (e.target.files && e.target.files[0]) {
+                                const file = e.target.files[0];
+
+                                // Validate file type
+                                const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                                if (!validTypes.includes(file.type)) {
+                                    alert('Please select a valid image file (JPEG, PNG, GIF)');
+                                    resetFileInput();
+                                    return;
+                                }
+
+                                // Validate file size (max 2MB)
+                                if (file.size > maxSizeBytes) {
+                                    alert(`Image size should be less than ${maxSizeMB}MB. Your file is ${(file.size/(1024*1024)).toFixed(2)}MB`);
+                                    resetFileInput();
+                                    return;
+                                }
+
+                                const reader = new FileReader();
+
+                                reader.onload = function(event) {
+                                    // Show the image and hide initials
+                                    profileImage.src = event.target.result;
+                                    profileImage.classList.remove('hidden');
+
+                                    if (profileInitials) {
+                                        profileInitials.classList.add('hidden');
+                                    }
+
+                                    // Optional: Trigger a save to server here via AJAX
+                                    // uploadProfileImage(file);
+                                };
+
+                                reader.readAsDataURL(file);
+                            }
+                        });
+
+                        function resetFileInput() {
+                            // Reset the file input to allow selecting a new file
+                            profileUpload.value = '';
+                        }
+
+                        // Optional: Function to upload to server immediately
+                        function uploadProfileImage(file) {
+                            const formData = new FormData();
+                            formData.append('profile_image', file);
+
+                            fetch('../controller/update_profile_image.php', {
+                                method: 'POST',
+                                body: formData,
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                }
+                            })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        // Update timestamp to prevent caching
+                                        document.getElementById('profile-image').src =
+                                            `../controller/get_profile_image.php?id=<?php echo $_SESSION['user']['id']; ?>&t=${new Date().getTime()}`;
+                                    } else {
+                                        alert('Error uploading image: ' + (data.message || 'Unknown error'));
+                                        resetFileInput();
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    alert('Error uploading image');
+                                    resetFileInput();
+                                });
+                        }
+                    });
+                </script>
+
+
                 <h3 class="text-xl font-semibold mb-1 text-center break-words"><?php echo htmlspecialchars($_SESSION['user']['full_name'] ?? 'User'); ?></h3>
                 <p class="text-blue-100 text-base text-center break-words"><?php echo htmlspecialchars($_SESSION['user']['student_id'] ?? ''); ?></p>
             </div>
@@ -557,66 +874,59 @@ $_SESSION['user']['last_activity'] = time();
 
 <!-- JavaScript to handle profile image upload and preview -->
 <script>
-    // profile-image-handler.js
     document.addEventListener('DOMContentLoaded', function() {
         // Handle profile image upload in the edit profile modal
         const profileUpload = document.getElementById('modal-profile-upload');
-        const profileImage = document.getElementById('modal-profile-image');
-        const profileInitials = document.getElementById('modal-profile-initials');
         const profileForm = document.getElementById('profile-edit-form');
-
-        // Also handle the same functionality for the main profile view
-        const mainProfileImage = document.getElementById('profile-image');
-        const mainProfileInitials = document.getElementById('profile-initials');
 
         if (profileUpload) {
             profileUpload.addEventListener('change', function(e) {
                 if (e.target.files && e.target.files[0]) {
                     const file = e.target.files[0];
 
-                    // Validate file size (max 2MB)
+                    // Validate file
                     if (file.size > 2 * 1024 * 1024) {
                         alert('Image size exceeds 2MB. Please choose a smaller file.');
                         return;
                     }
 
-                    // Validate file type
                     const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
                     if (!validTypes.includes(file.type)) {
                         alert('Only JPG, PNG and GIF images are allowed.');
                         return;
                     }
 
+                    // Create a preview
                     const reader = new FileReader();
-
                     reader.onload = function(e) {
-                        // Update the modal preview
+                        const profileImage = document.getElementById('modal-profile-image');
+                        const profileInitials = document.getElementById('modal-profile-initials');
+
                         profileImage.src = e.target.result;
                         profileImage.classList.remove('hidden');
                         profileInitials.classList.add('hidden');
-
-                        // Create a hidden file input if it doesn't exist
-                        let fileInput = profileForm.querySelector('input[name="profile_image"]');
-                        if (!fileInput) {
-                            fileInput = document.createElement('input');
-                            fileInput.type = 'file';
-                            fileInput.name = 'profile_image';
-                            fileInput.classList.add('hidden');
-                            profileForm.appendChild(fileInput);
-                        }
-
-                        // Create a new FileList-like object with our file
-                        const dataTransfer = new DataTransfer();
-                        dataTransfer.items.add(file);
-                        fileInput.files = dataTransfer.files;
                     };
-
                     reader.readAsDataURL(file);
+
+                    // Create a hidden file input if it doesn't exist
+                    let fileInput = profileForm.querySelector('input[name="profile_image"]');
+                    if (!fileInput) {
+                        fileInput = document.createElement('input');
+                        fileInput.type = 'file';
+                        fileInput.name = 'profile_image';
+                        fileInput.classList.add('hidden');
+                        profileForm.appendChild(fileInput);
+                    }
+
+                    // Create a new FileList-like object with our file
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    fileInput.files = dataTransfer.files;
                 }
             });
         }
 
-        // Handle form submission validation
+        // Handle form submission
         if (profileForm) {
             profileForm.addEventListener('submit', function(e) {
                 const password = document.getElementById('password').value;
@@ -642,97 +952,13 @@ $_SESSION['user']['last_activity'] = time();
                 profileForm.enctype = "multipart/form-data";
             });
         }
-
-        // Initialize direct upload functionality
-        initializeDirectImageUpload();
     });
 
-    // Function to initialize direct image upload without form submission
-    function initializeDirectImageUpload() {
-        const quickUploadBtn = document.getElementById('quick-upload-btn');
-        const quickFileInput = document.getElementById('quick-file-input');
-
-        if (quickUploadBtn && quickFileInput) {
-            quickUploadBtn.addEventListener('click', function() {
-                quickFileInput.click();
-            });
-
-            quickFileInput.addEventListener('change', function(e) {
-                if (e.target.files && e.target.files[0]) {
-                    const file = e.target.files[0];
-
-                    // Validate file
-                    if (file.size > 2 * 1024 * 1024) {
-                        alert('Image size exceeds 2MB. Please choose a smaller file.');
-                        return;
-                    }
-
-                    const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
-                    if (!validTypes.includes(file.type)) {
-                        alert('Only JPG, PNG and GIF images are allowed.');
-                        return;
-                    }
-
-                    // Create FormData and append file
-                    const formData = new FormData();
-                    formData.append('profile_image', file);
-
-                    // Display loading indicator
-                    document.getElementById('upload-loading').classList.remove('hidden');
-
-                    // Send AJAX request
-                    fetch('../controller/user_images.php', {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest'
-                        }
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            document.getElementById('upload-loading').classList.add('hidden');
-
-                            if (data.success) {
-                                // Update profile images both in modal and main view
-                                const profileImage = document.getElementById('profile-image');
-                                const profileInitials = document.getElementById('profile-initials');
-                                const modalProfileImage = document.getElementById('modal-profile-image');
-                                const modalProfileInitials = document.getElementById('modal-profile-initials');
-
-                                // Generate a cache-busting URL parameter
-                                const timestamp = new Date().getTime();
-                                const imageUrl = `../controller/get_profile_image.php?id=${getUserId()}&t=${timestamp}`;
-
-                                // Update images and toggle visibility
-                                if (profileImage) {
-                                    profileImage.src = imageUrl;
-                                    profileImage.classList.remove('hidden');
-                                }
-                                if (profileInitials) {
-                                    profileInitials.classList.add('hidden');
-                                }
-                                if (modalProfileImage) {
-                                    modalProfileImage.src = imageUrl;
-                                    modalProfileImage.classList.remove('hidden');
-                                }
-                                if (modalProfileInitials) {
-                                    modalProfileInitials.classList.add('hidden');
-                                }
-
-                                // Show success message
-                                showSuccessModal(data.message);
-                            } else {
-                                // Show error message
-                                alert(data.message || 'Failed to upload image.');
-                            }
-                        })
-                        .catch(error => {
-                            document.getElementById('upload-loading').classList.add('hidden');
-                            console.error('Error uploading image:', error);
-                            alert('An error occurred while uploading the image.');
-                        });
-                }
-            });
+    function refreshProfileImage() {
+        const profileImage = document.getElementById('profile-image');
+        if (profileImage) {
+            // Add timestamp to prevent caching
+            profileImage.src = profileImage.src.split('?')[0] + '?t=' + new Date().getTime();
         }
     }
 

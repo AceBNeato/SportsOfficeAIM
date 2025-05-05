@@ -1,5 +1,3 @@
-
-
 <?php
 session_start();
 
@@ -64,31 +62,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         try {
             $user_id = $_SESSION['user']['id'];
-            $role = $_SESSION['user']['role'];
             $updated = false;
-
-            // Determine which table to update based on user role
-            $table = ($role === 'admin') ? 'admins' : 'users';
+            $changes_made = []; // Track what was changed for notifications
 
             // Build the query dynamically based on which fields to update
             $query_parts = [];
             $params = [];
             $types = '';
 
-            if (!empty($full_name)) {
+            if (!empty($full_name) && $full_name !== $_SESSION['user']['full_name']) {
                 $query_parts[] = "full_name = ?";
                 $params[] = $full_name;
                 $types .= 's';
+                $changes_made[] = 'name';
             }
 
-            if (!empty($address)) {
+            if (!empty($address) && $address !== $_SESSION['user']['address']) {
                 $query_parts[] = "address = ?";
                 $params[] = $address;
                 $types .= 's';
+                $changes_made[] = 'address';
             }
-
-            // Re-check role and user table
-            $table = ($role === 'admin') ? 'admins' : 'users';
 
             // Check if new email already in use
             if (!empty($email) && $email !== $_SESSION['user']['email']) {
@@ -106,6 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $query_parts[] = "email = ?";
                 $params[] = $email;
                 $types .= 's';
+                $changes_made[] = 'email';
             }
 
             // Add password hash update if provided
@@ -114,9 +109,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $query_parts[] = "password = ?";
                 $params[] = $hashed_password;
                 $types .= 's';
+                $changes_made[] = 'password';
             }
 
-            // Final update query (users table always holds login info)
+            // Final update query
             if (!empty($query_parts)) {
                 $query = "UPDATE users SET " . implode(", ", $query_parts) . " WHERE id = ?";
                 $params[] = $user_id;
@@ -165,12 +161,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $img_stmt->bind_param("ibs", $user_id, $imageData, $imageType);
                     }
 
+                    $img_stmt->send_long_data(0, $imageData); // Important for large blobs
                     $img_stmt->execute();
                     $img_stmt->close();
 
                     // Flag that user has a profile image
                     $_SESSION['user']['has_profile_image'] = true;
                     $updated = true;
+                    $changes_made[] = 'profile picture';
                 }
             }
 
@@ -185,6 +183,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $_SESSION['profile_update_success'] = true;
                 $_SESSION['profile_message'] = "Profile updated successfully.";
+
+                // Create notification message based on changes
+                if (!empty($changes_made)) {
+                    $notification_message = "You updated your profile: " . implode(", ", $changes_made);
+                    // Store notification in session (will be processed by JavaScript)
+                    if (!isset($_SESSION['notifications'])) {
+                        $_SESSION['notifications'] = [];
+                    }
+                    array_unshift($_SESSION['notifications'], [
+                        'message' => $notification_message,
+                        'timestamp' => date('Y-m-d H:i:s')
+                    ]);
+
+                    // Keep only the last 10 notifications in session
+                    $_SESSION['notifications'] = array_slice($_SESSION['notifications'], 0, 10);
+                }
             }
 
             // Redirect back to user view
@@ -211,131 +225,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $conn->close();
 ?>
-
-
-<?php
-
-
-
-
-
-
-
-
-
-session_start();
-
-// Database configuration
-$host = "localhost";
-$username = "root";
-$password = "";
-$dbname = "SportOfficeDB";
-
-// Connect to database
-$conn = new mysqli($host, $username, $password, $dbname);
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-// Initialize variables
-$message = '';
-$user_data = null;
-$user_image = null;
-
-// Handle form submissions
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // User Registration
-    if (isset($_POST['register'])) {
-        $student_id = $_POST['student_id'];
-        $full_name = $_POST['full_name'];
-        $address = $_POST['address'];
-        $email = $_POST['email'];
-        $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-        $status = $_POST['status'];
-
-        try {
-            $stmt = $conn->prepare("INSERT INTO users (student_id, full_name, address, email, password, status) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssssss", $student_id, $full_name, $address, $email, $password, $status);
-            $stmt->execute();
-            $user_id = $stmt->insert_id;
-            $message = "Registration successful! User ID: $user_id";
-            $_SESSION['user_id'] = $user_id;
-            $_SESSION['full_name'] = $full_name;
-            $stmt->close();
-        } catch (mysqli_sql_exception $e) {
-            $message = "Error: " . $e->getMessage();
-        }
-    }
-
-    // Image Upload
-    if (isset($_FILES["user_image"]) && !empty($_FILES["user_image"]["tmp_name"])) {
-        if (!isset($_SESSION['user_id'])) {
-            $message = "Please register or log in first before uploading an image.";
-        } else {
-            $user_id = $_SESSION['user_id'];
-            $image = $_FILES['user_image']['tmp_name'];
-            $image_type = $_FILES['user_image']['type'];
-
-            $allowed_types = ['image/jpeg', 'image/png'];
-            if (in_array($image_type, $allowed_types) && getimagesize($image)) {
-                $imgData = file_get_contents($image);
-                $stmt = $conn->prepare("INSERT INTO user_images (user_id, image, image_type) VALUES (?, ?, ?)");
-                $stmt->bind_param("iss", $user_id, $imgData, $image_type);
-
-                if ($stmt->execute()) {
-                    $message = "Image uploaded successfully!";
-                } else {
-                    $message = "Error uploading image: " . $conn->error;
-                }
-                $stmt->close();
-            } else {
-                $message = "Invalid image file. Please upload JPEG or PNG.";
-            }
-        }
-    }
-
-    // User Login
-    if (isset($_POST['login'])) {
-        $email = $_POST['email'];
-        $password = $_POST['password'];
-
-        $stmt = $conn->prepare("SELECT id, full_name, password FROM users WHERE email = ?");
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        if ($result->num_rows > 0) {
-            $user = $result->fetch_assoc();
-            if (password_verify($password, $user['password'])) {
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['full_name'] = $user['full_name'];
-                $message = "Login successful! Welcome back, " . htmlspecialchars($user['full_name']);
-            } else {
-                $message = "Invalid password.";
-            }
-        } else {
-            $message = "User not found.";
-        }
-        $stmt->close();
-    }
-}
-
-// Get user data if logged in
-if (isset($_SESSION['user_id'])) {
-    $user_id = $_SESSION['user_id'];
-    $stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
-    $stmt->bind_param("i", $user_id);
-    $stmt->execute();
-    $user_data = $stmt->get_result()->fetch_assoc();
-    $stmt->close();
-
-    // Get latest user image if exists
-    $stmt = $conn->prepare("SELECT image_type, image FROM user_images WHERE user_id = ? ORDER BY uploaded_at DESC LIMIT 1");
-    $stmt->bind_param("i", $user_id);
-    $stmt->execute();
-    $image_result = $stmt->get_result();
-    if ($image_result->num_rows > 0) {
-        $user_image = $image_result->fetch_assoc();
-    }
-    $stmt->close();
-}
