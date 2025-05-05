@@ -1,3 +1,4 @@
+/* Base Sidebar Styles */
 .sidebar {
     width: 250px;
     background-color: #18181b;
@@ -51,23 +52,143 @@
     font-weight: bold;
 }
 
-
+/* Main Content Area */
 .main-content {
     margin-left: 250px;
     flex: 1;
-    padding-top: 0; /* ensure no top padding here */
+    padding-top: 0;
     height: 100vh;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+    transition: margin-left 0.3s ease;
 }
-
-
 
 .main-content.collapsed {
     margin-left: 70px;
 }
 
+/* Desktop-specific styles (min-width: 768px) */
+@media (min-width: 768px) {
+    /* Default expanded sidebar on desktop */
+    .sidebar {
+        width: 250px;
+    }
+
+    /* Collapsed state for desktop */
+    .sidebar.collapsed {
+        width: 70px;
+    }
+
+    /* Main content adjustments */
+    .main-content {
+        margin-left: 250px;
+    }
+
+    .main-content.collapsed {
+        margin-left: 70px;
+    }
+
+    /* Show all text elements when not collapsed */
+    .sidebar:not(.collapsed) .text-xs,
+    .sidebar:not(.collapsed) .menu-text,
+    .sidebar:not(.collapsed) .text-center p {
+        display: block;
+    }
+
+    /* Show collapse button only on desktop */
+    #collapseBtn {
+        display: flex !important;
+    }
+
+    /* Proper menu item alignment when expanded */
+    .sidebar:not(.collapsed) .menu-item {
+        justify-content: flex-start;
+        padding: 0.5rem 1rem;
+    }
+}
+
+/* Mobile-specific styles (max-width: 767px) */
+@media (max-width: 767px) {
+    /* Force collapsed sidebar on mobile */
+    .sidebar {
+        width: 70px !important;
+    }
+
+    /* Ensure it stays collapsed */
+    .sidebar.collapsed {
+        width: 70px !important;
+    }
+
+    /* Adjust main content margin */
+    .main-content {
+        margin-left: 70px !important;
+    }
+
+    /* Hide all text elements in sidebar */
+    .sidebar .text-xs,
+    .sidebar .menu-text,
+    .sidebar .text-center p {
+        display: none !important;
+    }
+
+    /* Center and resize logo */
+    .sidebar img {
+        width: 40px !important;
+        height: 40px !important;
+        margin: 1rem auto !important;
+    }
+
+    /* Center menu items */
+    .menu-item {
+        justify-content: center;
+        padding: 0.75rem 0 !important;
+    }
+
+    /* Hide collapse button completely on mobile */
+    #collapseBtn {
+        display: none !important;
+    }
+
+    /* Active menu indicator for mobile */
+    .sidebar .active-menu {
+        position: relative;
+    }
+
+    .sidebar .active-menu::before {
+        content: '';
+        position: absolute;
+        left: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 6px;
+        height: 6px;
+        background-color: white;
+        border-radius: 50%;
+    }
+}
+
+/* Tooltip for collapsed menu items */
+.sidebar.collapsed .menu-item {
+    position: relative;
+}
+
+.sidebar.collapsed .menu-item:hover::after {
+    content: attr(data-title);
+    position: absolute;
+    left: 70px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #1f2937;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    z-index: 50;
+    font-size: 12px;
+}
+
+/* Menu icon styling */
 .menu-icon {
     display: flex;
     align-items: center;
