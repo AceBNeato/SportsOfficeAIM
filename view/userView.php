@@ -606,47 +606,485 @@ $_SESSION['user']['last_activity'] = time();
 
 
                 <?php elseif ($currentPage === 'Submissions'): ?>
-                <!-- Submissions content -->
-                <div class="p-4 max-w-4xl mx-auto">
-                    <h2 class="text-2xl md:text-3xl font-semibold mb-2 text-center">Please Submit your Documents</h2>
-                    <p class="text-gray-600 mb-8 text-center">One Data. One Usep. OSAS-Sports Unit</p>
-
-                    <form action="submit_form.php" method="POST" enctype="multipart/form-data" class="space-y-6">
-                        <!-- Fullname and Year & Section -->
-                        <div class="flex flex-col md:flex-row gap-4">
-                            <input type="text" name="fullname" placeholder="Fullname" required
-                                   class="flex-1 border border-gray-300 rounded-xl px-4 py-3 text-base shadow-sm w-full">
-                            <input type="text" name="year_section" placeholder="Year & Section" required
-                                   class="flex-1 border border-gray-300 rounded-xl px-4 py-3 text-base shadow-sm w-full">
+                    <!-- Enhanced Submissions Content -->
+                    <div class="submissions-container">
+                        <!-- Header Section with Icon -->
+                        <div class="submissions-header">
+                            <div class="header-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </div>
+                            <h2>Submit Your Documents</h2>
+                            <p>One Data. One USeP. OSAS-Sports Unit</p>
                         </div>
 
-                        <!-- Document Type and File Upload -->
-                        <div class="flex flex-col md:flex-row gap-4">
-                            <input type="text" name="document_type" placeholder="Document Type" required
-                                   class="flex-1 border border-gray-300 rounded-xl px-4 py-3 text-base shadow-sm w-full">
-                            <input type="file" name="uploaded_file" required
-                                   class="flex-1 border border-gray-300 rounded-xl px-4 py-3 text-base shadow-sm w-full">
+                        <!-- Card Container -->
+                        <div class="submissions-card">
+                            <!-- Progress Indicator -->
+                            <div class="progress-indicator">
+                                <div class="progress-steps">
+                                    <div class="step">
+                                        <div class="step-number">1</div>
+                                        <p class="step-label">Personal Info</p>
+                                    </div>
+                                    <div class="progress-line">
+                                        <div class="progress-completed"></div>
+                                    </div>
+                                    <div class="step">
+                                        <div class="step-number">2</div>
+                                        <p class="step-label">Document Details</p>
+                                    </div>
+                                    <div class="progress-line">
+                                        <div class="progress-completed"></div>
+                                    </div>
+                                    <div class="step">
+                                        <div class="step-number">3</div>
+                                        <p class="step-label">Submit</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Form -->
+                            <form action="submit_form.php" method="POST" enctype="multipart/form-data" class="submissions-form">
+                                <!-- Section: Personal Information -->
+                                <div class="form-section">
+                                    <h3 class="section-title">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                        </svg>
+                                        Personal Information
+                                    </h3>
+
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label for="fullname">Full Name</label>
+                                            <input type="text" id="fullname" name="fullname" placeholder="Enter your full name" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="year_section">Year & Section</label>
+                                            <input type="text" id="year_section" name="year_section" placeholder="Ex: 4A - BSIT" required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Section: Document Information -->
+                                <div class="form-section">
+                                    <h3 class="section-title">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        Document Information
+                                    </h3>
+
+                                    <div class="form-stack">
+                                        <div class="form-group">
+                                            <label for="document_type">Document Type</label>
+                                            <select id="document_type" name="document_type" required>
+                                                <option value="" disabled selected>Select document type</option>
+                                                <option value="Medical Certificate">Medical Certificate</option>
+                                                <option value="Certification">Certification</option>
+                                                <option value="Recommendation Letter">Recommendation Letter</option>
+                                                <option value="Sports Clearance">Sports Clearance</option>
+                                                <option value="Others">Others</option>
+                                            </select>
+                                        </div>
+
+                                        <div id="other_type_container" class="form-group hidden">
+                                            <label for="other_type">Specify Other Document Type</label>
+                                            <input type="text" id="other_type" name="other_type" placeholder="Specify document type">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="uploaded_file">Upload Document</label>
+                                            <div class="file-upload-area">
+                                                <input type="file" id="uploaded_file" name="uploaded_file" required>
+                                                <label for="uploaded_file" class="file-upload-label">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                                    </svg>
+                                                    <span class="upload-instruction">Click to upload or drag and drop</span>
+                                                    <span class="upload-requirements">PDF, DOC, DOCX, JPG, PNG (Max 5MB)</span>
+                                                </label>
+                                                <div id="file_info" class="file-info hidden">
+                                                    <span class="file-info-label">Selected file:</span> <span id="file_name"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Section: Description -->
+                                <div class="form-section">
+                                    <h3 class="section-title">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                                        </svg>
+                                        Description
+                                    </h3>
+
+                                    <div class="form-group">
+                                        <label for="description">Document Description</label>
+                                        <textarea id="description" name="description" placeholder="Provide a brief description of the document" required></textarea>
+                                        <p class="form-hint">Please provide any relevant details about your document submission.</p>
+                                    </div>
+                                </div>
+
+                                <!-- Submit Button -->
+                                <div class="form-submit">
+                                    <button type="submit">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                        </svg>
+                                        Submit Document
+                                    </button>
+                                </div>
+                            </form>
                         </div>
+                    </div>
+
+                    <style>
+                        /* Base Styles */
+                        .submissions-container {
+                            padding: 1rem;
+                            max-width: 80rem;
+                            margin: 0 auto;
+                        }
+
+                        @media (min-width: 768px) {
+                            .submissions-container {
+                                padding: 1.5rem 2rem;
+                            }
+                        }
+
+                        /* Header Styles */
+                        .submissions-header {
+                            text-align: center;
+                            margin-bottom: 2rem;
+                        }
+
+                        .header-icon {
+                            display: inline-block;
+                            padding: 0.75rem;
+                            background-color: #fee2e2;
+                            border-radius: 9999px;
+                            margin-bottom: 0.75rem;
+                        }
+
+                        .header-icon svg {
+                            height: 2.5rem;
+                            width: 2.5rem;
+                            color: #ef4444;
+                            fill: none;
+                        }
+
+                        .submissions-header h2 {
+                            font-size: 1.5rem;
+                            font-weight: 700;
+                            color: #1f2937;
+                            margin: 0;
+                        }
+
+                        @media (min-width: 768px) {
+                            .submissions-header h2 {
+                                font-size: 1.875rem;
+                            }
+                        }
+
+                        .submissions-header p {
+                            color: #4b5563;
+                            margin-top: 0.5rem;
+                        }
+
+                        /* Card Styles */
+                        .submissions-card {
+                            background-color: white;
+                            border-radius: 0.75rem;
+                            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+                            border: 1px solid #e5e7eb;
+                            padding: 1.25rem;
+                        }
+
+                        @media (min-width: 768px) {
+                            .submissions-card {
+                                padding: 2rem;
+                            }
+                        }
+
+                        /* Progress Indicator Styles */
+                        .progress-indicator {
+                            margin-bottom: 2rem;
+                        }
+
+                        .progress-steps {
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+                        }
+
+                        .step {
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            position: relative;
+                            z-index: 1;
+                        }
+
+                        .step-number {
+                            width: 2.5rem;
+                            height: 2.5rem;
+                            background-color: #ef4444;
+                            border-radius: 9999px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            color: white;
+                            font-weight: 700;
+                        }
+
+                        .step-label {
+                            font-size: 0.875rem;
+                            font-weight: 500;
+                            margin-top: 0.5rem;
+                            text-align: center;
+                            color: #1f2937;
+                        }
+
+                        .progress-line {
+                            flex: 1 1 0%;
+                            height: 0.25rem;
+                            margin: 0 0.5rem;
+                            background-color: #fecaca;
+                            position: relative;
+                        }
+
+                        .progress-completed {
+                            height: 100%;
+                            width: 100%;
+                            background-color: #ef4444;
+                        }
+
+                        /* Form Styles */
+                        .submissions-form {
+                            display: flex;
+                            flex-direction: column;
+                            gap: 1.5rem;
+                        }
+
+                        .form-section {
+                            background-color: #f9fafb;
+                            padding: 1rem;
+                            border-radius: 0.5rem;
+                            margin-bottom: 1.5rem;
+                        }
+
+                        .section-title {
+                            font-size: 1.125rem;
+                            font-weight: 600;
+                            color: #1f2937;
+                            margin-bottom: 1rem;
+                            display: flex;
+                            align-items: center;
+                        }
+
+                        .section-title svg {
+                            height: 1.25rem;
+                            width: 1.25rem;
+                            color: #ef4444;
+                            fill: none;
+                            margin-right: 0.5rem;
+                        }
+
+                        .form-grid {
+                            display: grid;
+                            gap: 1rem;
+                        }
+
+                        @media (min-width: 768px) {
+                            .form-grid {
+                                grid-template-columns: repeat(2, minmax(0, 1fr));
+                            }
+                        }
+
+                        .form-stack {
+                            display: flex;
+                            flex-direction: column;
+                            gap: 1rem;
+                        }
+
+                        .form-group {
+                            display: flex;
+                            flex-direction: column;
+                        }
+
+                        .form-group label {
+                            font-size: 0.875rem;
+                            font-weight: 500;
+                            color: #374151;
+                            margin-bottom: 0.25rem;
+                        }
+
+                        .form-group input,
+                        .form-group select,
+                        .form-group textarea {
+                            border: 1px solid #d1d5db;
+                            border-radius: 0.5rem;
+                            padding: 0.75rem 1rem;
+                            font-size: 1rem;
+                            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+                            transition: all 0.2s ease;
+                        }
+
+                        .form-group input:focus,
+                        .form-group select:focus,
+                        .form-group textarea:focus {
+                            outline: none;
+                            border-color: #f87171;
+                            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+                        }
+
+                        .form-group textarea {
+                            height: 8rem;
+                            resize: none;
+                        }
+
+                        .form-hint {
+                            font-size: 0.75rem;
+                            color: #6b7280;
+                            margin-top: 0.25rem;
+                        }
+
+                        /* File Upload Styles */
+                        .file-upload-area {
+                            border: 2px dashed #d1d5db;
+                            border-radius: 0.5rem;
+                            padding: 1.5rem;
+                            text-align: center;
+                            transition: border-color 0.2s ease;
+                        }
+
+                        .file-upload-area:hover {
+                            border-color: #f87171;
+                        }
+
+                        .file-upload-label {
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            cursor: pointer;
+                        }
+
+                        .file-upload-label svg {
+                            height: 3rem;
+                            width: 3rem;
+                            color: #9ca3af;
+                            fill: none;
+                        }
+
+                        .upload-instruction {
+                            font-size: 1rem;
+                            font-weight: 500;
+                            color: #374151;
+                            margin-top: 0.5rem;
+                        }
+
+                        .upload-requirements {
+                            font-size: 0.875rem;
+                            color: #6b7280;
+                            margin-top: 0.25rem;
+                        }
+
+                        .file-info {
+                            font-size: 0.875rem;
+                            color: #4b5563;
+                            margin-top: 0.75rem;
+                        }
+
+                        .file-info-label {
+                            font-weight: 500;
+                        }
+
+                        .hidden {
+                            display: none;
+                        }
+
+                        /* Submit Button Styles */
+                        .form-submit {
+                            text-align: center;
+                            padding-top: 1rem;
+                        }
+
+                        .form-submit button {
+                            background-color: #ef4444;
+                            color: white;
+                            font-weight: 700;
+                            padding: 0.75rem 2rem;
+                            border-radius: 9999px;
+                            font-size: 1.125rem;
+                            transition: all 0.2s ease;
+                            display: inline-flex;
+                            align-items: center;
+                            justify-content: center;
+                            border: none;
+                            cursor: pointer;
+                            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                        }
 
-                        <!-- Description -->
-                        <textarea name="description" placeholder="Description" required
-                                  class="w-full border border-gray-300 rounded-xl px-4 py-3 h-36 text-base shadow-sm resize-none"></textarea>
+                        .form-submit button:hover {
+                            background-color: #dc2626;
+                            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+                        }
 
-                        <!-- Submit Button -->
-                        <div class="text-center">
-                            <button type="submit"
-                                    class="bg-red-400 hover:bg-red-500 text-white font-bold py-4 px-10 rounded-full text-lg transition duration-200">
-                                Send Document
-                            </button>
-                        </div>
-                    </form>
-                </div>
+                        .form-submit button svg {
+                            height: 1.25rem;
+                            width: 1.25rem;
+                            fill: none;
+                            margin-right: 0.5rem;
+                        }
+                    </style>
 
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            // Handle document type "Others" selection
+                            const documentTypeSelect = document.getElementById('document_type');
+                            const otherTypeContainer = document.getElementById('other_type_container');
+                            const otherTypeInput = document.getElementById('other_type');
 
+                            documentTypeSelect.addEventListener('change', function() {
+                                if (this.value === 'Others') {
+                                    otherTypeContainer.classList.remove('hidden');
+                                    otherTypeInput.setAttribute('required', 'required');
+                                } else {
+                                    otherTypeContainer.classList.add('hidden');
+                                    otherTypeInput.removeAttribute('required');
+                                }
+                            });
 
+                            // File upload preview
+                            const fileInput = document.getElementById('uploaded_file');
+                            const fileInfo = document.getElementById('file_info');
+                            const fileName = document.getElementById('file_name');
 
+                            fileInput.addEventListener('change', function() {
+                                if (this.files.length > 0) {
+                                    const file = this.files[0];
+                                    const fileSize = (file.size / (1024 * 1024)).toFixed(2); // Convert to MB
 
+                                    fileName.textContent = `${file.name} (${fileSize} MB)`;
+                                    fileInfo.classList.remove('hidden');
 
+                                    // Validate file size (5MB max)
+                                    if (file.size > 5 * 1024 * 1024) {
+                                        alert('File size exceeds 5MB limit. Please choose a smaller file.');
+                                        this.value = ''; // Clear the input
+                                        fileInfo.classList.add('hidden');
+                                    }
+                                } else {
+                                    fileInfo.classList.add('hidden');
+                                }
+                            });
+                        });
+                    </script>
 
 
 
@@ -708,7 +1146,12 @@ $_SESSION['user']['last_activity'] = time();
 
 
 
-                
+
+
+
+
+
+
 
                 <?php elseif ($currentPage === 'Track'): ?>
             <!-- Track content would go here -->
