@@ -5,7 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="61353cad-d58b-4648-9192-e39f980708fe" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/public/image/user.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/CSS/userStyle.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/CSS/userStyle.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/image/docicon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/image/eafd553e-5735-4754-b564-f2d7ef9d5209.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/image/grapicon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/image/studenticon.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/view/userView.php" beforeDir="false" afterPath="$PROJECT_DIR$/view/userView.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -180,6 +186,7 @@
       <workItem from="1746421206849" duration="249000" />
       <workItem from="1746426284550" duration="2315000" />
       <workItem from="1746435413352" duration="7374000" />
+      <workItem from="1746453193747" duration="4220000" />
     </task>
     <servers />
   </component>

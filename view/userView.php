@@ -155,6 +155,7 @@ $_SESSION['user']['last_activity'] = time();
                                 <div class="w-32 h-32 rounded-full bg-gray-200 overflow-hidden border-4 border-blue-100">
                                     <?php if ($_SESSION['user']['has_profile_image']): ?>
                                         <img src="../controller/get_profile_image.php?id=<?php echo $_SESSION['user']['id']; ?>"
+                                             onerror="this.onerror=null; this.src='../public/image/user.png'"
                                              alt="Profile Image" class="profile-image">
                                     <?php else: ?>
                                         <div class="profile-initials">
@@ -299,8 +300,10 @@ $_SESSION['user']['last_activity'] = time();
 
 
                 <!-- Right Column - Notifications -->
+                <!-- Right Column - Notifications -->
                 <div class="w-full md:w-1/2 h-[calc(100vh-150px)]">
                     <div class="bg-white rounded-lg shadow h-full flex flex-col">
+                        <!-- Header with buttons (fixed height) -->
                         <div class="flex justify-between items-center p-4 border-b">
                             <div class="flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
@@ -317,7 +320,9 @@ $_SESSION['user']['last_activity'] = time();
                                 </button>
                             </div>
                         </div>
-                        <div class="flex-1 overflow-y-auto">
+
+                        <!-- Scrollable notifications container -->
+                        <div class="flex-1 overflow-y-auto" style="max-height: calc(100vh - 200px);">
                             <div id="notificationsContainer" class="space-y-3 p-4">
                                 <!-- Notifications will be dynamically inserted here -->
                             </div>
@@ -636,7 +641,74 @@ $_SESSION['user']['last_activity'] = time();
                         </div>
                     </form>
                 </div>
-               
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
 
                 <?php elseif ($currentPage === 'Track'): ?>
             <!-- Track content would go here -->
@@ -690,8 +762,12 @@ $_SESSION['user']['last_activity'] = time();
                         <?php if (isset($_SESSION['user']['has_profile_image'])): ?>
                             <img id="profile-image"
                                  src="../controller/get_profile_image.php?id=<?php echo $_SESSION['user']['id']; ?>&t=<?php echo time(); ?>"
-                                 alt="Profile"
+                                 onerror="this.onerror=null; this.src='../public/image/user.png'"
+                                 alt="______Image_____"
                                  class="w-full h-full object-cover">
+
+
+
                             <div id="profile-initials" class="hidden"></div>
                         <?php else: ?>
                             <div id="profile-initials" class="w-full h-full flex items-center justify-center text-center bg-blue-500 text-white text-5xl font-bold">
