@@ -250,7 +250,7 @@ $_SESSION['user']['last_activity'] = time();
                     <div class="bg-white rounded-lg shadow p-6 relative">
                         <!-- Edit button positioned top right -->
                         <button class="absolute top-4 right-4 text-gray-500 hover:text-blue-500 transition"
-                                onclick="window.location.href='?page=Submissions'">
+                                onclick="window.location.href='?page=Track'">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                 <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
                             </svg>
@@ -600,16 +600,45 @@ $_SESSION['user']['last_activity'] = time();
 
 
 
+                <?php elseif ($currentPage === 'Submissions'): ?>
+                <!-- Submissions content -->
+                <div class="p-4 max-w-4xl mx-auto">
+                    <h2 class="text-2xl md:text-3xl font-semibold mb-2 text-center">Please Submit your Documents</h2>
+                    <p class="text-gray-600 mb-8 text-center">One Data. One Usep. OSAS-Sports Unit</p>
 
+                    <form action="submit_form.php" method="POST" enctype="multipart/form-data" class="space-y-6">
+                        <!-- Fullname and Year & Section -->
+                        <div class="flex flex-col md:flex-row gap-4">
+                            <input type="text" name="fullname" placeholder="Fullname" required
+                                   class="flex-1 border border-gray-300 rounded-xl px-4 py-3 text-base shadow-sm w-full">
+                            <input type="text" name="year_section" placeholder="Year & Section" required
+                                   class="flex-1 border border-gray-300 rounded-xl px-4 py-3 text-base shadow-sm w-full">
+                        </div>
 
-        <?php elseif ($currentPage === 'Submissions'): ?>
-            <!-- Submissions content would go here -->
-            <div class="p-4">
-                <h2 class="text-xl font-semibold mb-4">Your Submissions</h2>
-                <!-- Submission content would be dynamically generated -->
-            </div>
+                        <!-- Document Type and File Upload -->
+                        <div class="flex flex-col md:flex-row gap-4">
+                            <input type="text" name="document_type" placeholder="Document Type" required
+                                   class="flex-1 border border-gray-300 rounded-xl px-4 py-3 text-base shadow-sm w-full">
+                            <input type="file" name="uploaded_file" required
+                                   class="flex-1 border border-gray-300 rounded-xl px-4 py-3 text-base shadow-sm w-full">
+                        </div>
 
-        <?php elseif ($currentPage === 'Track'): ?>
+                        <!-- Description -->
+                        <textarea name="description" placeholder="Description" required
+                                  class="w-full border border-gray-300 rounded-xl px-4 py-3 h-36 text-base shadow-sm resize-none"></textarea>
+
+                        <!-- Submit Button -->
+                        <div class="text-center">
+                            <button type="submit"
+                                    class="bg-red-400 hover:bg-red-500 text-white font-bold py-4 px-10 rounded-full text-lg transition duration-200">
+                                Send Document
+                            </button>
+                        </div>
+                    </form>
+                </div>
+               
+
+                <?php elseif ($currentPage === 'Track'): ?>
             <!-- Track content would go here -->
             <div class="p-4">
                 <h2 class="text-xl font-semibold mb-4">Document Tracking</h2>
