@@ -5,7 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="61353cad-d58b-4648-9192-e39f980708fe" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/examplimage.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controller/get_profile_image.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/controller/user_images.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/view/userView.php" beforeDir="false" afterPath="$PROJECT_DIR$/view/userView.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,7 +66,7 @@
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Deru/Desktop/SportsOfficeAIM&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/xampp/htdocs/SportsOfficeAIM/test&quot;,
     &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
@@ -80,6 +84,7 @@
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\xampp\htdocs\SportsOfficeAIM\test" />
       <recent name="C:\Users\Deru\PhpstormProjects\SportsOfficeAIM\sportsofficedb\admin\JAVASCRIPT" />
       <recent name="C:\Users\Deru\PhpstormProjects\SportsOfficeAIM\sportsofficedb\admin" />
     </key>
@@ -171,6 +176,10 @@
       <workItem from="1746407807533" duration="394000" />
       <workItem from="1746408904027" duration="550000" />
       <workItem from="1746410740457" duration="2344000" />
+      <workItem from="1746413581245" duration="1139000" />
+      <workItem from="1746414782060" duration="110000" />
+      <workItem from="1746416381242" duration="25000" />
+      <workItem from="1746416466356" duration="4122000" />
     </task>
     <servers />
   </component>

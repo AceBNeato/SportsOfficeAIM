@@ -152,6 +152,7 @@ $_SESSION['user']['last_activity'] = time();
                         <div class="flex flex-col sm:flex-row items-start gap-6">
                             <div class="flex-shrink-0 relative group">
                                 <div class="w-24 h-24 rounded-full bg-gray-200 overflow-hidden border-4 border-blue-100">
+
                                     <div id="profile-initials" class="w-full h-full flex items-center justify-center text-center bg-blue-500 text-white text-2xl font-bold <?php echo isset($_SESSION['user']['has_profile_image']) ? 'hidden' : ''; ?>">
                                         <?php
                                         $initials = '';
@@ -165,9 +166,10 @@ $_SESSION['user']['last_activity'] = time();
                                         echo strtoupper($initials ?: 'U');
                                         ?>
                                     </div>
-                                    <?php if (isset($_SESSION['user']['has_profile_image']) && $_SESSION['user']['has_profile_image']): ?>
-                                        <img id="profile-image" src="../controller/get_profile_image.php?id=<?php echo $_SESSION['user']['id']; ?>" alt="Profile" class="w-full h-full object-cover">
-                                    <?php endif; ?>
+
+
+
+
                                 </div>
                             </div>
 
@@ -439,9 +441,15 @@ $_SESSION['user']['last_activity'] = time();
                             }
                             echo $initials ?: 'U';
                             ?>
+
                         </div>
                         <img id="modal-profile-image" src="<?php echo $_SESSION['user']['profile_pic'] ?? ''; ?>" alt="Profile" class="w-full h-full object-cover <?php echo isset($_SESSION['user']['profile_pic']) ? '' : 'hidden'; ?>">
                     </div>
+
+
+
+
+
                     <label for="modal-profile-upload" class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-full bg-black/50 cursor-pointer">
                         <span class="text-white text-sm font-medium bg-blue-600 px-2 py-1 rounded">Change Photo</span>
                         <input id="modal-profile-upload" type="file" accept="image/*" class="hidden">
