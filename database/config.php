@@ -48,6 +48,21 @@ if (!$conn->query($sql)) {
 }
 
 
+// 6. Create user_images table connected to users table
+$sql = "CREATE TABLE IF NOT EXISTS user_images (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    image LONGBLOB NOT NULL,
+    image_type VARCHAR(50),
+    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+)";
+if (!$conn->query($sql)) {
+    die("Error creating user_images table: " . $conn->error);
+}
+
+
+
 $conn->multi_query($sql);
 
 // Wait for procedure creation to finish
