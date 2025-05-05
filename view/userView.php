@@ -663,6 +663,57 @@ $_SESSION['user']['last_activity'] = time();
 </script>
 
 
+<!-- Modal HTML -->
+<div id="passwordModal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded-xl shadow-xl max-w-sm w-full p-5">
+        <h2 class="text-lg font-semibold mb-4 text-red-600">Password Mismatch</h2>
+        <p class="text-sm text-gray-600 mb-4">New password and confirm password do not match.</p>
+        <div class="flex justify-end">
+            <button onclick="closeModal('passwordModal')" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">OK</button>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+    function togglePassword(id) {
+        const input = document.getElementById(id);
+        const icon = input.nextElementSibling;
+        const [eye, eyeSlash] = icon.querySelectorAll('svg');
+
+        if (input.type === "password") {
+            input.type = "text";
+            eye.classList.add("hidden");
+            eyeSlash.classList.remove("hidden");
+        } else {
+            input.type = "password";
+            eye.classList.remove("hidden");
+            eyeSlash.classList.add("hidden");
+        }
+    }
+
+    function validatePasswords() {
+        const password = document.getElementById('password').value;
+        const confirm = document.getElementById('confirm_password').value;
+        if (password !== confirm) {
+            document.getElementById('passwordModal').classList.remove('hidden');
+            return false;
+        }
+        return true;
+    }
+
+    function closeModal() {
+        document.getElementById('passwordModal').classList.add('hidden');
+    }
+
+    // Attach to your form (you can adjust selector as needed)
+    document.querySelector('form')?.addEventListener('submit', function(e) {
+        if (!validatePasswords()) {
+            e.preventDefault();
+        }
+    });
+</script>
+
     <?php if (isset($_GET['message'])): ?>
     document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('messageModal').classList.remove('hidden');

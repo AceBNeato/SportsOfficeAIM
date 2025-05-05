@@ -56,32 +56,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Handle profile picture upload if one was submitted
-    if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] === UPLOAD_ERR_OK) {
-        $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
-        $file_type = $_FILES['profile_pic']['type'];
-
-        if (!in_array($file_type, $allowed_types)) {
-            $errors[] = "Invalid file type. Only JPG, PNG, and GIF are allowed.";
-        } else {
-            $upload_dir = '../public/uploads/profiles/';
-
-            // Create directory if it doesn't exist
-            if (!file_exists($upload_dir)) {
-                mkdir($upload_dir, 0755, true);
-            }
-
-            $file_name = uniqid('profile_') . '_' . basename($_FILES['profile_pic']['name']);
-            $upload_path = $upload_dir . $file_name;
-
-            if (move_uploaded_file($_FILES['profile_pic']['tmp_name'], $upload_path)) {
-                $profile_pic_path = $upload_path;
-            } else {
-                $errors[] = "Failed to upload profile picture.";
-            }
-        }
-    }
-
     // If there are no errors, update the database
     if (empty($errors)) {
         // Start transaction
@@ -118,9 +92,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $types .= 's';
             }
 
-            // Only update email in main users table if changed
+            // Re-check role and user table
+            $table = ($role === 'admin') ? 'admins' : 'users';
+
+// Check if new email already in use
             if (!empty($email) && $email !== $_SESSION['user']['email']) {
-                // Check if email already exists
                 $check_stmt = $conn->prepare("SELECT id FROM users WHERE email = ? AND id != ?");
                 $check_stmt->bind_param("si", $email, $user_id);
                 $check_stmt->execute();
@@ -135,17 +111,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $query_parts[] = "email = ?";
                 $params[] = $email;
                 $types .= 's';
-
-                // Also update the authentication table if using separate auth table
-                $auth_update = $conn->prepare("UPDATE users SET email = ? WHERE email = ?");
-                $auth_update->bind_param("ss", $email, $_SESSION['user']['email']);
-                $auth_update->execute();
-                $auth_update->close();
             }
 
-            // If there are fields to update
+// Add password hash update if provided
+            if (!empty($password)) {
+                $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+                $query_parts[] = "password = ?";
+                $params[] = $hashed_password;
+                $types .= 's';
+            }
+
+// Final update query (users table always holds login info)
             if (!empty($query_parts)) {
-                $query = "UPDATE $table SET " . implode(", ", $query_parts) . " WHERE id = ?";
+                $query = "UPDATE users SET " . implode(", ", $query_parts) . " WHERE id = ?";
                 $params[] = $user_id;
                 $types .= 'i';
 
@@ -155,6 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->close();
                 $updated = true;
             }
+
 
             // Update password if provided
             if (!empty($password)) {
@@ -171,16 +150,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Update session variables with new values
             if ($updated) {
-                // Refresh user data
                 $_SESSION['user']['full_name'] = $full_name;
                 if (!empty($email)) $_SESSION['user']['email'] = $email;
                 $_SESSION['user']['address'] = $address;
                 if (!empty($profile_pic_path)) $_SESSION['user']['profile_pic'] = $profile_pic_path;
 
-                // Set success message
                 $_SESSION['profile_update_success'] = true;
                 $_SESSION['profile_message'] = "Profile updated successfully.";
             }
+
 
             // Redirect back to user view
             header("Location: ../view/userView.php?page=Dashboard");
