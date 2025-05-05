@@ -4,13 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="61353cad-d58b-4648-9192-e39f980708fe" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/controller/get_profile_image.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/controller/user_images.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controller/update_profile.php" beforeDir="false" afterPath="$PROJECT_DIR$/controller/update_profile.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/view/userView.php" beforeDir="false" afterPath="$PROJECT_DIR$/view/userView.php" afterDir="false" />
-    </list>
+    <list default="true" id="61353cad-d58b-4648-9192-e39f980708fe" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -172,6 +166,7 @@
       <workItem from="1746372896121" duration="2494000" />
       <workItem from="1746397961495" duration="5468000" />
       <workItem from="1746405337060" duration="1841000" />
+      <workItem from="1746407807533" duration="394000" />
     </task>
     <servers />
   </component>
