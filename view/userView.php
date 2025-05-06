@@ -100,9 +100,10 @@ $_SESSION['user']['last_activity'] = time();
             // Get current page from query parameter with security validation
 
             $currentPage = isset($_GET['page']) ? $_GET['page'] : 'Dashboard';
-            $menu = ['Dashboard', 'Submissions', 'Track', 'Log-out'];
+            $menu = ['Dashboard', 'Achievement','Submissions', 'Track', 'Log-out'];
             $icon = [
                 'Dashboard' => "<box-icon type='solid' name='Dashboard' color='white'></box-icon>",
+                'Achievement' => "<box-icon name='trophy' type='solid' color='white'></box-icon>",
                 'Submissions' => "<box-icon type='solid' name='file-export' color='white'></box-icon>",
                 'Track' => "<box-icon type='solid' name='file' color='white'></box-icon>",
                 'Log-out' => "<box-icon name='log-out' color='white'></box-icon>"
@@ -167,6 +168,7 @@ $_SESSION['user']['last_activity'] = time();
                 </h1>
 
                 <?php if ($currentPage === 'Dashboard'): ?>
+                <?php elseif ($currentPage === 'Achievement'): ?>
                 <?php elseif ($currentPage === 'Submissions'): ?>
                 <?php elseif ($currentPage === 'Track'): ?>
                 <?php endif; ?>

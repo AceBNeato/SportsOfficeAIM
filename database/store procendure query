@@ -369,14 +369,3 @@ BEGIN
 END //
 DELIMITER ;
 
-ALTER TABLE submissions
-ADD COLUMN fullname VARCHAR(100) NOT NULL AFTER user_id,
-ADD COLUMN year_section VARCHAR(50) NOT NULL AFTER fullname,
-ADD COLUMN student_id VARCHAR(50) NOT NULL AFTER year_section,
-ADD COLUMN contact_email VARCHAR(100) NOT NULL AFTER student_id,
-ADD COLUMN document_type VARCHAR(50) NOT NULL AFTER contact_email,
-ADD COLUMN other_type VARCHAR(50) AFTER document_type,
-ADD COLUMN file_name VARCHAR(255) NOT NULL AFTER other_type,
-ADD COLUMN file_path VARCHAR(255) NOT NULL AFTER file_name,
-ADD COLUMN file_size INT NOT NULL AFTER file_path,
-ADD COLUMN description TEXT NOT NULL AFTER file_size;
