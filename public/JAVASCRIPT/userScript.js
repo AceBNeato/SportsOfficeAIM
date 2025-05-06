@@ -261,8 +261,24 @@ document.getElementById('close-modal').addEventListener('click', function() {
 }
 }
 
-
-
+// In your form submission handler
+fetch('../controller/submit_form.php', {
+    method: 'POST',
+    body: formData
+})
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Document submitted successfully! Reference ID: ' + data.submission_id);
+            // Redirect or reset form
+        } else {
+            alert('Error: ' + data.errors.join('\n'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again.');
+    });
 
 
 

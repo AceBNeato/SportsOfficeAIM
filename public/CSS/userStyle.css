@@ -725,3 +725,20 @@ form select {
         display: flex !important;
     }
 }
+
+/* Submission Modals */
+#submissionSuccessModal, #submissionErrorModal {
+    transition: opacity 0.3s ease;
+}
+
+#submissionErrorMessages p {
+    margin-bottom: 0.5rem;
+    padding-left: 1rem;
+    position: relative;
+}
+
+#submissionErrorMessages p::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+}

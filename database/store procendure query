@@ -322,8 +322,61 @@ DELIMITER ;
 
 
 
+DELIMITER //
 
+-- Procedure to handle document submission
+CREATE PROCEDURE IF NOT EXISTS SubmitDocument(
+    IN p_user_id INT,
+    IN p_full_name VARCHAR(255),
+    IN p_year_section VARCHAR(100),
 
+    IN p_contact_email VARCHAR(255),
+    IN p_document_type VARCHAR(100),
+    IN p_other_type VARCHAR(100),
+    IN p_file_name VARCHAR(255),
+    IN p_file_path VARCHAR(255),
+    IN p_file_size INT,
+    IN p_description TEXT
+)
+BEGIN
+    INSERT INTO submissions (
+        user_id,
+        full_name,
+        year_section,
 
+        contact_email,
+        document_type,
+        other_type,
+        file_name,
+        file_path,
+        file_size,
+        description
+    ) VALUES (
+        p_user_id,
+        p_full_name,
+        p_year_section,
 
+        p_contact_email,
+        p_document_type,
+        p_other_type,
+        p_file_name,
+        p_file_path,
+        p_file_size,
+        p_description
+    );
 
+    SELECT LAST_INSERT_ID() AS submission_id, 'Document submitted successfully' AS message;
+END //
+DELIMITER ;
+
+ALTER TABLE submissions
+ADD COLUMN fullname VARCHAR(100) NOT NULL AFTER user_id,
+ADD COLUMN year_section VARCHAR(50) NOT NULL AFTER fullname,
+ADD COLUMN student_id VARCHAR(50) NOT NULL AFTER year_section,
+ADD COLUMN contact_email VARCHAR(100) NOT NULL AFTER student_id,
+ADD COLUMN document_type VARCHAR(50) NOT NULL AFTER contact_email,
+ADD COLUMN other_type VARCHAR(50) AFTER document_type,
+ADD COLUMN file_name VARCHAR(255) NOT NULL AFTER other_type,
+ADD COLUMN file_path VARCHAR(255) NOT NULL AFTER file_name,
+ADD COLUMN file_size INT NOT NULL AFTER file_path,
+ADD COLUMN description TEXT NOT NULL AFTER file_size;

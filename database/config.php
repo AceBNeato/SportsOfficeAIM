@@ -47,7 +47,6 @@ if (!$conn->query($sql)) {
     die("Error creating admins table: " . $conn->error);
 }
 
-
 // 6. Create user_images table connected to users table
 $sql = "CREATE TABLE IF NOT EXISTS user_images (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -61,7 +60,26 @@ if (!$conn->query($sql)) {
     die("Error creating user_images table: " . $conn->error);
 }
 
-
+// 7. Create submissions table
+$sql = "CREATE TABLE IF NOT EXISTS submissions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    full_name VARCHAR(255) NOT NULL,
+    year_section VARCHAR(100) NOT NULL,
+    contact_email VARCHAR(255) NOT NULL,
+    document_type VARCHAR(100) NOT NULL,
+    other_type VARCHAR(100),
+    file_name VARCHAR(255) NOT NULL,
+    file_path VARCHAR(255) NOT NULL,
+    file_size INT NOT NULL,
+    description TEXT NOT NULL,
+    submission_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+)";
+if (!$conn->query($sql)) {
+    die("Error creating submissions table: " . $conn->error);
+}
 
 $conn->multi_query($sql);
 
@@ -72,16 +90,7 @@ do {
     }
 } while ($conn->more_results() && $conn->next_result());
 
-$conn->multi_query($sql);
-
-// Wait for procedure creation to finish
-do {
-    if ($result = $conn->store_result()) {
-        $result->free();
-    }
-} while ($conn->more_results() && $conn->next_result());
-
-// 8. Now add an admin using stored procedure
+// 9. Now add an admin using stored procedure
 $fullName = "Gian Glen Vincent Garcia";
 $address = "Tagum City";
 $sampleEmail = "admin@usep.edu.ph";
@@ -101,7 +110,7 @@ if ($result) {
 }
 $stmt->close();
 
-// 9. Count students
+// 10. Count students
 $result = $conn->query("CALL GetTotalStudents()");
 if ($result) {
     $row = $result->fetch_assoc();
@@ -112,5 +121,3 @@ if ($result) {
 
 $conn->close();
 ?>
-
-

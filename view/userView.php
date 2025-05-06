@@ -657,7 +657,7 @@ $_SESSION['user']['last_activity'] = time();
                         </div>
 
                         <!-- Form -->
-                        <form action="submit_form.php" method="POST" enctype="multipart/form-data" class="submissions-form">
+                        <form action="../controller/submit_form.php" method="POST" enctype="multipart/form-data" class="submissions-form">
                             <!-- Section: Personal Information -->
                             <div class="form-section">
                                 <h3 class="section-title">
@@ -677,12 +677,12 @@ $_SESSION['user']['last_activity'] = time();
                                         <input type="text" id="year_section" name="year_section" placeholder="Ex: 1IT - BSIT" required>
                                     </div>
                                     <div class="form-group">
-                                        <label for="student_number">Student Id</label>
-                                        <input type="text" id="student_number" name="student_number" placeholder="Enter your student id" required>
+                                        <label for="student_id">Student Id</label>
+                                        <input type="text" id="student_id" name="student_id" placeholder="Enter your student id" required>
                                     </div>
                                     <div class="form-group">
-                                        <label for="contact_number">Email</label>
-                                        <input type="tel" id="contact_number" name="contact_number" placeholder="Enter your email" required>
+                                        <label for="contact_email">Email</label>
+                                        <input type="tel" id="contact_email" name="contact_email" placeholder="Enter your email" required>
                                     </div>
                                 </div>
                             </div>
@@ -1735,7 +1735,99 @@ $_SESSION['user']['last_activity'] = time();
     <?php endif; ?>
 
 
+    <!-- Submission Success Modal -->
+    <div id="submissionSuccessModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 hidden">
+        <div class="bg-white rounded-lg shadow-lg p-6 w-80 text-center">
+            <div class="mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-green-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
+            <h2 class="text-lg font-semibold mb-2">Submission Successful!</h2>
+            <p id="submissionSuccessMessage" class="text-gray-600 mb-4">Your document has been submitted successfully!</p>
+            <div class="flex justify-between mt-4 gap-2">
+                <button id="goToDashboardBtn" class="px-3 py-1.5 text-sm bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors">
+                    Back to Dashboard
+                </button>
+                <button id="submitAnotherBtn" class="px-3 py-1.5 text-sm bg-green-500 text-white rounded hover:bg-green-600 transition-colors">
+                    Submit Another
+                </button>
+            </div>
+        </div>
+    </div>
 
+    <script>
+        // Handle form submission with AJAX
+        document.querySelector('.submissions-form')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const form = e.target;
+            const formData = new FormData(form);
+
+            // Show loading state
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Submitting...';
+            submitBtn.disabled = true;
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show success modal
+                        document.getElementById('submissionSuccessMessage').textContent = data.message;
+                        document.getElementById('submissionSuccessModal').classList.remove('hidden');
+
+                        // Reset form
+                        form.reset();
+                        document.getElementById('file_info').classList.add('hidden');
+                    } else {
+                        // Show error modal
+                        const errorContainer = document.getElementById('submissionErrorMessages');
+                        errorContainer.innerHTML = '';
+
+                        data.errors.forEach(error => {
+                            const errorElement = document.createElement('p');
+                            errorElement.className = 'text-sm mb-1';
+                            errorElement.textContent = `• ${error}`;
+                            errorContainer.appendChild(errorElement);
+                        });
+
+                        document.getElementById('submissionErrorModal').classList.remove('hidden');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Show error modal
+                    const errorContainer = document.getElementById('submissionErrorMessages');
+                    errorContainer.innerHTML = '<p class="text-sm mb-1">• An unexpected error occurred. Please try again.</p>';
+                    document.getElementById('submissionErrorModal').classList.remove('hidden');
+                })
+                .finally(() => {
+                    submitBtn.innerHTML = originalBtnText;
+                    submitBtn.disabled = false;
+                });
+        });
+
+        // Close buttons for modals
+        document.getElementById('closeSubmissionError')?.addEventListener('click', function() {
+            document.getElementById('submissionErrorModal').classList.add('hidden');
+        });
+
+        // Success modal buttons
+        document.getElementById('goToDashboardBtn')?.addEventListener('click', function() {
+            window.location.href = 'userView.php?page=Dashboard';
+        });
+
+        document.getElementById('submitAnotherBtn')?.addEventListener('click', function() {
+            document.getElementById('submissionSuccessModal').classList.add('hidden');
+            // Optionally focus on the first form field if needed
+            // document.querySelector('.submissions-form input').focus();
+        });
+    </script>
 
 
 
