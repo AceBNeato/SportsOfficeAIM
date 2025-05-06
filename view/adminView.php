@@ -56,7 +56,7 @@ $_SESSION['user']['last_activity'] = time();
             $currentPage = isset($_GET['page']) ? $_GET['page'] : 'Achievement';
             $menu = ['Achievement','Documents', 'Evaluation', 'Reports', 'Users', 'Log-out'];
             $icon = [
-                'Achievement' => "<box-ico name='trophy' type='solid' color='white'></box-icon>",
+                'Achievement' => "<box-icon name='trophy' type='solid' color='white'></box-icon>",
                 'Documents' => "<box-icon name='file-doc' type='solid' color='white'></box-icon>",
                 'Evaluation' => "<box-icon name='line-chart' color='white'></box-icon>",
                 'Reports' => "<box-icon name='report' type='solid' color='white'></box-icon>",
