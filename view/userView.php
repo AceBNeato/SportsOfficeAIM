@@ -682,7 +682,7 @@ $_SESSION['user']['last_activity'] = time();
                                     </div>
                                     <div class="form-group">
                                         <label for="contact_email">Email</label>
-                                        <input type="tel" id="contact_email" name="contact_email" placeholder="Enter your email" required>
+                                        <input type="text" id="contact_email" name="contact_email" placeholder="Enter your email" required>
                                     </div>
                                 </div>
                             </div>
@@ -1124,6 +1124,36 @@ $_SESSION['user']['last_activity'] = time();
                         });
                     });
                 </script>
+
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function () {
+                            const documentTypeSelect = document.getElementById("document_type");
+                            const otherTypeContainer = document.getElementById("other_type_container");
+
+                            documentTypeSelect.addEventListener("change", function () {
+                                if (this.value === "Others") {
+                                    otherTypeContainer.classList.remove("hidden");
+                                } else {
+                                    otherTypeContainer.classList.add("hidden");
+                                    document.getElementById("other_type").value = "";
+                                }
+                            });
+
+                            const uploadedFileInput = document.getElementById("uploaded_file");
+                            const fileInfo = document.getElementById("file_info");
+                            const fileNameSpan = document.getElementById("file_name");
+
+                            uploadedFileInput.addEventListener("change", function () {
+                                if (this.files.length > 0) {
+                                    fileNameSpan.textContent = this.files[0].name;
+                                    fileInfo.classList.remove("hidden");
+                                } else {
+                                    fileInfo.classList.add("hidden");
+                                    fileNameSpan.textContent = "";
+                                }
+                            });
+                        });
+                    </script>
 
 
 

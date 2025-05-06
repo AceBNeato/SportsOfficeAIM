@@ -60,7 +60,7 @@ if (!$conn->query($sql)) {
     die("Error creating user_images table: " . $conn->error);
 }
 
-// 7. Create submissions table
+// 7. Create submissions table (file stored in DB)
 $sql = "CREATE TABLE IF NOT EXISTS submissions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -70,13 +70,14 @@ $sql = "CREATE TABLE IF NOT EXISTS submissions (
     document_type VARCHAR(100) NOT NULL,
     other_type VARCHAR(100),
     file_name VARCHAR(255) NOT NULL,
-    file_path VARCHAR(255) NOT NULL,
+    file_data LONGBLOB NOT NULL,
     file_size INT NOT NULL,
     description TEXT NOT NULL,
     submission_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 )";
+
 if (!$conn->query($sql)) {
     die("Error creating submissions table: " . $conn->error);
 }

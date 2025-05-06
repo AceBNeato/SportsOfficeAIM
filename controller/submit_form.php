@@ -1,218 +1,178 @@
 <?php
-// submit_form.php
-
-// Start session to access user information
 session_start();
 
-// Database configuration
 $host = "localhost";
 $username = "root";
 $password = "";
 $dbname = "SportOfficeDB";
 
-// Create connection
+// Database connection
 $conn = new mysqli($host, $username, $password, $dbname);
-
-// Check connection
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+    die(json_encode(['success' => false, 'errors' => ["Database connection failed"]]));
 }
 
-// Initialize variables
 $errors = [];
 $success = false;
 $submission_id = null;
 
-// Process form when submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Validate and sanitize input data
-    $fullname = trim($_POST['fullname']);
-    $year_section = trim($_POST['year_section']);
-    $student_id = trim($_POST['student_id']);
-    $contact_email = trim($_POST['contact_email']);
-    $document_type = trim($_POST['document_type']);
-    $other_type = isset($_POST['other_type']) ? trim($_POST['other_type']) : '';
-    $description = trim($_POST['description']);
+    // Validate and sanitize inputs
+    $fullname = filter_input(INPUT_POST, 'fullname', FILTER_SANITIZE_STRING);
+    $year_section = filter_input(INPUT_POST, 'year_section', FILTER_SANITIZE_STRING);
+    $student_id = filter_input(INPUT_POST, 'student_id', FILTER_SANITIZE_STRING);
+    $contact_email = filter_input(INPUT_POST, 'contact_email', FILTER_SANITIZE_EMAIL);
+    $document_type = filter_input(INPUT_POST, 'document_type', FILTER_SANITIZE_STRING);
+    $other_type = isset($_POST['other_type']) ? filter_input(INPUT_POST, 'other_type', FILTER_SANITIZE_STRING) : '';
+    $description = filter_input(INPUT_POST, 'description', FILTER_SANITIZE_STRING);
 
-    // Basic validation
-    if (empty($fullname)) {
-        $errors[] = "Full name is required";
+    // Validation
+    if (empty($fullname) || !preg_match('/^[A-Za-z\s]{2,100}$/', $fullname)) {
+        $errors[] = "Invalid full name (2-100 letters and spaces only)";
     }
-    if (empty($year_section)) {
-        $errors[] = "Year & section is required";
+
+    if (empty($year_section) || !preg_match('/^[1-5][A-Za-z]{2,4}\s?-\s?[A-Za-z]{2,10}$/', $year_section)) {
+        $errors[] = "Invalid year & section format (e.g., '1IT - BSIT')";
     }
-    if (empty($student_id)) {
-        $errors[] = "Student ID is required";
+
+    if (empty($student_id) || !preg_match('/^[A-Za-z0-9-]{5,20}$/', $student_id)) {
+        $errors[] = "Invalid student ID (5-20 letters, numbers, hyphens)";
     }
+
     if (empty($contact_email) || !filter_var($contact_email, FILTER_VALIDATE_EMAIL)) {
         $errors[] = "Valid email is required";
     }
+
     if (empty($document_type)) {
         $errors[] = "Document type is required";
     }
+
     if ($document_type === 'Others' && empty($other_type)) {
         $errors[] = "Please specify document type";
     }
-    if (empty($description)) {
-        $errors[] = "Description is required";
+
+    if (empty($description) || strlen($description) < 10) {
+        $errors[] = "Description must be at least 10 characters";
     }
 
-    // Handle file upload
+    // File validation
     $file_name = '';
-    $file_path = '';
     $file_size = 0;
+    $file_data = null;
+    $allowed_types = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'];
 
     if (isset($_FILES['uploaded_file']) && $_FILES['uploaded_file']['error'] == UPLOAD_ERR_OK) {
         $file = $_FILES['uploaded_file'];
-
-        // Validate file
-        $allowed_types = [
-            'application/pdf',
-            'application/msword',
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'image/jpeg',
-            'image/png',
-            'image/jpg'
-        ];
-        $max_size = 5 * 1024 * 1024; // 5MB
-
-        // Get file extension and validate
         $file_ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-        $allowed_extensions = ['pdf', 'doc', 'docx', 'jpeg', 'png', 'jpg'];
 
-        if (!in_array($file_ext, $allowed_extensions)) {
+        // Verify file type
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $file['tmp_name']);
+        finfo_close($finfo);
+
+        $valid_mimes = [
+            'pdf' => 'application/pdf',
+            'doc' => 'application/msword',
+            'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'png' => 'image/png'
+        ];
+
+        if (!in_array($file_ext, $allowed_types) || !in_array($mime, $valid_mimes)) {
             $errors[] = "Invalid file type. Only PDF, DOC, DOCX, JPG, PNG are allowed.";
         }
 
-        if ($file['size'] > $max_size) {
+        if ($file['size'] > 5 * 1024 * 1024) { // 5MB
             $errors[] = "File size exceeds 5MB limit";
         }
 
-        // If no errors, process the file
-        if (empty($errors)) {
-            $upload_dir = '../uploads/'; // Changed to relative path from form location
-
-            // Create upload directory if it doesn't exist
-            if (!file_exists($upload_dir)) {
-                mkdir($upload_dir, 0777, true);
-            }
-
-            // Generate unique filename while preserving extension
-            $file_name = uniqid('doc_', true) . '.' . $file_ext;
-            $file_path = $upload_dir . $file_name;
-            $file_size = $file['size'];
-
-            // Move the file
-            if (!move_uploaded_file($file['tmp_name'], $file_path)) {
-                $errors[] = "Failed to upload file. Please try again.";
-                error_log("File upload failed. Check directory permissions for: " . $upload_dir);
-            }
+        $file_data = file_get_contents($file['tmp_name']);
+        if ($file_data === false) {
+            $errors[] = "Failed to read uploaded file";
         }
+
+        $file_name = uniqid('doc_', true) . '.' . $file_ext;
+        $file_size = $file['size'];
     } else {
-        $file_error = $_FILES['uploaded_file']['error'] ?? 'unknown';
-        $errors[] = "File upload is required. Error code: " . $file_error;
+        $errors[] = "File upload is required";
     }
 
-    // If no errors, proceed with database insertion
+    // Proceed if no errors
     if (empty($errors)) {
-        // Check if the user exists in the users table based on the student ID
-        // If not, create a new user first
-        $user_id = null;
+        $conn->begin_transaction();
 
-        // First, try to find the user by email
-        $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
-        $stmt->bind_param("s", $contact_email);
-        $stmt->execute();
-        $result = $stmt->get_result();
+        try {
+            // Check if user exists
+            $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+            $stmt->bind_param("s", $contact_email);
+            $stmt->execute();
+            $result = $stmt->get_result();
 
-        if ($result->num_rows > 0) {
-            // User exists, get their ID
-            $row = $result->fetch_assoc();
-            $user_id = $row['id'];
-        } else {
-            // User doesn't exist, create a new user
-            $temp_password = password_hash(uniqid(), PASSWORD_DEFAULT); // Generate temporary password
-            $status = 'undergraduate';
-            $address = 'Not specified'; // Default address
-
-            $stmt = $conn->prepare("INSERT INTO users (student_id, full_name, address, email, password, status) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssssss",
-                $student_id,
-                $fullname,
-                $address,
-                $contact_email,
-                $temp_password,
-                $status
-            );
-
-            if ($stmt->execute()) {
-                $user_id = $conn->insert_id;
-                error_log("Created new user with ID: $user_id");
+            if ($result->num_rows > 0) {
+                $row = $result->fetch_assoc();
+                $user_id = $row['id'];
             } else {
-                $errors[] = "Failed to create user account: " . $stmt->error;
-            }
-        }
-        $stmt->close();
+                // Create new user
+                $temp_password = password_hash(bin2hex(random_bytes(16)), PASSWORD_DEFAULT);
+                $status = 'undergraduate';
+                $address = 'Not specified';
 
-        // Only proceed if we have a valid user_id
-        if ($user_id && empty($errors)) {
-            // If document type is "Others", use the specified type
+                $stmt = $conn->prepare("INSERT INTO users (student_id, full_name, address, email, password, status) VALUES (?, ?, ?, ?, ?, ?)");
+                $stmt->bind_param("ssssss", $student_id, $fullname, $address, $contact_email, $temp_password, $status);
+
+                if (!$stmt->execute()) {
+                    throw new Exception("Failed to create user: " . $stmt->error);
+                }
+
+                $user_id = $conn->insert_id;
+            }
+
+            // Insert submission
             $final_document_type = ($document_type === 'Others') ? $other_type : $document_type;
 
-            // Prepare the SQL statement using prepared statements
             $stmt = $conn->prepare("INSERT INTO submissions 
-                           (user_id, full_name, year_section, contact_email, 
-                            document_type, other_type, file_name, file_path, file_size, description, status) 
-                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')");
+                (user_id, full_name, year_section, contact_email, 
+                 document_type, other_type, file_name, file_data, file_size, description, status) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')");
 
-            if ($stmt === false) {
-                $errors[] = "Database error: " . $conn->error;
-            } else {
-                $stmt->bind_param("isssssssis",
-                    $user_id,
-                    $fullname,
-                    $year_section,
-                    $contact_email,
-                    $final_document_type,
-                    $other_type,
-                    $file_name,
-                    $file_path,
-                    $file_size,
-                    $description
-                );
+            $null = NULL;
+            $stmt->bind_param("issssssbis",
+                $user_id,
+                $fullname,
+                $year_section,
+                $contact_email,
+                $final_document_type,
+                $other_type,
+                $file_name,
+                $null,
+                $file_size,
+                $description
+            );
 
-                if ($stmt->execute()) {
-                    $submission_id = $conn->insert_id;
-                    $success = true;
+            $stmt->send_long_data(7, $file_data);
 
-                    // Log successful submission
-                    error_log("Document submitted successfully. ID: $submission_id");
-                } else {
-                    $errors[] = "Error submitting document: " . $stmt->error;
-
-                    // Clean up uploaded file if DB insert failed
-                    if (file_exists($file_path)) {
-                        unlink($file_path);
-                    }
-                }
-                $stmt->close();
+            if (!$stmt->execute()) {
+                throw new Exception("Failed to submit document: " . $stmt->error);
             }
-        } else {
-            if (empty($errors)) {
-                $errors[] = "Failed to identify or create user account";
-            }
+
+            $submission_id = $conn->insert_id;
+            $conn->commit();
+            $success = true;
+
+        } catch (Exception $e) {
+            $conn->rollback();
+            $errors[] = $e->getMessage();
         }
     }
-
-    // Return JSON response for AJAX requests
-    header('Content-Type: application/json');
-    echo json_encode([
-        'success' => $success,
-        'errors' => $errors,
-        'submission_id' => $submission_id,
-        'message' => $success ? "Your document has been submitted successfully!" : ""
-    ]);
-    exit;
 }
 
-$conn->close();
+// Return JSON response
+header('Content-Type: application/json');
+echo json_encode([
+    'success' => $success,
+    'errors' => $errors,
+    'submission_id' => $submission_id,
+    'message' => $success ? "Your document has been submitted successfully!" : ""
+]);
+exit;
