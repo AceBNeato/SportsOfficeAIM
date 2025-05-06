@@ -53,9 +53,10 @@ $_SESSION['user']['last_activity'] = time();
 
         <nav class="space-y-2 w-full px-2 mt-4">
             <?php
-            $currentPage = isset($_GET['page']) ? $_GET['page'] : 'Documents';
-            $menu = ['Documents', 'Evaluation', 'Reports', 'Users', 'Log-out'];
+            $currentPage = isset($_GET['page']) ? $_GET['page'] : 'Achievement';
+            $menu = ['Achievement','Documents', 'Evaluation', 'Reports', 'Users', 'Log-out'];
             $icon = [
+                'Achievement' => "<box-ico name='trophy' type='solid' color='white'></box-icon>",
                 'Documents' => "<box-icon name='file-doc' type='solid' color='white'></box-icon>",
                 'Evaluation' => "<box-icon name='line-chart' color='white'></box-icon>",
                 'Reports' => "<box-icon name='report' type='solid' color='white'></box-icon>",
@@ -92,10 +93,16 @@ $_SESSION['user']['last_activity'] = time();
 
     <div class="sticky top-0 z-30 bg-gray-100 w-full px-1 sm:px-4 lg:px-3">
 
+        <div class="sticky top-0 z-30 bg-gray-100 w-full px-1 sm:px-4 lg:px-3">
+
+
+
+
             <div class="border-b-4 border-red-500 px-5 pt-2 pb-1 flex justify-between items-center">
                 <h1 class="text-2xl sm:text-3xl font-semibold text-gray-900 tracking-tight">
                     <?php echo htmlspecialchars($currentPage); ?>
                 </h1>
+
 
 
             <?php if ($currentPage === 'Users'): ?>

@@ -159,16 +159,17 @@ $_SESSION['user']['last_activity'] = time();
 <div id="mainContent" class="main-content px-1 sm:px-4 lg:px-0">
 
     <div class="sticky top-0 z-30 bg-gray-100 w-full px-1 sm:px-4 lg:px-3">
-        <div class="sticky top-0 z-30 bg-gray-100 w-full px-1 sm:px-4 lg:px-3">
-        <div class="border-b-4 border-red-500 px-5 pt-2 pb-1 flex justify-between items-center">
-            <h1 class="text-2xl sm:text-3xl font-semibold text-gray-900 tracking-tight">
-                <?php echo htmlspecialchars($currentPage); ?>
-            </h1>
 
-            <?php if ($currentPage === 'Dashboard'): ?>
-            <?php elseif ($currentPage === 'Submissions'): ?>
-            <?php elseif ($currentPage === 'Track'): ?>
-            <?php endif; ?>
+            <div class="sticky top-0 z-30 bg-gray-100 w-full px-1 sm:px-4 lg:px-3">
+            <div class="border-b-4 border-red-500 px-5 pt-2 pb-1 flex justify-between items-center">
+                <h1 class="text-2xl sm:text-3xl font-semibold text-gray-900 tracking-tight">
+                    <?php echo htmlspecialchars($currentPage); ?>
+                </h1>
+
+                <?php if ($currentPage === 'Dashboard'): ?>
+                <?php elseif ($currentPage === 'Submissions'): ?>
+                <?php elseif ($currentPage === 'Track'): ?>
+                <?php endif; ?>
         </div>
         </div>
 
