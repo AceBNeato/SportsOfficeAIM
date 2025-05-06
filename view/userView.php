@@ -2,6 +2,35 @@
 // Start the session if not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
+// Check if user is logged in
+    if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+        header("Location: ../view/loginView.php");
+        exit;
+    }
+
+// Check session timeout (30 minutes)
+    $session_timeout = 1800;
+    if (isset($_SESSION['user']['last_activity']) && (time() - $_SESSION['user']['last_activity'] > $session_timeout)) {
+        session_unset();
+        session_destroy();
+        header("Location: ../view/loginView.php?timeout=1");
+        exit;
+    }
+
+// Update last activity
+    $_SESSION['user']['last_activity'] = time();
+
+// OPTIONAL: Debug year_section value
+    if (!isset($_SESSION['submissions']['year_section'])) {
+        error_log("DEBUG: year_section not set in session.");
+    } else {
+        error_log("DEBUG: year_section = " . $_SESSION['submissions']['year_section']);
+    }
+
 
 }
 
@@ -212,10 +241,6 @@ $_SESSION['user']['last_activity'] = time();
                              </div>
                             </div>
                         </div>
-
-
-
-
 
 
 
@@ -670,19 +695,30 @@ $_SESSION['user']['last_activity'] = time();
                                 <div class="form-grid">
                                     <div class="form-group">
                                         <label for="fullname">Full Name</label>
-                                        <input type="text" id="fullname" name="fullname" placeholder="Enter your full name" required>
+                                        <input type="text" id="fullname" name="fullname"
+                                               placeholder="Enter your full name" required
+                                               value="<?php echo isset($_SESSION['user']['full_name']) ? htmlspecialchars($_SESSION['user']['full_name']) : ''; ?>">
                                     </div>
+
                                     <div class="form-group">
                                         <label for="year_section">Year & Section</label>
-                                        <input type="text" id="year_section" name="year_section" placeholder="Ex: 1IT - BSIT" required>
+                                        <input type="text" id="year_section" name="year_section"
+                                               placeholder="Ex: 1IT - BSIT" required
+                                               value="<?php echo htmlspecialchars($_SESSION['submissions']['year_section'] ?? ''); ?>">
                                     </div>
+
                                     <div class="form-group">
                                         <label for="student_id">Student Id</label>
-                                        <input type="text" id="student_id" name="student_id" placeholder="Enter your student id" required>
+                                        <input type="text" id="student_id" name="student_id"
+                                               placeholder="Enter your student id" required
+                                               value="<?php echo htmlspecialchars($_SESSION['user']['student_id'] ?? ''); ?>">
                                     </div>
+
                                     <div class="form-group">
                                         <label for="contact_email">Email</label>
-                                        <input type="text" id="contact_email" name="contact_email" placeholder="Enter your email" required>
+                                        <input type="email" id="contact_email" name="contact_email"
+                                               placeholder="Enter your email" required
+                                               value="<?php echo htmlspecialchars($_SESSION['user']['email'] ?? ''); ?>">
                                     </div>
                                 </div>
                             </div>
@@ -778,6 +814,7 @@ $_SESSION['user']['last_activity'] = time();
                             </div>
 
                             <!-- Section: Description -->
+                            <!-- Section: Description -->
                             <div class="form-section">
                                 <h3 class="section-title">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
@@ -790,8 +827,23 @@ $_SESSION['user']['last_activity'] = time();
                                     <label for="description">Document Description</label>
                                     <textarea id="description" name="description" placeholder="Provide a brief description of the document" required></textarea>
                                     <p class="form-hint">Please provide any relevant details about your document submission.</p>
+                                    <p id="desc-warning" style="color: red; display: none;">Description must be at least 10 characters long.</p>
                                 </div>
                             </div>
+
+                            <script>
+                                const description = document.getElementById("description");
+                                const warning = document.getElementById("desc-warning");
+
+                                description.addEventListener("input", () => {
+                                    if (description.value.trim().length < 10) {
+                                        warning.style.display = "block";
+                                    } else {
+                                        warning.style.display = "none";
+                                    }
+                                });
+                            </script>
+
 
                             <!-- Submit Button -->
                             <div class="form-submit">

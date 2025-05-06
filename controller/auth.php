@@ -138,6 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $address = $user_details['address'];
         $id = $user_details['id'];
         $student_id = null;
+        $year_section = null; // Admins typically don't have year/section
     } else {
         // Query for regular user
         $query = "SELECT id, student_id, full_name, address, email, password FROM users WHERE email = ?";
@@ -166,6 +167,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id = $user_details['id'];
         $student_id = $user_details['student_id'];
         $password = $user_details['password'];
+
+        // Get year_section from submissions table
+        $year_section = null;
+        $submission_query = "SELECT year_section FROM submissions WHERE user_id = ? LIMIT 1";
+        $submission_stmt = $conn->prepare($submission_query);
+        if ($submission_stmt) {
+            $submission_stmt->bind_param("s", $user_id);
+            $submission_stmt->execute();
+            $submission_result = $submission_stmt->get_result();
+            if ($submission_result->num_rows > 0) {
+                $submission_data = $submission_result->fetch_assoc();
+                $year_section = $submission_data['year_section'];
+            }
+            $submission_stmt->close();
+        }
     }
 
     // Check if user has a profile image
@@ -197,14 +213,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'address' => $address,
         'role' => $role,
         'full_name' => $full_name,
+        'year_section' => $year_section,
         'last_activity' => time(),
         'ip_address' => $_SERVER['REMOTE_ADDR'],
         'user_agent' => $_SERVER['HTTP_USER_AGENT'],
-        'has_profile_image' => $has_profile_image  // Add this flag to session
+        'has_profile_image' => $has_profile_image
     ];
+
+    // Also store in submissions session for form autofill
+    $_SESSION['submissions']['year_section'] = $year_section ?? '';
 
     // Debug log
     error_log("User logged in - Email: $email, Role: $role, Has Image: " . ($has_profile_image ? 'Yes' : 'No') .
+        ", Year/Section: " . ($year_section ?? 'Not set') .
         ", Redirecting to: " . ($role === 'admin' ? 'adminView.php' : 'userView.php'));
 
     // Redirect based on role

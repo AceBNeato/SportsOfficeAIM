@@ -27,8 +27,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $description = filter_input(INPUT_POST, 'description', FILTER_SANITIZE_STRING);
 
     // Validation
-    if (empty($fullname) || !preg_match('/^[A-Za-z\s]{2,100}$/', $fullname)) {
-        $errors[] = "Invalid full name (2-100 letters and spaces only)";
+    if (empty($fullname) || !preg_match('/^[A-Za-z\s\.]{2,100}$/', $fullname)) {
+        $errors[] = "Invalid full name (2-100 letters, spaces, and dots only)";
     }
 
     if (empty($year_section) || !preg_match('/^[1-5][A-Za-z]{2,4}\s?-\s?[A-Za-z]{2,10}$/', $year_section)) {

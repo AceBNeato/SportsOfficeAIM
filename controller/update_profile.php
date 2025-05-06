@@ -139,7 +139,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 elseif ($upload['size'] > $max_size) {
                     throw new Exception('File is too large. Maximum allowed size is 2MB.');
                 }
-                else {
+                    else {
                     // Read file data
                     $imageData = file_get_contents($upload['tmp_name']);
                     $imageType = $upload['type'];
