@@ -1297,468 +1297,395 @@ $_SESSION['user']['last_activity'] = time();
 
 
 
-
-
                 <?php elseif ($currentPage === 'Track'): ?>
-                    <!-- Track content -->
-                    <div class="p-4">
-                        <h2 class="text-xl font-semibold mb-4">Document Tracking</h2>
-                        <div class="space-y-4">
-                            <?php
-                            // Database connection
-                            $host = "localhost";
-                            $username = "root";
-                            $password = "";
-                            $dbname = "SportOfficeDB";
+                <!-- Track content -->
+                <div class="p-6 bg-gray-100 min-h-screen">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-6">Document Tracking</h2>
+                    <div class="space-y-4">
+                        <?php
+                        // Database connection (use secure credentials in production, e.g., environment variables)
+                        $host = "localhost";
+                        $username = "root";
+                        $password = "";
+                        $dbname = "SportOfficeDB";
 
-                            // Connect to MySQL server
-                            $conn = new mysqli($host, $username, $password, $dbname);
-                            if ($conn->connect_error) {
-                                die("Connection failed: " . $conn->connect_error);
-                            }
+                        // Connect to MySQL server
+                        $conn = new mysqli($host, $username, $password, $dbname);
+                        if ($conn->connect_error) {
+                            die("Connection failed: " . $conn->connect_error);
+                        }
 
-                            // Fetch submissions for the logged-in user
-                            $user_id = $_SESSION['user']['id']; // Assuming user ID is stored in session
-                            $stmt = $conn->prepare("
+                        // Fetch submissions for the logged-in user
+                        $user_id = $_SESSION['user']['id']; // Assuming user ID is stored in session
+                        $stmt = $conn->prepare("
                 SELECT id, document_type, submission_date, status, description, file_name, other_type 
                 FROM submissions 
                 WHERE user_id = ? 
                 ORDER BY submission_date DESC
             ");
-                            $stmt->bind_param("i", $user_id);
-                            $stmt->execute();
-                            $result = $stmt->get_result();
+                        $stmt->bind_param("i", $user_id);
+                        $stmt->execute();
+                        $result = $stmt->get_result();
 
-                            // Fetch user profile image
-                            $profile_image_data = null;
-                            $profile_image_type = null;
-                            $profile_stmt = $conn->prepare("SELECT image, image_type FROM user_images WHERE user_id = ? ORDER BY uploaded_at DESC LIMIT 1");
-                            $profile_stmt->bind_param("i", $user_id);
-                            $profile_stmt->execute();
-                            $profile_result = $profile_stmt->get_result();
-                            if ($profile_result->num_rows > 0) {
-                                $profile_row = $profile_result->fetch_assoc();
-                                $profile_image_data = $profile_row['image'];
-                                $profile_image_type = $profile_row['image_type'];
-                            }
-                            $profile_stmt->close();
+                        // Fetch user profile image
+                        $profile_image_data = null;
+                        $profile_image_type = null;
+                        $profile_stmt = $conn->prepare("SELECT image, image_type FROM user_images WHERE user_id = ? ORDER BY uploaded_at DESC LIMIT 1");
+                        $profile_stmt->bind_param("i", $user_id);
+                        $profile_stmt->execute();
+                        $profile_result = $profile_stmt->get_result();
+                        if ($profile_result->num_rows > 0) {
+                            $profile_row = $profile_result->fetch_assoc();
+                            $profile_image_data = $profile_row['image'];
+                            $profile_image_type = $profile_row['image_type'];
+                        }
+                        $profile_stmt->close();
 
-                            if ($result->num_rows > 0) {
-                                while ($doc = $result->fetch_assoc()) {
-                                    // Format the submission date
-                                    $submission_date = date("m-d-Y", strtotime($doc['submission_date']));
+                        if ($result->num_rows > 0) {
+                            while ($doc = $result->fetch_assoc()) {
+                                // Format the submission date
+                                $submission_date = date("m-d-Y", strtotime($doc['submission_date']));
 
-                                    // Map status to Tailwind CSS classes
-                                    $status_class = match ($doc['status']) {
-                                        'pending' => 'bg-yellow-100 text-yellow-800',
-                                        'approved' => 'bg-green-100 text-green-800',
-                                        'rejected' => 'bg-red-100 text-red-800',
-                                        default => 'bg-gray-100 text-gray-800'
-                                    };
+                                // Map status to Tailwind CSS classes
+                                $status_class = match ($doc['status']) {
+                                    'pending' => 'bg-yellow-100 text-yellow-800',
+                                    'approved' => 'bg-green-100 text-green-800',
+                                    'rejected' => 'bg-red-100 text-red-800',
+                                    default => 'bg-gray-100 text-gray-800'
+                                };
 
-                                    // Adjust status display text
-                                    $status_display = match ($doc['status']) {
-                                        'pending' => 'Not been Approved',
-                                        'approved' => 'Approved',
-                                        'rejected' => 'Rejected',
-                                        default => $doc['status']
-                                    };
-                                    ?>
-                                    <div class="flex items-center bg-white rounded-lg shadow p-4">
-                                        <!-- File Icon -->
-                                        <div class="mr-4">
-                                            <svg class="h-10 w-10 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
-                                                <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 14H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
-                                            </svg>
-                                        </div>
-                                        <!-- Document Details -->
-                                        <div class="flex-1">
-                                            <p class="text-sm font-medium text-gray-900">Document Type: <?php echo htmlspecialchars($doc['document_type']); ?></p>
-                                            <p class="text-sm text-gray-600">Date of Submission: <?php echo htmlspecialchars($submission_date); ?></p>
-                                        </div>
-                                        <!-- Status -->
-                                        <div class="ml-4">
-                            <span class="inline-block px-3 py-1 text-sm font-semibold rounded-full <?php echo $status_class; ?>">
+                                // Adjust status display text
+                                $status_display = match ($doc['status']) {
+                                    'pending' => 'Not been Approved',
+                                    'approved' => 'Approved',
+                                    'rejected' => 'Rejected',
+                                    default => $doc['status']
+                                };
+                                ?>
+                                <div class="flex items-center bg-white rounded-xl shadow-md p-5 hover:shadow-lg transition-shadow">
+                                    <!-- File Icon -->
+                                    <div class="mr-5">
+                                        <svg class="h-12 w-12 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 14H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                                        </svg>
+                                    </div>
+                                    <!-- Document Details -->
+                                    <div class="flex-1">
+                                        <p class="text-base font-semibold text-gray-900">Document Type: <?php echo htmlspecialchars($doc['document_type']); ?></p>
+                                        <p class="text-sm text-gray-600">Date of Submission: <?php echo htmlspecialchars($submission_date); ?></p>
+                                    </div>
+                                    <!-- Status -->
+                                    <div class="ml-5">
+                            <span class="inline-block px-4 py-1.5 text-sm font-semibold rounded-full <?php echo $status_class; ?>">
                                 <?php echo htmlspecialchars($status_display); ?>
                             </span>
-                                        </div>
-                                        <!-- Action Buttons -->
-                                        <div class="ml-4 flex space-x-2">
-                                            <!-- View Button -->
-                                            <button onclick="openDocumentModal('<?php echo htmlspecialchars($doc['document_type']); ?>', '<?php echo htmlspecialchars($submission_date); ?>', '<?php echo htmlspecialchars($status_display); ?>', '<?php echo htmlspecialchars($doc['description']); ?>', '<?php echo $doc['status']; ?>')" class="text-gray-500 hover:text-gray-700" aria-label="View document <?php echo htmlspecialchars($doc['document_type']); ?>">
-                                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                                </svg>
-                                            </button>
-                                            <!-- Edit Button -->
-                                            <button onclick="openEditModal('<?php echo $doc['id']; ?>', '<?php echo htmlspecialchars($doc['document_type']); ?>', '<?php echo htmlspecialchars($doc['other_type']); ?>', '<?php echo htmlspecialchars($doc['description']); ?>', '<?php echo htmlspecialchars($doc['file_name']); ?>', '<?php echo $doc['status']; ?>')" class="text-gray-500 hover:text-blue-500" aria-label="Edit document <?php echo htmlspecialchars($doc['document_type']); ?>">
-                                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                                </svg>
-                                            </button>
-                                        </div>
                                     </div>
-                                    <?php
-                                }
-                            } else {
-                                echo '<p class="text-gray-500 text-center py-4">No submissions found.</p>';
+                                    <!-- Action Buttons -->
+                                    <div class="ml-5 flex space-x-3">
+                                        <!-- View Button -->
+                                        <button onclick="openDocumentModal('<?php echo htmlspecialchars($doc['document_type']); ?>', '<?php echo htmlspecialchars($submission_date); ?>', '<?php echo htmlspecialchars($status_display); ?>', '<?php echo htmlspecialchars($doc['description']); ?>', '<?php echo $doc['status']; ?>')" class="text-gray-500 hover:text-gray-700 transition-colors" aria-label="View document <?php echo htmlspecialchars($doc['document_type']); ?>">
+                                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                            </svg>
+                                        </button>
+                                        <!-- Edit Button -->
+                                        <button onclick="openEditModal('<?php echo $doc['id']; ?>', '<?php echo htmlspecialchars($doc['document_type']); ?>', '<?php echo htmlspecialchars($doc['other_type']); ?>', '<?php echo htmlspecialchars($doc['description']); ?>', '<?php echo htmlspecialchars($doc['file_name']); ?>', '<?php echo $doc['status']; ?>', '<?php echo htmlspecialchars($submission_date); ?>', null)" class="text-gray-500 hover:text-blue-500 transition-colors" aria-label="Edit document <?php echo htmlspecialchars($doc['document_type']); ?>">
+                                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <?php
                             }
+                        } else {
+                            echo '<p class="text-gray-500 text-center py-6 text-lg">No submissions found.</p>';
+                        }
 
-                            // Clean up
-                            $stmt->close();
-                            $conn->close();
-                            ?>
-                        </div>
+                        // Clean up
+                        $stmt->close();
+                        $conn->close();
+                        ?>
                     </div>
+                </div>
+
+
+
+
+
+
+
+
 
                     <!-- Edit Submission Modal -->
-                    <div id="editSubmissionModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 hidden">
-                        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md border-2 border-gray-200">
-                            <div class="flex justify-between items-center mb-4">
-                                <h2 class="text-lg font-semibold">Submitted Document</h2>
-                                <button onclick="closeModal('editSubmissionModal')" class="text-gray-500 hover:text-gray-700">
-                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div id="editSubmissionModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50 hidden">
+                        <div class="bg-white rounded-xl shadow-xl p-5 w-full max-w-md border border-gray-200 mx-4">
+                            <!-- Header Row -->
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <h2 class="text-lg font-semibold text-gray-800">Edit Submission</h2>
+                                    <p class="text-xs text-gray-500 mt-1">Update your document details</p>
+                                </div>
+                                <button onclick="closeModal('editSubmissionModal')" class="text-gray-400 hover:text-gray-600 transition-colors p-1 -mt-1 -mr-1">
+                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                     </svg>
                                 </button>
                             </div>
-                            <div class="flex items-center mb-4">
-                                <div class="w-12 h-12 mr-3 flex items-center justify-center overflow-hidden">
+
+                            <!-- Profile Section - Tightly Aligned -->
+                            <div class="flex items-center mb-5 px-3 py-2 bg-gray-50 rounded-md border border-gray-100">
+                                <div class="w-8 h-8 mr-3 flex-shrink-0 flex items-center justify-center overflow-hidden rounded-full border border-gray-300">
                                     <?php if ($profile_image_data && $profile_image_type): ?>
-                                        <img src="data:<?php echo htmlspecialchars($profile_image_type); ?>;base64,<?php echo base64_encode($profile_image_data); ?>" alt="Profile Picture" class="w-full h-full object-cover rounded-full">
+                                        <img src="data:<?php echo htmlspecialchars($profile_image_type); ?>;base64,<?php echo base64_encode($profile_image_data); ?>"
+                                             alt="Profile" class="w-full h-full object-cover">
                                     <?php else: ?>
-                                        <svg class="h-6 w-6 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+                                        <svg class="h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
                                             <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                                         </svg>
                                     <?php endif; ?>
                                 </div>
-                                <div>
-                                    <p class="text-sm font-medium text-gray-900">Student Name: <?php echo htmlspecialchars($_SESSION['user']['full_name']); ?></p>
-                                    <p class="text-sm text-gray-600">Student ID: <?php echo htmlspecialchars($_SESSION['user']['student_id']); ?></p>
+                                <div class="min-w-0">
+                                    <p class="text-sm font-medium text-gray-800 truncate"><?php echo htmlspecialchars($_SESSION['user']['full_name']); ?></p>
+                                    <p class="text-xs text-gray-500 truncate">ID: <?php echo htmlspecialchars($_SESSION['user']['student_id']); ?></p>
                                 </div>
                             </div>
+
+                            <!-- Form Content -->
                             <form id="editSubmissionForm" action="../controller/update_submission.php" method="POST" enctype="multipart/form-data">
                                 <input type="hidden" name="submission_id" id="edit_submission_id">
-                                <div class="mb-4">
-                                    <p class="text-sm font-medium text-gray-900">Document Type: <span id="edit_document_type_display"></span></p>
+
+                                <!-- Document Info Row -->
+                                <div class="flex justify-between items-center mb-3">
+                                    <div>
+                                        <span class="text-xs text-gray-500">Document Type:</span>
+                                        <span id="edit_document_type_display" class="block text-sm font-medium text-gray-800"></span>
+                                    </div>
+                                    <div id="edit_status_display" class="text-xs px-2 py-1 rounded-full"></div>
                                 </div>
-                                <div id="edit_status_display" class="mb-4"></div>
+
+                                <!-- Description Field -->
                                 <div class="mb-4">
-                                    <label for="edit_description" class="block text-sm font-medium text-gray-700">Description</label>
-                                    <textarea id="edit_description" name="description" class="w-full mt-1 p-2 border rounded-lg" required></textarea>
-                                    <p id="edit_desc_warning" class="text-red-500 text-sm mt-1 hidden">Description must be at least 10 characters long.</p>
+                                    <div class="flex justify-between items-center mb-1">
+                                        <label for="edit_description" class="text-sm font-medium text-gray-700">Description</label>
+                                        <span id="edit_desc_warning" class="text-red-500 text-xs hidden">Minimum 10 characters</span>
+                                    </div>
+                                    <textarea id="edit_description" name="description" rows="3"
+                                              class="w-full p-2.5 text-sm border border-gray-300 rounded-md bg-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                              required></textarea>
                                 </div>
-                                <div id="edit_action_buttons" class="flex justify-between"></div>
-                                <p class="text-sm text-gray-600 mt-4">Date of Submission: <span id="edit_submission_date"></span></p>
+
+                                <!-- File Upload Field -->
+                                <div class="mb-4">
+                                    <label for="edit_file" class="block text-sm font-medium text-gray-700 mb-1">Replace File (Optional)</label>
+                                    <div class="relative">
+                                        <input type="file" id="edit_file" name="file"
+                                               class="block w-full text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-colors"
+                                               accept=".pdf,.doc,.docx"/>
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div id="edit_action_buttons" class="flex gap-2 mb-4"></div>
+
+                                <!-- Footer -->
+                                <div class="flex justify-between items-center pt-3 mt-4 border-t border-gray-200">
+                                    <div class="text-xs text-gray-500">
+                                        <span>Submitted: </span>
+                                        <span id="edit_submission_date" class="font-medium text-gray-600"></span>
+                                    </div>
+                                    <button type="submit"
+                                            class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:ring-offset-1">
+                                        Save Changes
+                                    </button>
+                                </div>
                             </form>
                         </div>
                     </div>
 
-                    <!-- JavaScript for Modal and Form Handling -->
-                    <script>
-                        function openEditModal(submissionId, documentType, otherType, description, fileName, status) {
-                            // Populate the modal form with existing data
-                            document.getElementById('edit_submission_id').value = submissionId;
-                            document.getElementById('edit_document_type_display').textContent = documentType === 'Others' && otherType ? otherType : documentType;
-                            document.getElementById('edit_description').value = description;
-                            document.getElementById('edit_submission_date').textContent = '<?php echo date("m-d-Y"); ?>'; // Current date as submission date
+                <!-- JavaScript for Modal and Form Handling -->
+                <script>
+                    function openEditModal(submissionId, documentType, otherType, description, fileName, status, submissionDate, approvalDate = null) {
+                        // Populate the modal form with existing data
+                        document.getElementById('edit_submission_id').value = submissionId;
+                        document.getElementById('edit_document_type_display').textContent = documentType === 'Others' && otherType ? otherType : documentType;
+                        document.getElementById('edit_description').value = description;
+                        document.getElementById('edit_submission_date').textContent = submissionDate; // Use passed submission date
 
-                            // Handle status-specific display and buttons
-                            const statusDisplay = document.getElementById('edit_status_display');
-                            const actionButtons = document.getElementById('edit_action_buttons');
-                            let approveDate = '<?php echo date("m-d-Y"); ?>'; // Default to current date for approved status
+                        // Handle status-specific display and buttons
+                        const statusDisplay = document.getElementById('edit_status_display');
+                        const actionButtons = document.getElementById('edit_action_buttons');
 
-                            if (status === 'pending') {
-                                statusDisplay.innerHTML = `<p class="text-sm font-medium text-yellow-800 bg-yellow-100 px-3 py-1 rounded-full inline-block">Not been Approved</p>`;
-                                actionButtons.innerHTML = `
-                <button type="button" onclick="deleteSubmission(${submissionId})" class="px-2 py-1 bg-gray-300 text-gray-700 rounded text-sm hover:bg-gray-400">Delete</button>
-                <button type="button" onclick="uploadNewFile(${submissionId})" class="px-2 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600">Upload New</button>
-            `;
-                            } else if (status === 'approved') {
-                                statusDisplay.innerHTML = `<p class="text-sm font-medium text-green-800 bg-green-100 px-3 py-1 rounded-full inline-block">Approved</p>`;
-                                actionButtons.innerHTML = `
-                <button type="button" onclick="deleteSubmission(${submissionId})" class="px-2 py-1 bg-gray-300 text-gray-700 rounded text-sm hover:bg-gray-400">Delete</button>
-                <a href="../controller/download_submission.php?id=${submissionId}" class="px-2 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600">Download</a>
-            `;
-                                // Add approve date (simulated, should come from database in a real scenario)
-                                statusDisplay.innerHTML += `<p class="text-sm text-gray-600 mt-2">Date of Approve: ${approveDate}</p>`;
-                            } else if (status === 'rejected') {
-                                statusDisplay.innerHTML = `<p class="text-sm font-medium text-red-800 bg-red-100 px-3 py-1 rounded-full inline-block">Rejected</p>`;
-                                actionButtons.innerHTML = `
-                <button type="button" onclick="deleteSubmission(${submissionId})" class="px-2 py-1 bg-gray-300 text-gray-700 rounded text-sm hover:bg-gray-400">Delete</button>
-                <button type="button" onclick="returnToSubmit(${submissionId})" class="px-2 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600">Return to Submit</button>
-            `;
+                        if (status === 'pending') {
+                            statusDisplay.innerHTML = `<p class="text-sm font-medium text-yellow-800 bg-yellow-100 px-4 py-2 rounded-full inline-block">Not been Approved</p>`;
+                            actionButtons.innerHTML = `
+                    <button type="button" onclick="deleteSubmission(${submissionId})" class="px-2 py-1 bg-gray-200 text-gray-700 rounded text-sm hover:bg-gray-300 shadow-sm transition-colors">Delete</button>
+                    <button type="button" onclick="uploadNewFile(${submissionId})" class="px-2 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600 shadow-sm transition-colors">Upload New</button>
+                `;
+                        } else if (status === 'approved') {
+                            statusDisplay.innerHTML = `<p class="text-sm font-medium text-green-800 bg-green-100 px-4 py-2 rounded-full inline-block">Approved</p>`;
+                            actionButtons.innerHTML = `
+                    <button type="button" onclick="deleteSubmission(${submissionId})" class="px-2 py-1 bg-gray-200 text-gray-700 rounded text-sm hover:bg-gray-300 shadow-sm transition-colors">Delete</button>
+                    <a href="../controller/download_submission.php?id=${submissionId}" class="px-2 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600 shadow-sm transition-colors">Download</a>
+                `;
+                            if (approvalDate) {
+                                statusDisplay.innerHTML += `<p class="text-sm text-gray-600 mt-2">Date of Approval: ${approvalDate}</p>`;
                             }
-
-                            // Show the modal
-                            document.getElementById('editSubmissionModal').classList.remove('hidden');
-
-                            // Validate description length on input
-                            const descriptionInput = document.getElementById('edit_description');
-                            const warning = document.getElementById('edit_desc_warning');
-                            descriptionInput.addEventListener('input', () => {
-                                if (descriptionInput.value.trim().length < 10) {
-                                    warning.classList.remove('hidden');
-                                } else {
-                                    warning.classList.add('hidden');
-                                }
-                            });
+                        } else if (status === 'rejected') {
+                            statusDisplay.innerHTML = `<p class="text-sm font-medium text-red-800 bg-red-100 px-4 py-2 rounded-full inline-block">Rejected</p>`;
+                            actionButtons.innerHTML = `
+                    <button type="button" onclick="deleteSubmission(${submissionId})" class="px-2 py-1 bg-gray-200 text-gray-700 rounded text-sm hover:bg-gray-300 shadow-sm transition-colors">Delete</button>
+                    <button type="button" onclick="returnToSubmit(${submissionId})" class="px-2 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600 shadow-sm transition-colors">Return to Submit</button>
+                `;
                         }
 
-                        // Handle document type change (not applicable here since it's display-only)
-                        // Form submission with AJAX (modified for status-specific actions)
-                        document.getElementById('editSubmissionForm').addEventListener('submit', function(e) {
-                            e.preventDefault();
+                        // Show the modal with smooth transition
+                        const modal = document.getElementById('editSubmissionModal');
+                        modal.classList.remove('hidden');
+                        setTimeout(() => modal.classList.add('opacity-100'), 50);
 
-                            const description = document.getElementById('edit_description').value;
-                            if (description.trim().length < 10) {
-                                document.getElementById('edit_desc_warning').classList.remove('hidden');
-                                return;
+                        // Validate description length on input
+                        const descriptionInput = document.getElementById('edit_description');
+                        const warning = document.getElementById('edit_desc_warning');
+                        descriptionInput.addEventListener('input', () => {
+                            if (descriptionInput.value.trim().length < 10) {
+                                warning.classList.remove('hidden');
+                            } else {
+                                warning.classList.add('hidden');
                             }
-
-                            const formData = new FormData(this);
-                            const submitBtn = this.querySelector('button[type="submit"]');
-                            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Saving...';
-                            submitBtn.disabled = true;
-
-                            fetch(this.action, {
-                                method: 'POST',
-                                body: formData
-                            })
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.success) {
-                                        alert('Submission updated successfully!');
-                                        location.reload(); // Reload to reflect changes
-                                    } else {
-                                        alert('Error updating submission: ' + (data.message || 'Unknown error'));
-                                    }
-                                })
-                                .catch(error => {
-                                    console.error('Error:', error);
-                                    alert('An error occurred while updating the submission.');
-                                })
-                                .finally(() => {
-                                    submitBtn.innerHTML = 'Save Changes';
-                                    submitBtn.disabled = false;
-                                    closeModal('editSubmissionModal');
-                                });
                         });
+                    }
 
-                        function openDocumentModal(type, date, status, description, statusValue) {
-                            const modal = document.createElement('div');
-                            modal.className = 'fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50';
-                            modal.innerHTML = `
-            <div class="bg-white rounded-lg shadow-lg p-6 w-96 text-center">
-                <h2 class="text-lg font-semibold mb-2">Document Details</h2>
-                <p><strong>Type:</strong> ${type}</p>
-                <p><strong>Date:</strong> ${date}</p>
-                <p><strong>Status:</strong> ${status}</p>
-                <p><strong>Description:</strong> ${description}</p>
-                <button onclick="this.parentElement.parentElement.remove()" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Close</button>
-            </div>
-        `;
-                            document.body.appendChild(modal);
-                        }
-
-                        function closeModal(modalId) {
-                            document.getElementById(modalId).classList.add('hidden');
-                        }
-
-                        // Corrected deleteSubmission function
-                        function deleteSubmission(submissionId) {
-                            if (confirm('Are you sure you want to delete this submission?')) {
-                                fetch('../controller/delete_submission.php', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                                    body: `id=${encodeURIComponent(submissionId)}`
-                                })
-                                    .then(response => response.json())
-                                    .then(data => {
-                                        if (data.success) {
-                                            alert('Submission deleted successfully!');
-                                            location.reload();
-                                        } else {
-                                            alert('Error deleting submission: ' + data.message);
-                                        }
-                                    })
-                                    .catch(error => {
-                                        console.error('Error:', error);
-                                        alert('An error occurred while deleting the submission.');
-                                    });
-                            }
-                        }
-
-                        // Corrected uploadNewFile function to open edit modal for file upload
-                        function uploadNewFile(submissionId) {
-                            fetch('../controller/get_submission.php?id=' + encodeURIComponent(submissionId), {
-                                method: 'GET',
-                                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-                            })
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.success) {
-                                        openEditModal(submissionId, data.document_type, data.other_type, data.description, data.file_name, 'pending');
-                                    } else {
-                                        alert('Error fetching submission data: ' + data.message);
-                                    }
-                                })
-                                .catch(error => {
-                                    console.error('Error:', error);
-                                    alert('An error occurred while fetching submission data.');
-                                });
-                        }
-
-                        function returnToSubmit(submissionId) {
-                            if (confirm('Are you sure you want to return this submission for resubmission?')) {
-                                fetch('../controller/return_submission.php', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                                    body: `id=${encodeURIComponent(submissionId)}`
-                                })
-                                    .then(response => response.json())
-                                    .then(data => {
-                                        if (data.success) {
-                                            alert('Submission returned for resubmission!');
-                                            location.reload();
-                                        } else {
-                                            alert('Error returning submission: ' + data.message);
-                                        }
-                                    })
-                                    .catch(error => {
-                                        console.error('Error:', error);
-                                        alert('An error occurred while returning the submission.');
-                                    });
-                            }
-
-                            // Show the modal
-                            document.getElementById('editSubmissionModal').classList.remove('hidden');
-
-                            // Validate description length on input
-                            const descriptionInput = document.getElementById('edit_description');
-                            const warning = document.getElementById('edit_desc_warning');
-                            descriptionInput.addEventListener('input', () => {
-                                if (descriptionInput.value.trim().length < 10) {
-                                    warning.classList.remove('hidden');
-                                } else {
-                                    warning.classList.add('hidden');
-                                }
-                            });
-                        }
-
-                        // Handle document type change (not applicable here since it's display-only)
-                        // Form submission with AJAX (modified for status-specific actions)
-                        document.getElementById('editSubmissionForm').addEventListener('submit', function(e) {
-                            e.preventDefault();
-
-                            const description = document.getElementById('edit_description').value;
-                            if (description.trim().length < 10) {
-                                document.getElementById('edit_desc_warning').classList.remove('hidden');
-                                return;
-                            }
-
-                            const formData = new FormData(this);
-                            const submitBtn = this.querySelector('button[type="submit"]');
-                            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Saving...';
-                            submitBtn.disabled = true;
-
-                            fetch(this.action, {
-                                method: 'POST',
-                                body: formData
-                            })
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.success) {
-                                        alert('Submission updated successfully!');
-                                        location.reload(); // Reload to reflect changes
-                                    } else {
-                                        alert('Error updating submission: ' + (data.message || 'Unknown error'));
-                                    }
-                                })
-                                .catch(error => {
-                                    console.error('Error:', error);
-                                    alert('An error occurred while updating the submission.');
-                                })
-                                .finally(() => {
-                                    submitBtn.innerHTML = 'Save Changes';
-                                    submitBtn.disabled = false;
-                                    closeModal('editSubmissionModal');
-                                });
-                        });
-
-                        function openDocumentModal(type, date, status, description, statusValue) {
-                            const modal = document.createElement('div');
-                            modal.className = 'fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50';
-                            modal.innerHTML = `
-                <div class="bg-white rounded-lg shadow-lg p-6 w-96 text-center">
-                    <h2 class="text-lg font-semibold mb-2">Document Details</h2>
-                    <p><strong>Type:</strong> ${type}</p>
-                    <p><strong>Date:</strong> ${date}</p>
-                    <p><strong>Status:</strong> ${status}</p>
-                    <p><strong>Description:</strong> ${description}</p>
-                    <button onclick="this.parentElement.parentElement.remove()" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Close</button>
+                    function openDocumentModal(type, date, status, description, statusValue) {
+                        const modal = document.createElement('div');
+                        modal.className = 'fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50';
+                        modal.innerHTML = `
+                <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-md text-center">
+                    <h2 class="text-xl font-semibold mb-4 text-gray-900">Document Details</h2>
+                    <p class="text-sm text-gray-700"><strong>Type:</strong> ${type}</p>
+                    <p class="text-sm text-gray-700"><strong>Date:</strong> ${date}</p>
+                    <p class="text-sm text-gray-700"><strong>Status:</strong> ${status}</p>
+                    <p class="text-sm text-gray-700"><strong>Description:</strong> ${description}</p>
+                    <button onclick="this.parentElement.parentElement.remove()" class="mt-6 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors">Close</button>
                 </div>
             `;
-                            document.body.appendChild(modal);
-                        }
+                        document.body.appendChild(modal);
+                    }
 
-                        function closeModal(modalId) {
-                            document.getElementById(modalId).classList.add('hidden');
-                        }
+                    function closeModal(modalId) {
+                        const modal = document.getElementById(modalId);
+                        modal.classList.remove('opacity-100');
+                        setTimeout(() => modal.classList.add('hidden'), 300);
+                    }
 
-                        // Placeholder functions for actions
-                        function deleteSubmission(submissionId) {
-                            if (confirm('Are you sure you want to delete this submission?')) {
-                                fetch('../controller/delete_submission.php', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                                    body: `id=${submissionId}`
+                    function deleteSubmission(submissionId) {
+                        if (confirm('Are you sure you want to delete this submission?')) {
+                            fetch('../controller/delete_submission.php', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                                body: `id=${encodeURIComponent(submissionId)}`
+                            })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        alert('Submission deleted successfully!');
+                                        location.reload();
+                                    } else {
+                                        alert('Error deleting submission: ' + data.message);
+                                    }
                                 })
-                                    .then(response => response.json())
-                                    .then(data => {
-                                        if (data.success) {
-                                            alert('Submission deleted successfully!');
-                                            location.reload();
-                                        } else {
-                                            alert('Error deleting submission: ' + data.message);
-                                        }
-                                    })
-                                    .catch(error => {
-                                        console.error('Error:', error);
-                                        alert('An error occurred while deleting the submission.');
-                                    });
-                            }
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    alert('An error occurred while deleting the submission.');
+                                });
                         }
+                    }
 
-                        function uploadNewFile(submissionId) {
-                            alert('Upload new file functionality to be implemented. Redirecting to edit form.');
-                            openEditModal(submissionId, '', '', '', '', 'pending'); // Reopen edit modal for file upload
-                        }
+                    function uploadNewFile(submissionId) {
+                        fetch('../controller/get_submission.php?id=' + encodeURIComponent(submissionId), {
+                            method: 'GET',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    openEditModal(submissionId, data.document_type, data.other_type, data.description, data.file_name, 'pending', data.submission_date, null);
+                                    // Clear file input to encourage new upload
+                                    document.getElementById('edit_file').value = '';
+                                } else {
+                                    alert('Error fetching submission data: ' + data.message);
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                alert('An error occurred while fetching submission data.');
+                            });
+                    }
 
-                        function returnToSubmit(submissionId) {
-                            if (confirm('Are you sure you want to return this submission for resubmission?')) {
-                                fetch('../controller/return_submission.php', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                                    body: `id=${submissionId}`
+                    function returnToSubmit(submissionId) {
+                        if (confirm('Are you sure you want to return this submission for resubmission?')) {
+                            fetch('../controller/return_submission.php', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                                body: `id=${encodeURIComponent(submissionId)}`
+                            })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        alert('Submission returned for resubmission!');
+                                        location.reload();
+                                    } else {
+                                        alert('Error returning submission: ' + data.message);
+                                    }
                                 })
-                                    .then(response => response.json())
-                                    .then(data => {
-                                        if (data.success) {
-                                            alert('Submission returned for resubmission!');
-                                            location.reload();
-                                        } else {
-                                            alert('Error returning submission: ' + data.message);
-                                        }
-                                    })
-                                    .catch(error => {
-                                        console.error('Error:', error);
-                                        alert('An error occurred while returning the submission.');
-                                    });
-                            }
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    alert('An error occurred while returning the submission.');
+                                });
                         }
-                    </script>
+                    }
+
+                    document.getElementById('editSubmissionForm').addEventListener('submit', function(e) {
+                        e.preventDefault();
+
+                        const description = document.getElementById('edit_description').value;
+                        if (description.trim().length < 10) {
+                            document.getElementById('edit_desc_warning').classList.remove('hidden');
+                            return;
+                        }
+
+                        const formData = new FormData(this);
+                        const submitBtn = this.querySelector('button[type="submit"]');
+                        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Saving...';
+                        submitBtn.disabled = true;
+
+                        fetch(this.action, {
+                            method: 'POST',
+                            body: formData
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    alert('Submission updated successfully!');
+                                    location.reload();
+                                } else {
+                                    alert('Error updating submission: ' + (data.message || 'Unknown error'));
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                alert('An error occurred while updating the submission.');
+                            })
+                            .finally(() => {
+                                submitBtn.innerHTML = 'Save Changes';
+                                submitBtn.disabled = false;
+                                closeModal('editSubmissionModal');
+                            });
+                    });
+                </script>
+
+
 
 
 
