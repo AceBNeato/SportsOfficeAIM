@@ -5,7 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="61353cad-d58b-4648-9192-e39f980708fe" name="Changes" comment="">
+<<<<<<< HEAD
       <change beforePath="$PROJECT_DIR$/view/adminView.php" beforeDir="false" afterPath="$PROJECT_DIR$/view/adminView.php" afterDir="false" />
+=======
+      <change afterPath="$PROJECT_DIR$/controller/delete_submission.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/controller/download_submission.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/controller/return_submission.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/view/userView.php" beforeDir="false" afterPath="$PROJECT_DIR$/view/userView.php" afterDir="false" />
+>>>>>>> parent of 89db30a (ok)
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -85,11 +93,11 @@
       <recent name="C:\Users\Deru\PhpstormProjects\SportsOfficeAIM\sportsofficedb\admin" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\xampp\htdocs\SportsOfficeAIM\controller" />
-      <recent name="C:\xampp\htdocs\SportsOfficeAIM\controller\addUserProccess" />
-      <recent name="C:\xampp\htdocs\SportsOfficeAIM\controller\submissionProcces" />
       <recent name="C:\xampp\htdocs\SportsOfficeAIM" />
       <recent name="C:\xampp\htdocs\SportsOfficeAIM\view\view" />
+      <recent name="C:\xampp\htdocs\SportsOfficeAIM\view" />
+      <recent name="C:\xampp\htdocs\SportsOfficeAIM\database" />
+      <recent name="C:\xampp\htdocs\SportsOfficeAIM\sportsofficedb\controller" />
     </key>
   </component>
   <component name="SharedIndexes">
@@ -196,8 +204,6 @@
       <workItem from="1746549676592" duration="1318000" />
       <workItem from="1746567403515" duration="765000" />
       <workItem from="1746568231520" duration="4378000" />
-      <workItem from="1746579452466" duration="1313000" />
-      <workItem from="1746614298924" duration="5386000" />
     </task>
     <servers />
   </component>

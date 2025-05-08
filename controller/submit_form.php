@@ -92,7 +92,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $errors[] = "Failed to read uploaded file";
         }
 
-        $file_name = uniqid('doc_', true) . 'controller' . $file_ext;
+        $file_name = uniqid('doc_', true) . '.' . $file_ext;
         $file_size = $file['size'];
     } else {
         $errors[] = "File upload is required";

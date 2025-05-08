@@ -1300,7 +1300,7 @@ $_SESSION['user']['last_activity'] = time();
                 <?php elseif ($currentPage === 'Track'): ?>
                 <!-- Track content -->
                 <div class="p-6 bg-gray-100 min-h-screen">
-
+                    <h2 class="text-3xl font-bold text-gray-900 mb-6">Document Tracking</h2>
                     <div class="space-y-4">
                         <?php
                         // Database connection (use secure credentials in production, e.g., environment variables)
@@ -1419,79 +1419,90 @@ $_SESSION['user']['last_activity'] = time();
 
 
                     <!-- Edit Submission Modal -->
-                    <div id="editSubmissionModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden">
-                        <div class="bg-white rounded-2xl shadow-2xl p-4 w-full max-w-lg border border-gray-200 mx-4">
-                            <!-- Header -->
-                            <div class="relative mb-4">
-                                <h2 class="text-lg font-semibold text-gray-800">Edit Submission</h2>
-                                <p class="text-xs text-gray-500 mt-1">Update your document details</p>
-                                <button onclick="closeModal('editSubmissionModal')" class="absolute top-0 right-0 text-gray-400 hover:text-gray-600 transition-colors">
-                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div id="editSubmissionModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50 hidden">
+                        <div class="bg-white rounded-xl shadow-xl p-5 w-full max-w-md border border-gray-200 mx-4">
+                            <!-- Header Row -->
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <h2 class="text-lg font-semibold text-gray-800">Edit Submission</h2>
+                                    <p class="text-xs text-gray-500 mt-1">Update your document details</p>
+                                </div>
+                                <button onclick="closeModal('editSubmissionModal')" class="text-gray-400 hover:text-gray-600 transition-colors p-1 -mt-1 -mr-1">
+                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                     </svg>
                                 </button>
                             </div>
 
-                            <!-- Profile Info -->
-                            <div class="flex items-center gap-2 mb-4 px-3 py-2 bg-gray-50 rounded-lg border border-gray-100">
-                                <div class="w-8 h-8 flex-shrink-0 overflow-hidden rounded-full border border-gray-300">
+                            <!-- Profile Section - Tightly Aligned -->
+                            <div class="flex items-center mb-5 px-3 py-2 bg-gray-50 rounded-md border border-gray-100">
+                                <div class="w-8 h-8 mr-3 flex-shrink-0 flex items-center justify-center overflow-hidden rounded-full border border-gray-300">
                                     <?php if ($profile_image_data && $profile_image_type): ?>
                                         <img src="data:<?php echo htmlspecialchars($profile_image_type); ?>;base64,<?php echo base64_encode($profile_image_data); ?>"
                                              alt="Profile" class="w-full h-full object-cover">
                                     <?php else: ?>
-                                        <svg class="w-5 h-5 text-gray-400 mx-auto my-1.5" fill="currentColor" viewBox="0 0 24 24">
+                                        <svg class="h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
                                             <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                                         </svg>
                                     <?php endif; ?>
                                 </div>
-                                <div class="min-w-0 flex-1">
-                                    <p class="text-xs font-medium text-gray-800 truncate"><?php echo htmlspecialchars($_SESSION['user']['full_name']); ?></p>
+                                <div class="min-w-0">
+                                    <p class="text-sm font-medium text-gray-800 truncate"><?php echo htmlspecialchars($_SESSION['user']['full_name']); ?></p>
                                     <p class="text-xs text-gray-500 truncate">ID: <?php echo htmlspecialchars($_SESSION['user']['student_id']); ?></p>
                                 </div>
                             </div>
 
-                            <!-- Form -->
+                            <!-- Form Content -->
                             <form id="editSubmissionForm" action="../controller/update_submission.php" method="POST" enctype="multipart/form-data">
                                 <input type="hidden" name="submission_id" id="edit_submission_id">
 
-                                <!-- Document Info -->
-                                <div class="flex justify-between items-center mb-3 gap-3">
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-xs font-medium text-gray-500 whitespace-nowrap">Document Type:</span>
-                                        <p id="edit_document_type_display" class="text-xs font-medium text-gray-800 truncate"></p>
+                                <!-- Document Info Row -->
+                                <div class="flex justify-between items-center mb-3">
+                                    <div>
+                                        <span class="text-xs text-gray-500">Document Type:</span>
+                                        <span id="edit_document_type_display" class="block text-sm font-medium text-gray-800"></span>
                                     </div>
-                                    <div id="edit_status_display" class="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600 whitespace-nowrap"></div>
+                                    <div id="edit_status_display" class="text-xs px-2 py-1 rounded-full"></div>
                                 </div>
 
-                                    <div class="w-full max-w-xs mx-auto"> <!-- Adjust max-w-xs to match your button width -->
-                                        <label for="edit_description" class="text-sm font-medium text-gray-700 block text-center">Description</label>
-                                        <span id="edit_desc_warning" class="text-xs text-red-500 hidden block text-center">Minimum 10 characters</span>
-                                        <textarea id="edit_description" name="description" rows="4"
-                                                  class="w-full p-3 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none"
-                                                  style="min-height: 80px; overflow-y: auto;"
-                                                  required></textarea>
+                                <!-- Description Field -->
+                                <div class="mb-4">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <label for="edit_description" class="text-sm font-medium text-gray-700">Description</label>
+                                        <span id="edit_desc_warning" class="text-red-500 text-xs hidden">Minimum 10 characters</span>
                                     </div>
-                                    <!-- Action Buttons -->
-                                    <div id="edit_action_buttons" class="flex flex-wrap gap-2 mt-2 justify-center"></div>
-                                    <!-- Footer Info -->
-                                    <div class="flex justify-center items-center border-t border-gray-200 pt-3 w-full">
-                                        <p class="text-xs text-gray-500 text-center">
-                                            <span>Submitted: </span>
-                                            <span id="edit_submission_date" class="font-medium text-gray-600"></span>
-                                        </p>
+                                    <textarea id="edit_description" name="description" rows="3"
+                                              class="w-full p-2.5 text-sm border border-gray-300 rounded-md bg-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                              required></textarea>
+                                </div>
+
+                                <!-- File Upload Field -->
+                                <div class="mb-4">
+                                    <label for="edit_file" class="block text-sm font-medium text-gray-700 mb-1">Replace File (Optional)</label>
+                                    <div class="relative">
+                                        <input type="file" id="edit_file" name="file"
+                                               class="block w-full text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-colors"
+                                               accept=".pdf,.doc,.docx"/>
                                     </div>
+                                </div>
 
+                                <!-- Action Buttons -->
+                                <div id="edit_action_buttons" class="flex gap-2 mb-4"></div>
 
-                                <!-- Submit Button -->
-                                <button type="submit"
-                                        class="w-full py-2 bg-blue-600 text-white rounded-md text-xs font-semibold hover:bg-blue-700 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1">
-                                    Save Changes
-                                </button>
+                                <!-- Footer -->
+                                <div class="flex justify-between items-center pt-3 mt-4 border-t border-gray-200">
+                                    <div class="text-xs text-gray-500">
+                                        <span>Submitted: </span>
+                                        <span id="edit_submission_date" class="font-medium text-gray-600"></span>
+                                    </div>
+                                    <button type="submit"
+                                            class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:ring-offset-1">
+                                        Save Changes
+                                    </button>
+                                </div>
                             </form>
                         </div>
                     </div>
-
-
 
                 <!-- JavaScript for Modal and Form Handling -->
                 <script>
