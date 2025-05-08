@@ -354,7 +354,7 @@ $_SESSION['user']['last_activity'] = time();
 
 
     <?php elseif ($currentPage === 'Achievement'): ?>
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" style="padding-top: 1rem;">
             <div class="bg-white shadow-md rounded-lg overflow-hidden">
                 <!-- Header -->
                 <header class="bg-gradient-to-r from-red-600 to-orange-500 shadow-md rounded-lg p-8 mb-8">

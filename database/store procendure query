@@ -1,16 +1,12 @@
-
-    //Config
-
-    DELIMITER //
-
-    CREATE PROCEDURE AddAdminIfAllowed(
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `AddAdminIfAllowed`(
         IN p_full_name VARCHAR(255),
         IN p_address VARCHAR(255),
         IN p_email VARCHAR(255),
         IN p_password VARCHAR(255),
         IN p_status ENUM('undergraduate', 'alumni')
     )
-    BEGIN
+BEGIN
         DECLARE admin_count INT DEFAULT 0;
 
         -- Count existing admins
@@ -28,22 +24,67 @@
         ELSE
             SELECT 'Admin limit reached' AS result;
         END IF;
-    END //
+    END$$
+DELIMITER ;
 
-    DELIMITER ;
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `AddUserIfAllowed`(
+    IN p_student_id VARCHAR(50),
+    IN p_full_name VARCHAR(255),
+    IN p_address VARCHAR(255),
+    IN p_email VARCHAR(255),
+    IN p_password VARCHAR(255),
+    IN p_status ENUM('undergraduate', 'alumni')
+)
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM users WHERE email = p_email OR student_id = p_student_id
+    ) THEN
+        INSERT INTO users (student_id, full_name, address, email, password, status)
+        VALUES (p_student_id, p_full_name, p_address, p_email, p_password, p_status);
+        SELECT 'User added successfully' AS result;
+    ELSE
+        SELECT 'Email or Student ID already registered' AS result;
+    END IF;
+END$$
+DELIMITER ;
 
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `DeleteUserById`(IN studentId VARCHAR(255))
+BEGIN
+    DELETE FROM users WHERE student_id = studentId;
+END$$
+DELIMITER ;
 
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `DeleteUserIfAllowed`(IN userId INT)
+BEGIN
+    DELETE FROM users WHERE id = userId;
+END$$
+DELIMITER ;
 
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetTotalStudents`()
+BEGIN
+        SELECT COUNT(*) AS total FROM users;
+    END$$
+DELIMITER ;
 
-    //login
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetUserByStudentID`(IN sid VARCHAR(50))
+BEGIN
+    SELECT student_id, full_name, address, status
+    FROM users
+    WHERE student_id = sid;
+END$$
+DELIMITER ;
 
-    DELIMITER //
-
-    CREATE PROCEDURE LoginUser (
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `LoginUser`(
         IN p_email VARCHAR(255),
         IN p_password VARCHAR(255)
     )
-    BEGIN
+BEGIN
         DECLARE user_id INT DEFAULT NULL;
         DECLARE user_email VARCHAR(255);
         DECLARE user_password VARCHAR(255);
@@ -76,48 +117,11 @@
                 SELECT 'No user found with that email' AS message;
             END IF;
         END IF;
-    END //
+    END$$
+DELIMITER ;
 
-    DELIMITER ;
-
-
-
-
-    /Admin User
-
-    DELIMITER //
-
-    CREATE PROCEDURE SearchUsers(IN search_term VARCHAR(255))
-    BEGIN
-        IF search_term IS NULL OR TRIM(search_term) = '' THEN
-            SELECT student_id, full_name, address FROM users;
-        ELSE
-            SELECT student_id, full_name, address FROM users
-            WHERE LOWER(student_id) LIKE CONCAT('%', LOWER(search_term), '%')
-               OR LOWER(full_name) LIKE CONCAT('%', LOWER(search_term), '%');
-        END IF;
-    END //
-
-    DELIMITER ;
-
-
-    // admin report
-
-    DELIMITER //
-
-    CREATE PROCEDURE GetTotalStudents()
-    BEGIN
-        SELECT COUNT(*) AS total FROM users;
-    END //
-
-    DELIMITER ;
-
-
-//forgotpass
-
-DELIMITER //
-
-CREATE PROCEDURE ResetPasswordRequest(
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ResetPasswordRequest`(
     IN p_student_id VARCHAR(50),
     IN p_email VARCHAR(255),
     IN p_reset_token_hash VARCHAR(64),
@@ -140,32 +144,24 @@ BEGIN
     END IF;
 
     SELECT userCount AS result;
-END //
-
-DELIMITER ;
-
-DELIMITER //
-
-CREATE PROCEDURE DeleteUserIfAllowed(IN userId INT)
-BEGIN
-    DELETE FROM users WHERE id = userId;
-END //
-
-DELIMITER ;
-]
-DELIMITER $$
-
-CREATE PROCEDURE DeleteUserById(IN studentId VARCHAR(255))
-BEGIN
-    DELETE FROM users WHERE student_id = studentId;
 END$$
-
 DELIMITER ;
 
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SearchUsers`(IN search_term VARCHAR(255))
+BEGIN
+        IF search_term IS NULL OR TRIM(search_term) = '' THEN
+            SELECT student_id, full_name, address FROM users;
+        ELSE
+            SELECT student_id, full_name, address FROM users
+            WHERE LOWER(student_id) LIKE CONCAT('%', LOWER(search_term), '%')
+               OR LOWER(full_name) LIKE CONCAT('%', LOWER(search_term), '%');
+        END IF;
+    END$$
+DELIMITER ;
 
-DELIMITER //
-
-CREATE PROCEDURE UpdateUserByStudentID(
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateUserByStudentID`(
     IN sid VARCHAR(50),
     IN fname VARCHAR(255),
     IN addr TEXT,
@@ -177,114 +173,28 @@ BEGIN
         address = addr,
         status = stat
     WHERE student_id = sid;
-END //
-
+END$$
 DELIMITER ;
 
-DELIMITER //
-
-CREATE PROCEDURE GetUserByStudentID(IN sid VARCHAR(50))
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `find_user_by_email`(IN user_email VARCHAR(255))
 BEGIN
-    SELECT student_id, full_name, address, status
-    FROM users
-    WHERE student_id = sid;
-END //
+    -- First check in admins table
+    SELECT
+        id, email, password, 'admin' AS role, full_name, address
+    FROM
+        admins
+    WHERE
+        email = user_email
 
+    UNION
+
+    -- Then check in users table
+    SELECT
+        id, email, password, 'user' AS role, full_name, address
+    FROM
+        users
+    WHERE
+        email = user_email;
+END$$
 DELIMITER ;
-
-
-
-
-
-DELIMITER //
-
-    CREATE PROCEDURE find_user_by_email(IN user_email VARCHAR(255))
-    BEGIN
-        -- First check in admins table
-        SELECT
-            id, email, password, 'admin' AS role, full_name, address
-        FROM
-            admins
-        WHERE
-            email = user_email
-
-        UNION
-
-        -- Then check in users table
-        SELECT
-            id, email, password, 'user' AS role, full_name, address
-        FROM
-            users
-        WHERE
-            email = user_email;
-    END //
-
-    DELIMITER ;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-DELIMITER //
-
--- Procedure to handle document submission
-CREATE PROCEDURE IF NOT EXISTS SubmitDocument(
-    IN p_user_id INT,
-    IN p_full_name VARCHAR(255),
-    IN p_year_section VARCHAR(100),
-
-    IN p_contact_email VARCHAR(255),
-    IN p_document_type VARCHAR(100),
-    IN p_other_type VARCHAR(100),
-    IN p_file_name VARCHAR(255),
-    IN p_file_path VARCHAR(255),
-    IN p_file_size INT,
-    IN p_description TEXT
-)
-BEGIN
-    INSERT INTO submissions (
-        user_id,
-        full_name,
-        year_section,
-
-        contact_email,
-        document_type,
-        other_type,
-        file_name,
-        file_path,
-        file_size,
-        description
-    ) VALUES (
-        p_user_id,
-        p_full_name,
-        p_year_section,
-
-        p_contact_email,
-        p_document_type,
-        p_other_type,
-        p_file_name,
-        p_file_path,
-        p_file_size,
-        p_description
-    );
-
-    SELECT LAST_INSERT_ID() AS submission_id, 'Document submitted successfully' AS message;
-END //
-DELIMITER ;
-
-
