@@ -354,20 +354,20 @@ $_SESSION['user']['last_activity'] = time();
 
 
     <?php elseif ($currentPage === 'Achievement'): ?>
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- Header -->
-            <header class="bg-white shadow-md rounded-lg p-8 mb-8">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h1 class="text-3xl font-bold text-gray-800">Award Recognition</h1>
-                        <p class="text-gray-500 text-base mt-1">One Data. One USeP.</p>
-                    </div>
-                    <img src="../public/image/Usep.png" alt="USeP Logo" class="h-12 md:hidden">
-                </div>
-            </header>
-
-            <!-- Form Card -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white shadow-md rounded-lg overflow-hidden">
+                <!-- Header -->
+                <header class="bg-gradient-to-r from-red-600 to-orange-500 shadow-md rounded-lg p-8 mb-8">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h1 class="text-3xl font-bold text-white">Award Recognition</h1>
+                            <p class="text-white text-base mt-1 opacity-80">One Data. One USeP.</p>
+                        </div>
+                        <img src="../public/image/Usep.png" alt="USeP Logo" class="h-16">
+                    </div>
+                </header>
+
+                <!-- Form Card -->
                 <form method="POST" action="../controller/handleAchievement.php" class="p-8 space-y-8" enctype="multipart/form-data" id="achievementForm" aria-labelledby="awardRecognitionHeading">
                     <!-- Success/Error Message -->
                     <?php if (isset($_SESSION['achievement_message'])): ?>
@@ -411,7 +411,6 @@ $_SESSION['user']['last_activity'] = time();
                                 </div>
                                 <p id="searchHint" class="mt-1 text-xs text-gray-500">Minimum 3 characters to search</p>
                             </div>
-
                         </section>
 
                         <!-- Award Details Section -->
@@ -465,7 +464,6 @@ $_SESSION['user']['last_activity'] = time();
                                     ></textarea>
                                 </div>
                             </div>
-
                         </section>
 
                         <!-- File Upload Section -->
@@ -486,8 +484,8 @@ $_SESSION['user']['last_activity'] = time();
                                 </label>
                             </div>
                             <div id="fileNameDisplay" class="text-sm text-gray-600 mt-3 text-center" role="status"></div>
-
                         </section>
+
                         <!-- Action Buttons -->
                         <div class="flex justify-end space-x-4 mt-6">
                             <button
