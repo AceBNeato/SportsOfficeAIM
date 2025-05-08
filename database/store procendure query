@@ -112,52 +112,6 @@
 
     DELIMITER ;
 
-    DELIMITER //
-    CREATE PROCEDURE find_user_by_email(IN userEmail VARCHAR(255))
-    BEGIN
-        -- Try to find in Admins first
-        SELECT id, email, password, 'admin' AS role
-        FROM admins
-        WHERE email = userEmail
-        LIMIT 1;
-
-        -- If no rows found, search Users
-        IF ROW_COUNT() = 0 THEN
-            SELECT id, email, password, 'student' AS role
-            FROM users
-            WHERE email = userEmail
-            LIMIT 1;
-        END IF;
-    END //
-    DELIMITER ;
-
-
-DELIMITER //
-
-CREATE PROCEDURE AddUserIfAllowed(
-    IN p_student_id VARCHAR(50),
-    IN p_full_name VARCHAR(255),
-    IN p_address VARCHAR(255),
-    IN p_email VARCHAR(255),
-    IN p_password VARCHAR(255),
-    IN p_status ENUM('undergraduate', 'alumni')
-)
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM users WHERE email = p_email OR student_id = p_student_id
-    ) THEN
-        INSERT INTO users (student_id, full_name, address, email, password, status)
-        VALUES (p_student_id, p_full_name, p_address, p_email, p_password, p_status);
-        SELECT 'User added successfully' AS result;
-    ELSE
-        SELECT 'Email or Student ID already registered' AS result;
-    END IF;
-END //
-
-DELIMITER ;
-
-
-
 
 //forgotpass
 
@@ -238,70 +192,34 @@ END //
 
 DELIMITER ;
 
-DELIMITER //
-CREATE PROCEDURE AddAdminIfAllowed(
-    IN p_full_name VARCHAR(255),
-    IN p_address VARCHAR(255),
-    IN p_email VARCHAR(255),
-    IN p_password VARCHAR(255),
-    IN p_status ENUM('undergraduate', 'alumni')
-)
-BEGIN
-    IF NOT EXISTS (SELECT 1 FROM admins WHERE email = p_email) THEN
-        INSERT INTO admins (full_name, address, email, password, status)
-        VALUES (p_full_name, p_address, p_email, p_password, p_status);
-        SELECT 'Admin added successfully' AS result;
-    ELSE
-        SELECT 'Admin already exists' AS result;
-    END IF;
-END //
-DELIMITER ;
 
 
-DELIMITER //
-CREATE PROCEDURE find_user_by_email(IN user_email VARCHAR(255))
-BEGIN
-    SELECT
-        id, email, password, 'user' AS role, NULL AS first_name, NULL AS last_name
-    FROM users
-    WHERE email = user_email
-
-    UNION
-
-    SELECT
-        id, email, password, 'admin' AS role, NULL AS first_name, NULL AS last_name
-    FROM admins
-    WHERE email = user_email;
-END //
-DELIMITER ;
 
 
 DELIMITER //
 
-DROP PROCEDURE IF EXISTS find_user_by_email //
+    CREATE PROCEDURE find_user_by_email(IN user_email VARCHAR(255))
+    BEGIN
+        -- First check in admins table
+        SELECT
+            id, email, password, 'admin' AS role, full_name, address
+        FROM
+            admins
+        WHERE
+            email = user_email
 
-CREATE PROCEDURE find_user_by_email(IN user_email VARCHAR(255))
-BEGIN
-    -- First check in admins table
-    SELECT
-        id, email, password, 'admin' AS role, full_name, address
-    FROM
-        admins
-    WHERE
-        email = user_email
+        UNION
 
-    UNION
+        -- Then check in users table
+        SELECT
+            id, email, password, 'user' AS role, full_name, address
+        FROM
+            users
+        WHERE
+            email = user_email;
+    END //
 
-    -- Then check in users table
-    SELECT
-        id, email, password, 'user' AS role, full_name, address
-    FROM
-        users
-    WHERE
-        email = user_email;
-END //
-
-DELIMITER ;
+    DELIMITER ;
 
 
 
@@ -368,4 +286,5 @@ BEGIN
     SELECT LAST_INSERT_ID() AS submission_id, 'Document submitted successfully' AS message;
 END //
 DELIMITER ;
+
 
