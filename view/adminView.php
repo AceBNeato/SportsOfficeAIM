@@ -166,6 +166,15 @@ $_SESSION['user']['last_activity'] = time();
 
         <?php endif; ?>
 
+
+
+
+
+
+
+
+
+
         <?php if ($currentPage === 'Documents'): ?>
             <!-- Documents Table Header -->
             <div class="w-full bg-red-500 text-white font-semibold rounded-t-lg my-4">
@@ -344,17 +353,309 @@ $_SESSION['user']['last_activity'] = time();
 
 
 
+        <?php elseif ($currentPage === 'Achievement'): ?>
+        
+            <div class="max-w-4xl mx-auto">
+                <!-- Header -->
+                <header class="bg-white shadow-md rounded-lg p-6 mb-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-800">Award Recognition</h1>
+                            <p class="text-gray-500 text-sm">One Data. One USeP.</p>
+                        </div>
+                        <img src="../public/image/Usep.png" alt="USeP Logo" class="h-10 md:hidden">
+                    </div>
+                </header>
+
+                <!-- Form Card -->
+                <div class="bg-white shadow-md rounded-lg overflow-hidden">
+                    <form method="POST" action="../controller/handleAchievement.php" class="p-6 space-y-6" enctype="multipart/form-data" id="achievementForm" aria-labelledby="awardRecognitionHeading">
+                        <!-- Success/Error Message -->
+                        <?php if (isset($_SESSION['achievement_message'])): ?>
+                            <div class="bg-<?php echo $_SESSION['achievement_status'] === 'success' ? 'green' : 'red'; ?>-100 border-l-4 border-<?php echo $_SESSION['achievement_status'] === 'success' ? 'green' : 'red'; ?>-500 p-4 mb-6 rounded-md">
+                                <div class="flex items-center">
+                                    <svg class="h-5 w-5 text-<?php echo $_SESSION['achievement_status'] === 'success' ? 'green' : 'red'; ?>-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<?php echo $_SESSION['achievement_status'] === 'success' ? 'M5 13l4 4L19 7' : 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'; ?>"></path>
+                                    </svg>
+                                    <p class="text-<?php echo $_SESSION['achievement_status'] === 'success' ? 'green' : 'red'; ?>-700"><?php echo htmlspecialchars($_SESSION['achievement_message']); ?></p>
+                                </div>
+                            </div>
+                            <?php unset($_SESSION['achievement_message'], $_SESSION['achievement_status']); ?>
+                        <?php endif; ?>
+
+                        <!-- Form Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Student Search -->
+                            <div class="col-span-1">
+                                <h2 class="text-lg font-semibold text-gray-800 mb-2" id="studentInfoHeading">Student Information</h2>
+                                <div class="relative">
+                                    <label for="studentSearch" class="block text-sm font-medium text-gray-700 mb-1">Search Student</label>
+                                    <div class="relative">
+                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                            </svg>
+                                        </div>
+                                        <input
+                                                type="text"
+                                                id="studentSearch"
+                                                name="student_id"
+                                                placeholder="Enter Student ID or Name"
+                                                class="pl-10 w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                                                required
+                                                autocomplete="off"
+                                                aria-autocomplete="list"
+                                                aria-controls="searchResults"
+                                                aria-describedby="searchHint"
+                                        />
+                                        <div id="searchResults" class="hidden absolute z-20 mt-1 w-full bg-white shadow-lg rounded-md border border-gray-200 max-h-60 overflow-auto" role="listbox"></div>
+                                    </div>
+                                    <p id="searchHint" class="mt-1 text-xs text-gray-500">Minimum 3 characters to search</p>
+                                </div>
+                            </div>
+
+                            <!-- Award Details -->
+                            <div class="col-span-1 space-y-4">
+                                <h2 class="text-lg font-semibold text-gray-800 mb-2" id="awardDetailsHeading">Award Details</h2>
+                                <div>
+                                    <label for="awardType" class="block text-sm font-medium text-gray-700 mb-1">Award Type</label>
+                                    <div class="relative">
+                                        <select
+                                                id="awardType"
+                                                name="award_type"
+                                                class="appearance-none w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                                                required
+                                                aria-required="true"
+                                        >
+                                            <option value="" disabled selected>Select Award Type</option>
+                                            <option value="championship">Championship</option>
+                                            <option value="medal">Medal</option>
+                                            <option value="certificate">Certificate of Achievement</option>
+                                        </select>
+                                        <svg class="pointer-events-none absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="eventName" class="block text-sm font-medium text-gray-700 mb-1">Event Name</label>
+                                    <input
+                                            type="text"
+                                            id="eventName"
+                                            name="event_name"
+                                            placeholder="e.g. Regional Sports Competition"
+                                            class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                                            required
+                                            aria-required="true"
+                                    />
+                                </div>
+                                <div>
+                                    <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Achievement Description</label>
+                                    <textarea
+                                            id="description"
+                                            name="description"
+                                            placeholder="Describe the achievement"
+                                            rows="3"
+                                            class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                                            required
+                                            aria-required="true"
+                                    ></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- File Upload -->
+                        <div>
+                            <label for="fileUpload" class="block text-sm font-medium text-gray-700 mb-1">Supporting Documents</label>
+                            <div class="flex items-center justify-center w-full">
+                                <label for="fileUpload" class="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-white hover:bg-gray-50 hover:border-red-500" aria-describedby="fileUploadHint">
+                                    <div class="flex flex-col items-center justify-center pt-4 pb-4">
+                                        <svg class="w-6 h-6 mb-1 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                        </svg>
+                                        <p class="text-sm text-gray-600">
+                                            <span class="font-semibold text-red-500">Click to upload</span> or drag and drop
+                                        </p>
+                                        <p id="fileUploadHint" class="text-xs text-gray-500">PDF, JPG, PNG (Max. 5MB)</p>
+                                    </div>
+                                    <input id="fileUpload" name="achievement_file" type="file" class="hidden" accept=".pdf,.jpg,.jpeg,.png" aria-required="true" />
+                                </label>
+                            </div>
+                            <div id="fileNameDisplay" class="text-sm text-gray-600 mt-2 text-center" role="status"></div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex justify-end space-x-4">
+                            <button
+                                    type="reset"
+                                    class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 font-medium"
+                                    aria-label="Clear form"
+                            >
+                                Clear Form
+                            </button>
+                            <button
+                                    type="submit"
+                                    class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 font-medium"
+                                    aria-label="Submit achievement"
+                            >
+                                Submit Achievement
+                            </button>
+                        </div>
+
+                        <!-- Hidden fields -->
+                        <input type="hidden" name="page" value="Achievement">
+                        <input type="hidden" name="_token" value="<?php echo bin2hex(random_bytes(32)); ?>">
+                    </form>
+                </div>
+            </div>
 
 
 
+        <script>
+            // Prevent form resubmission on page refresh
+            if (window.history.replaceState) {
+                window.history.replaceState(null, null, window.location.href);
+            }
 
+            // File upload display
+            document.getElementById('fileUpload').addEventListener('change', function(e) {
+                const fileNameDisplay = document.getElementById('fileNameDisplay');
+                if (this.files.length > 0) {
+                    const file = this.files[0];
+                    const fileSize = (file.size / (1024 * 1024)).toFixed(2); // Convert to MB
 
+                    if (file.size > 5 * 1024 * 1024) {
+                        fileNameDisplay.innerHTML = `
+                        <div class="flex items-center justify-center bg-red-50 text-red-600 p-2 rounded-md border border-red-100">
+                            <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            File too large (${fileSize}MB). Max 5MB allowed.
+                        </div>`;
+                        this.value = ''; // Clear the file input
+                    } else {
+                        fileNameDisplay.innerHTML = `
+                        <div class="flex items-center justify-between bg-green-50 text-green-700 p-2 rounded-md border border-green-100">
+                            <div class="flex items-center">
+                                <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                ${file.name} (${fileSize}MB)
+                            </div>
+                            <button type="button" onclick="clearFileInput()" class="text-gray-500 hover:text-gray-700" aria-label="Clear file">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>`;
+                    }
+                } else {
+                    fileNameDisplay.textContent = '';
+                }
+            });
 
+            function clearFileInput() {
+                document.getElementById('fileUpload').value = '';
+                document.getElementById('fileNameDisplay').textContent = '';
+            }
 
+            // Student search autocomplete with real database
+            document.getElementById('studentSearch').addEventListener('input', debounce(async function(e) {
+                const query = this.value.trim();
+                const resultsContainer = document.getElementById('searchResults');
 
+                if (query.length > 2) {
+                    resultsContainer.innerHTML = `
+                    <div class="p-3 text-center text-gray-500">
+                        <svg class="animate-spin h-5 w-5 mx-auto text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <p class="mt-1 text-sm">Searching...</p>
+                    </div>`;
+                    resultsContainer.classList.remove('hidden');
 
+                    try {
+                        const response = await fetch(`../controller/searchStudents.php?query=${encodeURIComponent(query)}`);
+                        const results = await response.json();
 
+                        if (results.length > 0) {
+                            resultsContainer.innerHTML = results.map(item => `
+                            <div class="p-2 hover:bg-red-50 cursor-pointer border-b border-gray-100 last:border-b-0 flex items-center"
+                                onclick="selectStudent('${item.id}', '${item.name}')"
+                                role="option"
+                                aria-selected="false">
+                                <div class="bg-red-100 p-1 rounded-full mr-2">
+                                    <svg class="h-4 w-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="font-medium text-red-600">${item.id}</div>
+                                    <div class="text-sm text-gray-800">${item.name}</div>
+                                </div>
+                            </div>
+                        `).join('');
+                        } else {
+                            resultsContainer.innerHTML = `
+                            <div class="p-3 text-center text-gray-500">
+                                <p class="text-sm">No students found matching "${query}"</p>
+                            </div>`;
+                        }
+                    } catch (error) {
+                        resultsContainer.innerHTML = `
+                        <div class="p-3 text-center text-gray-500">
+                            <p class="text-sm">Error searching students. Please try again.</p>
+                        </div>`;
+                    }
+                } else if (query.length === 0) {
+                    resultsContainer.classList.add('hidden');
+                } else {
+                    resultsContainer.innerHTML = `
+                    <div class="p-3 text-center text-gray-500">
+                        <p class="text-sm">Please enter at least 3 characters</p>
+                    </div>`;
+                    resultsContainer.classList.remove('hidden');
+                }
+            }, 300));
 
+            function selectStudent(id, name) {
+                document.getElementById('studentSearch').value = `${id} - ${name}`;
+                document.getElementById('searchResults').classList.add('hidden');
+            }
+
+            // Debounce function
+            function debounce(func, wait) {
+                let timeout;
+                return function() {
+                    const context = this, args = arguments;
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func.apply(context, args), wait);
+                };
+            }
+
+            // Keyboard navigation for search results
+            document.getElementById('studentSearch').addEventListener('keydown', function(e) {
+                const resultsContainer = document.getElementById('searchResults');
+                const items = resultsContainer.querySelectorAll('[role="option"]');
+                if (!items.length) return;
+
+                if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    const current = document.activeElement;
+                    let index = Array.from(items).indexOf(current);
+                    if (e.key === 'ArrowDown') {
+                        index = (index + 1) % items.length;
+                    } else if (e.key === 'ArrowUp') {
+                        index = (index - 1 + items.length) % items.length;
+                    }
+                    items[index].focus();
+                } else if (e.key === 'Enter' && document.activeElement.role === 'option') {
+                    e.preventDefault();
+                    document.activeElement.click();
+                }
+            });
+        </script>
 
 
 

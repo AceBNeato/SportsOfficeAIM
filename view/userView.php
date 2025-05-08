@@ -1300,7 +1300,7 @@ $_SESSION['user']['last_activity'] = time();
                 <?php elseif ($currentPage === 'Track'): ?>
                 <!-- Track content -->
                 <div class="p-6 bg-gray-100 min-h-screen">
-                   
+
                     <div class="space-y-4">
                         <?php
                         // Database connection (use secure credentials in production, e.g., environment variables)
