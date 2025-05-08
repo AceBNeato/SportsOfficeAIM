@@ -131,7 +131,19 @@ error_log("Login page loaded. Error message: " . ($errorMessage ?: 'none'));
             color: white;
             overflow: hidden;
             text-align: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.5), 0 0 40px rgba(255, 107, 107, 0.3);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 20px rgba(255, 107, 107, 0.5), 0 0 40px rgba(255, 107, 107, 0.3);
+                transform: scale(1);
+            }
+            to {
+                box-shadow: 0 0 30px rgba(255, 107, 107, 0.7), 0 0 60px rgba(255, 107, 107, 0.4);
+                transform: scale(1.02);
+            }
         }
 
         .privacy-modal-content {
@@ -164,8 +176,12 @@ error_log("Login page loaded. Error message: " . ($errorMessage ?: 'none'));
 
         .privacy-link {
             color: #ff6b6b;
-            text-decoration: underline;
+            text-decoration: none; /* No underline by default */
             cursor: pointer;
+        }
+
+        .privacy-link:hover {
+            text-decoration: underline; /* Underline on hover */
         }
 
         .privacy-button {
@@ -405,3 +421,5 @@ error_log("Login page loaded. Error message: " . ($errorMessage ?: 'none'));
 </script>
 </body>
 </html>
+
+
