@@ -1,5 +1,6 @@
 <?php
 // Simple router simulation using a GET parameter
+//why
 $page = $_GET['page'] ?? 'login';
 
 switch ($page) {
