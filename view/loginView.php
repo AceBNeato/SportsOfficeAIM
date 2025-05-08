@@ -256,6 +256,7 @@ error_log("Login page loaded. Error message: " . ($errorMessage ?: 'none'));
             <i class="bx bx-x"></i>
         </button>
         <h2 style="text-align: center;">Terms of Use</h2>
+
         <p>
             Welcome to the USeP OSAS-Sports Unit system. By accessing or using this website, you agree to be bound by the following terms and conditions:
         </p>
@@ -268,9 +269,7 @@ error_log("Login page loaded. Error message: " . ($errorMessage ?: 'none'));
         <p>
             3. <strong>Data Privacy:</strong> We are committed to protecting your personal information. Please refer to our <a href="https://www.usep.edu.ph/usep-data-privacy-statement/">Privacy Policy</a> for details.
         </p>
-        <p>
-            4. <strong>Changes to Terms:</strong> We reserve the right to modify these terms at any time. Continued use of the system constitutes acceptance of the updated terms.
-        </p>
+        
         <p>
             For any questions or concerns, please contact the USeP OSAS-Sports Unit administration.
         </p>
