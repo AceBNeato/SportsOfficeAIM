@@ -1,33 +1,115 @@
 <?php
-// Start the session if not already started
+// Include PHPMailer
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require '../vendor/autoload.php';
+
+// Centralized database connection
+class Database {
+    private static $instance = null;
+    private $conn;
+
+    private function __construct() {
+        $servername = "localhost";
+        $username = "root";
+        $password = "";
+        $dbname = "SportOfficeDB";
+
+        $this->conn = new mysqli($servername, $username, $password, $dbname);
+        if ($this->conn->connect_error) {
+            die("Connection failed: " . $this->conn->connect_error);
+        }
+    }
+
+    public static function getInstance() {
+        if (!self::$instance) {
+            self::$instance = new Database();
+        }
+        return self::$instance->conn;
+    }
+}
+
+// Start session and validate
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Check if user is logged in
-if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-    header("Location: ../view/loginView.php");
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || !isset($_SESSION['user']['id'])) {
+    header("Location: ../view/loginView.php?message=" . urlencode("Please log in."));
     exit;
 }
 
-// Check session timeout (30 minutes)
-$session_timeout = 1800; // 30 minutes in seconds
+// Session timeout (30 minutes)
+$session_timeout = 1800;
 if (isset($_SESSION['user']['last_activity']) && (time() - $_SESSION['user']['last_activity'] > $session_timeout)) {
-    // Session expired
     session_unset();
     session_destroy();
     header("Location: ../view/loginView.php?timeout=1");
     exit;
 }
-
-// Update last activity time
 $_SESSION['user']['last_activity'] = time();
+
+// PHPMailer-based email notification
+function sendEmailNotification($email, $fullName, $status, $password = null) {
+    $mail = new PHPMailer(true);
+
+    try {
+        // Server settings (update with your SMTP details)
+        $mail->isSMTP();
+        $mail->Host = 'smtp.example.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = 'your-email@example.com';
+        $mail->Password = 'your-email-password';
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = 587;
+
+        // Recipients
+        $mail->setFrom('no-reply@sportsoffice.com', 'Sports Office');
+        $mail->addAddress($email, $fullName);
+
+        // Content
+        $mail->isHTML(true);
+        $mail->Subject = "Account Approval Status: " . ucfirst($status);
+        $body = "<p>Dear $fullName,</p>";
+        $body .= "<p>Your account approval request has been <strong>$status</strong>.</p>";
+
+        if ($status === 'approved' && $password) {
+            $body .= "<p>You can now log in using the following credentials:</p>";
+            $body .= "<p>Email: $email<br>Password: $password</p>";
+        }
+
+        $body .= "<p>Thank you,<br>Sports Office Team</p>";
+        $mail->Body = $body;
+
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        error_log("Email could not be sent. Error: {$mail->ErrorInfo}");
+        return false;
+    }
+}
+
+// Helper function for user search
+function searchUsers($searchTerm) {
+    $conn = Database::getInstance();
+    $searchTerm = strtolower(trim($searchTerm));
+    $stmt = $conn->prepare("CALL SearchUsers(?)");
+    if (!$stmt) {
+        error_log("Prepare failed: " . $conn->error);
+        return [];
+    }
+    $stmt->bind_param("s", $searchTerm);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $users = $result->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+    return $users;
+}
 ?>
+
 <!DOCTYPE html>
-
-
 <html lang="en">
-
 <head>
     <meta charset="UTF-8" />
     <title>Admin Dashboard</title>
@@ -54,7 +136,7 @@ $_SESSION['user']['last_activity'] = time();
         <nav class="space-y-2 w-full px-2 mt-4">
             <?php
             $currentPage = isset($_GET['page']) ? $_GET['page'] : 'Achievement';
-            $menu = ['Achievement','Documents', 'Evaluation', 'Reports', 'Users', 'Account Approvals','Log-out'];
+            $menu = ['Achievement', 'Documents', 'Evaluation', 'Reports', 'Users', 'Account Approvals', 'Log-out'];
             $icon = [
                 'Achievement' => "<box-icon name='trophy' type='solid' color='white'></box-icon>",
                 'Documents' => "<box-icon name='file-doc' type='solid' color='white'></box-icon>",
@@ -62,7 +144,6 @@ $_SESSION['user']['last_activity'] = time();
                 'Reports' => "<box-icon name='report' type='solid' color='white'></box-icon>",
                 'Users' => "<box-icon name='user-circle' color='white'></box-icon>",
                 'Account Approvals' => "<box-icon name='user-check' color='white'></box-icon>",
-
                 'Log-out' => "<box-icon name='log-out' color='white'></box-icon>"
             ];
 
@@ -73,8 +154,8 @@ $_SESSION['user']['last_activity'] = time();
                 $idAttr = $isLogout ? "id='logoutBtn' href='#'" : "href='?page=$item'";
 
                 echo "<a $idAttr class='$class' data-title='$item'>
-                  <span class='menu-icon'>{$icon[$item]}</span>
-                  <span class='menu-text'>$item</span>
+                    <span class='menu-icon'>{$icon[$item]}</span>
+                    <span class='menu-text'>$item</span>
                 </a>";
             }
             ?>
@@ -92,43 +173,28 @@ $_SESSION['user']['last_activity'] = time();
 
 <!-- Main Content -->
 <div id="mainContent" class="main-content px-1 sm:px-4 lg:px-0">
-
     <div class="sticky top-0 z-30 bg-gray-100 w-full px-1 sm:px-4 lg:px-3">
-
-        <div class="sticky top-0 z-30 bg-gray-100 w-full px-1 sm:px-4 lg:px-3">
-
-
-
-
-            <div class="border-b-4 border-red-500 px-5 pt-2 pb-1 flex justify-between items-center">
-                <h1 class="text-2xl sm:text-3xl font-semibold text-gray-900 tracking-tight">
-                    <?php echo htmlspecialchars($currentPage); ?>
-                </h1>
-
-
+        <div class="border-b-4 border-red-500 px-5 pt-2 pb-1 flex justify-between items-center">
+            <h1 class="text-2xl sm:text-3xl font-semibold text-gray-900 tracking-tight">
+                <?php echo htmlspecialchars($currentPage); ?>
+            </h1>
 
             <?php if ($currentPage === 'Users'): ?>
                 <div class="w-full px-4 sm:px-0 flex flex-col items-center sm:items-end space-y-2 sm:space-y-4">
-                    <!-- Add User Button -->
                     <button onclick="document.getElementById('addUserModal').classList.remove('hidden')"
                             class="flex items-center text-red-500 font-semibold hover:text-blue-600 sm:self-end w-auto">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                             viewBox="0 0 24 24" stroke="currentColor"
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
                              class="w-5 h-5 mr-1 border-2 border-blue-500 rounded-full p-0.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M12 4v16m8-8H4"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                         </svg>
                         Add users
                     </button>
-
-                    <!-- Compact Search Form - Far Right Aligned -->
                     <div class="w-full px-4">
                         <div class="flex justify-end">
                             <form method="GET" action="" class="flex items-center gap-2 -mr-2">
                                 <input type="hidden" name="page" value="Users"/>
                                 <input type="text" name="search" placeholder="Search..."
                                        class="w-40 border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white">
-
                                 <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-lg whitespace-nowrap flex items-center justify-center text-sm">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -138,25 +204,12 @@ $_SESSION['user']['last_activity'] = time();
                             </form>
                         </div>
                     </div>
-
-
                 </div>
-
             <?php endif; ?>
-
-
-
-
         </div>
 
         <?php if ($currentPage === 'Users'): ?>
-
             <div class="hidden sm:block w-full bg-red-500 text-white font-semibold rounded-t-lg px-5 mt-2 mb-4">
-                <div class="flex sm:hidden flex-col p-4 space-y-4 text-sm">
-                    <div>Student ID</div>
-                    <div>Student Name</div>
-                    <div>Student Address</div>
-                </div>
                 <div class="hidden sm:flex items-center px-4 py-6">
                     <div class="w-1/12 text-center"></div>
                     <div class="w-3/12">Student ID</div>
@@ -164,36 +217,16 @@ $_SESSION['user']['last_activity'] = time();
                     <div class="w-4/12">Student Address</div>
                 </div>
             </div>
-
-
         <?php endif; ?>
 
-
-
-
-
-
-
-
-
-
         <?php if ($currentPage === 'Documents'): ?>
-            <!-- Documents Table Header -->
             <div class="w-full bg-red-500 text-white font-semibold rounded-t-lg my-4">
                 <div class="hidden sm:grid grid-cols-12 gap-4 items-center px-5 py-4">
-                    <!-- Avatar column (empty) -->
                     <div class="col-span-1"></div>
-
-                    <!-- AFdjusted Student ID column -->
                     <div class="col-span-5 pl-3">Student ID</div>
-
-                    <!-- Student Name column -->
                     <div class="col-span-6">Student Name</div>
                 </div>
-
             </div>
-
-            <!-- Search Form - Always Horizontal Layout -->
             <div class="w-full px-4">
                 <form method="GET" action="" class="flex flex-row items-center gap-2 w-full">
                     <input type="hidden" name="page" value="Documents"/>
@@ -207,14 +240,10 @@ $_SESSION['user']['last_activity'] = time();
                     </button>
                 </form>
             </div>
-
         <?php endif; ?>
 
-
         <?php if ($currentPage === 'Evaluation'): ?>
-
-            <!-- Search Form - Always Horizontal Layout with Top Spacing -->
-            <div class="w-full px-4 mt-4">  <!-- Added mt-4 for top margin -->
+            <div class="w-full px-4 mt-4">
                 <form method="GET" action="" class="flex flex-row items-center gap-2 w-full">
                     <input type="hidden" name="page" value="Evaluation"/>
                     <input type="text" name="search" placeholder="Search Student..."
@@ -227,138 +256,60 @@ $_SESSION['user']['last_activity'] = time();
                     </button>
                 </form>
             </div>
-
         <?php endif; ?>
-
-
     </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     <?php if ($currentPage === 'Users'): ?>
-    <?php
-    $conn = new mysqli("localhost", "root", "", "SportOfficeDB");
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-
-    $searchTerm = isset($_GET['search']) ? trim($_GET['search']) : '';
-    $searchTerm = strtolower($searchTerm);
-
-    $stmt = $conn->prepare("CALL SearchUsers(?)");
-    if (!$stmt) {
-        die("Prepare failed: " . $conn->error);
-    }
-
-    $stmt->bind_param("s", $searchTerm);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    $users = $result->fetch_all(MYSQLI_ASSOC); // Fetch ALL before closing
-    $stmt->close();
-    $conn->close();
-    ?>
-
-    <?php if (count($users) > 0): ?>
-    <div class="max-h-[calc(100vh-10rem)] overflow-y-auto overflow-x-hidden scroll-thin">
-        <div class="w-full px-4 sm:px-8 lg:px-8 space-y-2">
-            <?php foreach ($users as $row): ?>
-
-                <div class="bg-white p-4 rounded-lg shadow-sm space-y-2 sm:space-y-0 sm:grid sm:grid-cols-12 sm:items-center">
-
-                    <div class="text-center text-xl text-gray-600 sm:col-span-1">
-                        <button
-                                type="button"
-                                class="text-blue-500 hover:text-blue-700 focus:outline-none"
-                                title="Edit User"
-                                data-student-id="<?= htmlspecialchars($row['student_id'], ENT_QUOTES, 'UTF-8') ?>"
-                                data-full-name="<?= htmlspecialchars($row['full_name'], ENT_QUOTES, 'UTF-8') ?>"
-                                data-address="<?= htmlspecialchars($row['address'], ENT_QUOTES, 'UTF-8') ?>"
-                                data-status="<?= isset($row['status']) ? htmlspecialchars($row['status'], ENT_QUOTES, 'UTF-8') : '' ?>"
-                                onclick="openEditModal(this)"
-                        >
-                            <i class="fas fa-edit"></i>
-                        </button>
-
+        <?php
+        $users = searchUsers(isset($_GET['search']) ? $_GET['search'] : '');
+        ?>
+        <div class="max-h-[calc(100vh-10rem)] overflow-y-auto overflow-x-hidden scroll-thin">
+            <div class="w-full px-4 sm:px-8 lg:px-8 space-y-2">
+                <?php if (count($users) > 0): ?>
+                    <?php foreach ($users as $row): ?>
+                        <div class="bg-white p-4 rounded-lg shadow-sm space-y-2 sm:space-y-0 sm:grid sm:grid-cols-12 sm:items-center">
+                            <div class="text-center text-xl text-gray-600 sm:col-span-1">
+                                <button type="button" class="text-blue-500 hover:text-blue-700 focus:outline-none"
+                                        title="Edit User"
+                                        data-student-id="<?= htmlspecialchars($row['student_id'], ENT_QUOTES, 'UTF-8') ?>"
+                                        data-full-name="<?= htmlspecialchars($row['full_name'], ENT_QUOTES, 'UTF-8') ?>"
+                                        data-address="<?= htmlspecialchars($row['address'], ENT_QUOTES, 'UTF-8') ?>"
+                                        data-status="<?= isset($row['status']) ? htmlspecialchars($row['status'], ENT_QUOTES, 'UTF-8') : '' ?>"
+                                        onclick="openEditModal(this)">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </div>
+                            <div class="text-gray-800 font-medium sm:col-span-3">
+                                <span class="block sm:hidden font-semibold text-gray-600">Student ID:</span>
+                                <?= htmlspecialchars($row['student_id']) ?>
+                            </div>
+                            <div class="text-gray-800 sm:col-span-4">
+                                <span class="block sm:hidden font-semibold text-gray-600">Name:</span>
+                                <?= htmlspecialchars($row['full_name']) ?>
+                            </div>
+                            <div class="text-gray-700 sm:col-span-4">
+                                <span class="block sm:hidden font-semibold text-gray-600">Address:</span>
+                                <?= htmlspecialchars($row['address']) ?>
+                            </div>
+                            <div class="text-center text-xl text-gray-600 sm:col-span-1">
+                                <button onclick="confirmDeleteUser('<?= htmlspecialchars($row['student_id']) ?>', '<?= htmlspecialchars($row['id'] ?? $row['student_id']) ?>')"
+                                        class="text-red-500 hover:text-red-700">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="text-center text-gray-500 py-6 font-semibold">
+                        No users found matching your search.
                     </div>
-
-
-
-                    <div class="text-gray-800 font-medium sm:col-span-3">
-                        <span class="block sm:hidden font-semibold text-gray-600">Student ID:</span>
-                        <?= htmlspecialchars($row['student_id']) ?>
-                    </div>
-
-                    <div class="text-gray-800 sm:col-span-4">
-                        <span class="block sm:hidden font-semibold text-gray-600">Name:</span>
-                        <?= htmlspecialchars($row['full_name']) ?>
-                    </div>
-                    <div class="text-gray-700 sm:col-span-4">
-                        <span class="block sm:hidden font-semibold text-gray-600">Address:</span>
-                        <?= htmlspecialchars($row['address']) ?>
-                    </div>
-
-
-
-                    <!-- Delete Button -->
-                    <div class="text-center text-xl text-gray-600 sm:col-span-1">
-                        <button
-                                    onclick="confirmDeleteUser('<?= htmlspecialchars($row['student_id']) ?>', '<?= htmlspecialchars($row['id'] ?? $row['student_id']) ?>')"
-                                class="text-red-500 hover:text-red-700">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-
-
-
-
-
-
-                </div>
-            <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
         </div>
-    </div>
-    <?php else: ?>
-    <div class="text-center text-gray-500 py-6 font-semibold">
-        No users found matching your search.
-    </div>
-    <?php endif; ?>
-
-
-
-
-
-
-
-
 
     <?php elseif ($currentPage === 'Achievement'): ?>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" style="padding-top: 1rem;">
             <div class="bg-white shadow-md rounded-lg overflow-hidden">
-                <!-- Header -->
                 <header class="bg-gradient-to-r from-red-600 to-orange-500 shadow-md rounded-lg p-8 mb-8">
                     <div class="flex items-center justify-between">
                         <div>
@@ -368,10 +319,7 @@ $_SESSION['user']['last_activity'] = time();
                         <img src="../public/image/Usep.png" alt="USeP Logo" class="h-16">
                     </div>
                 </header>
-
-                <!-- Form Card - Extra Wide Version -->
                 <form method="POST" action="../controller/handleAchievement.php" class="p-8 space-y-8 w-full" enctype="multipart/form-data" id="achievementForm" aria-labelledby="awardRecognitionHeading">
-                    <!-- Success/Error Message -->
                     <?php if (isset($_SESSION['achievement_message'])): ?>
                         <div class="bg-<?php echo $_SESSION['achievement_status'] === 'success' ? 'green' : 'red'; ?>-100 border-l-4 border-<?php echo $_SESSION['achievement_status'] === 'success' ? 'green' : 'red'; ?>-500 p-4 mb-6 rounded-md">
                             <div class="flex items-center">
@@ -383,10 +331,7 @@ $_SESSION['user']['last_activity'] = time();
                         </div>
                         <?php unset($_SESSION['achievement_message'], $_SESSION['achievement_status']); ?>
                     <?php endif; ?>
-
-                    <!-- Form Sections - Extra Wide Version -->
                     <div class="space-y-8">
-                        <!-- Student Search Section - Full Width -->
                         <section class="border border-gray-200 rounded-lg p-6">
                             <h2 class="text-xl font-semibold text-gray-800 mb-4" id="studentInfoHeading">Student Information</h2>
                             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -398,44 +343,23 @@ $_SESSION['user']['last_activity'] = time();
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                             </svg>
                                         </div>
-                                        <input
-                                                type="text"
-                                                id="studentSearch"
-                                                name="student_id"
-                                                placeholder="Enter Student ID or Name"
-                                                class="pl-10 w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                                                required
-                                                autocomplete="off"
-                                                aria-autocomplete="list"
-                                                aria-controls="searchResults"
-                                                aria-describedby="searchHint"
-                                        />
+                                        <input type="text" id="studentSearch" name="student_id" placeholder="Enter Student ID or Name"
+                                               class="pl-10 w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                                               required autocomplete="off" aria-autocomplete="list" aria-controls="searchResults" aria-describedby="searchHint"/>
                                         <div id="searchResults" class="hidden absolute z-20 mt-1 w-full bg-white shadow-lg rounded-md border border-gray-200 max-h-60 overflow-auto" role="listbox"></div>
                                     </div>
                                     <p id="searchHint" class="mt-1 text-xs text-gray-500">Minimum 3 characters to search</p>
                                 </div>
-                                <div class="flex items-end">
-                                    <!-- Optional additional student info field can go here -->
-                                </div>
                             </div>
                         </section>
-
-                        <!-- Award Details Section - Ultra Wide Layout -->
                         <section class="border border-gray-200 rounded-lg p-6">
                             <h2 class="text-xl font-semibold text-gray-800 mb-4" id="awardDetailsHeading">Award Details</h2>
                             <div class="grid grid-cols-1 xl:grid-cols-7 gap-8">
-                                <!-- Left Column - Award Info -->
                                 <div class="xl:col-span-3 space-y-6">
                                     <div>
                                         <label for="awardType" class="block text-sm font-medium text-gray-700 mb-1">Award Type</label>
                                         <div class="relative">
-                                            <select
-                                                    id="awardType"
-                                                    name="award_type"
-                                                    class="appearance-none w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                                                    required
-                                                    aria-required="true"
-                                            >
+                                            <select id="awardType" name="award_type" class="appearance-none w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent" required aria-required="true">
                                                 <option value="" disabled selected>Select Award Type</option>
                                                 <option value="championship">Championship</option>
                                                 <option value="medal">Medal</option>
@@ -451,210 +375,158 @@ $_SESSION['user']['last_activity'] = time();
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div>
                                             <label for="eventName" class="block text-sm font-medium text-gray-700 mb-1">Event Name</label>
-                                            <input
-                                                    type="text"
-                                                    id="eventName"
-                                                    name="event_name"
-                                                    placeholder="e.g. Regional Sports Competition"
-                                                    class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                                                    required
-                                                    aria-required="true"
-                                            />
+                                            <input type="text" id="eventName" name="event_name" placeholder="e.g. Regional Sports Competition"
+                                                   class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent" required aria-required="true"/>
                                         </div>
                                         <div>
                                             <label for="eventDate" class="block text-sm font-medium text-gray-700 mb-1">Event Date</label>
-                                            <input
-                                                    type="date"
-                                                    id="eventDate"
-                                                    name="event_date"
-                                                    class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                                                    aria-required="true"
-                                            />
+                                            <input type="date" id="eventDate" name="event_date"
+                                                   class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent" aria-required="true"/>
                                         </div>
                                     </div>
                                 </div>
-
-                                <!-- Right Column - Description -->
                                 <div class="xl:col-span-4">
                                     <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Achievement Description</label>
-                                    <textarea
-                                            id="description"
-                                            name="description"
-                                            placeholder="Describe the achievement in detail (e.g., competition details, significance, achievements, etc.)"
-                                            rows="6"
-                                            class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                                            required
-                                            aria-required="true"
-                                    ></textarea>
+                                    <textarea id="description" name="description" placeholder="Describe the achievement in detail (e.g., competition details, significance, achievements, etc.)"
+                                              rows="6" class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent" required aria-required="true"></textarea>
                                 </div>
                             </div>
                         </section>
-
-                        <!-- File Upload Section - Extra Wide -->
                         <section class="border border-gray-200 rounded-lg p-6">
-                            <div class="w-full">  <!-- Changed to full width container -->
-                                <div class="w-full">  <!-- Full width content -->
-                                    <label for="fileUpload" class="block text-sm font-medium text-gray-700 mb-1">Supporting Documents</label>
-
-                                    <div class="flex items-center justify-center w-full">
-                                        <label for="fileUpload" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-white hover:bg-gray-50 hover:border-red-500" aria-describedby="fileUploadHint">
-                                            <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                                <svg class="w-8 h-8 mb-2 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                                                </svg>
-                                                <p class="text-sm text-gray-600">
-                                                    <span class="font-semibold text-red-500">Click to upload</span> or drag and drop
-                                                </p>
-                                                <p id="fileUploadHint" class="text-xs text-gray-500">PDF, JPG, PNG, DOCX (Max. 10MB)</p>
-                                            </div>
-                                            <input id="fileUpload" name="achievement_file" type="file" class="hidden" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" aria-required="true" multiple />
-                                        </label>
-                                    </div>
-                                    <div id="fileNameDisplay" class="text-sm text-gray-600 mt-3" role="status"></div>
+                            <div class="w-full">
+                                <label for="fileUpload" class="block text-sm font-medium text-gray-700 mb-1">Supporting Documents</label>
+                                <div class="flex items-center justify-center w-full">
+                                    <label for="fileUpload" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-white hover:bg-gray-50 hover:border-red-500" aria-describedby="fileUploadHint">
+                                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                            <svg class="w-8 h-8 mb-2 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                            </svg>
+                                            <p class="text-sm text-gray-600">
+                                                <span class="font-semibold text-red-500">Click to upload</span> or drag and drop
+                                            </p>
+                                            <p id="fileUploadHint" class="text-xs text-gray-500">PDF, JPG, PNG, DOCX (Max. 10MB)</p>
+                                        </div>
+                                        <input id="fileUpload" name="achievement_file" type="file" class="hidden" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" aria-required="true" multiple />
+                                    </label>
                                 </div>
+                                <div id="fileNameDisplay" class="text-sm text-gray-600 mt-3" role="status"></div>
                             </div>
                         </section>
-
-                        <!-- Centered Action Buttons - Wider -->
                         <div class="flex justify-center space-x-6 mt-8">
-                            <button
-                                    type="reset"
-                                    class="px-10 py-3 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 font-medium text-sm transition-colors duration-200"
-                                    aria-label="Clear form"
-                            >
+                            <button type="reset" class="px-10 py-3 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 font-medium text-sm transition-colors duration-200" aria-label="Clear form">
                                 Clear Form
                             </button>
-                            <button
-                                    type="submit"
-                                    class="px-10 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 font-medium text-sm transition-colors duration-200"
-                                    aria-label="Submit achievement"
-                            >
+                            <button type="submit" class="px-10 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 font-medium text-sm transition-colors duration-200" aria-label="Submit achievement">
                                 Submit Achievement
                             </button>
                         </div>
                     </div>
-
-                    <!-- Hidden fields -->
                     <input type="hidden" name="page" value="Achievement">
                     <input type="hidden" name="_token" value="<?php echo bin2hex(random_bytes(32)); ?>">
                 </form>
             </div>
         </div>
-
         <script>
-            // Prevent form resubmission on page refresh
             if (window.history.replaceState) {
                 window.history.replaceState(null, null, window.location.href);
             }
-
-            // File upload display
             document.getElementById('fileUpload').addEventListener('change', function(e) {
                 const fileNameDisplay = document.getElementById('fileNameDisplay');
                 if (this.files.length > 0) {
                     const file = this.files[0];
-                    const fileSize = (file.size / (1024 * 1024)).toFixed(2); // Convert to MB
-
-                    if (file.size > 5 * 1024 * 1024) {
+                    const fileSize = (file.size / (1024 * 1024)).toFixed(2);
+                    if (file.size > 10 * 1024 * 1024) {
                         fileNameDisplay.innerHTML = `
-                <div class="flex items-center justify-center bg-red-50 text-red-600 p-3 rounded-md border border-red-100">
-                    <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    File too large (${fileSize}MB). Max 5MB allowed.
-                </div>`;
-                        this.value = ''; // Clear the file input
+                            <div class="flex items-center justify-center bg-red-50 text-red-600 p-3 rounded-md border border-red-100">
+                                <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                File too large (${fileSize}MB). Max 10MB allowed.
+                            </div>`;
+                        this.value = '';
                     } else {
                         fileNameDisplay.innerHTML = `
-                <div class="flex items-center justify-between bg-green-50 text-green-700 p-3 rounded-md border border-green-100">
-                    <div class="flex items-center">
-                        <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        ${file.name} (${fileSize}MB)
-                    </div>
-                    <button type="button" onclick="clearFileInput()" class="text-gray-500 hover:text-gray-700" aria-label="Clear file">
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    </button>
-                </div>`;
+                            <div class="flex items-center justify-between bg-green-50 text-green-700 p-3 rounded-md border border-green-100">
+                                <div class="flex items-center">
+                                    <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    ${file.name} (${fileSize}MB)
+                                </div>
+                                <button type="button" onclick="clearFileInput()" class="text-gray-500 hover:text-gray-700" aria-label="Clear file">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>`;
                     }
                 } else {
                     fileNameDisplay.textContent = '';
                 }
             });
-
             function clearFileInput() {
                 document.getElementById('fileUpload').value = '';
                 document.getElementById('fileNameDisplay').textContent = '';
             }
-
-            // Student search autocomplete with real database
             document.getElementById('studentSearch').addEventListener('input', debounce(async function(e) {
                 const query = this.value.trim();
                 const resultsContainer = document.getElementById('searchResults');
-
                 if (query.length > 2) {
                     resultsContainer.innerHTML = `
-            <div class="p-4 text-center text-gray-500">
-                <svg class="animate-spin h-5 w-5 mx-auto text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <p class="mt-1 text-sm">Searching...</p>
-            </div>`;
+                        <div class="p-4 text-center text-gray-500">
+                            <svg class="animate-spin h-5 w-5 mx-auto text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <p class="mt-1 text-sm">Searching...</p>
+                        </div>`;
                     resultsContainer.classList.remove('hidden');
-
                     try {
                         const response = await fetch(`../controller/searchStudents.php?query=${encodeURIComponent(query)}`);
                         const results = await response.json();
-
                         if (results.length > 0) {
                             resultsContainer.innerHTML = results.map(item => `
-                    <div class="p-3 hover:bg-red-50 cursor-pointer border-b border-gray-100 last:border-b-0 flex items-center"
-                        onclick="selectStudent('${item.id}', '${item.name}')"
-                        role="option"
-                        aria-selected="false">
-                        <div class="bg-red-100 p-1.5 rounded-full mr-3">
-                            <svg class="h-5 w-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                            </svg>
-                        </div>
-                        <div>
-                            <div class="font-medium text-red-600">${item.id}</div>
-                            <div class="text-sm text-gray-800">${item.name}</div>
-                        </div>
-                    </div>
-                `).join('');
+                                <div class="p-3 hover:bg-red-50 cursor-pointer border-b border-gray-100 last:border-b-0 flex items-center"
+                                    onclick="selectStudent('${item.id}', '${item.name}')"
+                                    role="option"
+                                    aria-selected="false">
+                                    <div class="bg-red-100 p-1.5 rounded-full mr-3">
+                                        <svg class="h-5 w-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <div class="font-medium text-red-600">${item.id}</div>
+                                        <div class="text-sm text-gray-800">${item.name}</div>
+                                    </div>
+                                </div>
+                            `).join('');
                         } else {
                             resultsContainer.innerHTML = `
-                    <div class="p-4 text-center text-gray-500">
-                        <p class="text-sm">No students found matching "${query}"</p>
-                    </div>`;
+                                <div class="p-4 text-center text-gray-500">
+                                    <p class="text-sm">No students found matching "${query}"</p>
+                                </div>`;
                         }
                     } catch (error) {
                         resultsContainer.innerHTML = `
-                <div class="p-4 text-center text-gray-500">
-                    <p class="text-sm">Error searching students. Please try again.</p>
-                </div>`;
+                            <div class="p-4 text-center text-gray-500">
+                                <p class="text-sm">Error searching students. Please try again.</p>
+                            </div>`;
                     }
                 } else if (query.length === 0) {
                     resultsContainer.classList.add('hidden');
                 } else {
                     resultsContainer.innerHTML = `
-            <div class="p-4 text-center text-gray-500">
-                <p class="text-sm">Please enter at least 3 characters</p>
-            </div>`;
+                        <div class="p-4 text-center text-gray-500">
+                            <p class="text-sm">Please enter at least 3 characters</p>
+                        </div>`;
                     resultsContainer.classList.remove('hidden');
                 }
             }, 300));
-
             function selectStudent(id, name) {
                 document.getElementById('studentSearch').value = `${id} - ${name}`;
                 document.getElementById('searchResults').classList.add('hidden');
             }
-
-            // Debounce function
             function debounce(func, wait) {
                 let timeout;
                 return function() {
@@ -663,13 +535,10 @@ $_SESSION['user']['last_activity'] = time();
                     timeout = setTimeout(() => func.apply(context, args), wait);
                 };
             }
-
-            // Keyboard navigation for search results
             document.getElementById('studentSearch').addEventListener('keydown', function(e) {
                 const resultsContainer = document.getElementById('searchResults');
                 const items = resultsContainer.querySelectorAll('[role="option"]');
                 if (!items.length) return;
-
                 if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
                     e.preventDefault();
                     const current = document.activeElement;
@@ -687,13 +556,9 @@ $_SESSION['user']['last_activity'] = time();
             });
         </script>
 
-
-
     <?php elseif ($currentPage === 'Reports'): ?>
         <div class="p-4 sm:p-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-
-                <!-- Total Students -->
                 <div class="bg-white rounded-xl shadow p-4 flex items-center space-x-4">
                     <div class="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 flex justify-center items-center text-red-500 bg-red-100 rounded-full text-2xl">
                         <i class='bx bxs-user-account'></i>
@@ -701,25 +566,18 @@ $_SESSION['user']['last_activity'] = time();
                     <div>
                         <p class="text-gray-800 font-semibold text-sm sm:text-base">Total Students</p>
                         <?php
-                        $reportConn = new mysqli("localhost", "root", "", "SportOfficeDB");
+                        $conn = Database::getInstance();
                         $totalStudents = 0;
-                        if (!$reportConn->connect_error) {
-                            // Call the stored procedure
-                            if ($result = $reportConn->query("CALL GetTotalStudents()")) {
-                                if ($row = $result->fetch_assoc()) {
-                                    $totalStudents = $row['total'];
-                                }
-                                $result->free(); // Important: free result set when using CALL
+                        if ($result = $conn->query("CALL GetTotalStudents()")) {
+                            if ($row = $result->fetch_assoc()) {
+                                $totalStudents = $row['total'];
                             }
-                            $reportConn->close();
+                            $result->free();
                         }
                         ?>
                         <p class="text-2xl sm:text-3xl font-bold text-gray-900"><?= $totalStudents ?></p>
                     </div>
                 </div>
-
-
-                <!-- Approved Reports -->
                 <div class="bg-white rounded-xl shadow p-4 flex items-center space-x-4">
                     <div class="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 flex justify-center items-center text-green-600 bg-green-100 rounded-full text-2xl">
                         <i class='bx bxs-file-doc'></i>
@@ -729,8 +587,6 @@ $_SESSION['user']['last_activity'] = time();
                         <p class="text-2xl sm:text-3xl font-bold text-gray-900">0</p>
                     </div>
                 </div>
-
-                <!-- Submission Stats -->
                 <div class="bg-white rounded-xl shadow p-4 sm:p-8 flex flex-col md:flex-row items-center justify-center col-span-1 md:col-span-2 space-y-4 md:space-y-0 md:space-x-8">
                     <div class="flex justify-center items-center w-24 sm:w-32 h-24 sm:h-32 text-blue-600 bg-blue-100 rounded-full text-5xl">
                         <i class='bx bxs-bar-chart-alt-2'></i>
@@ -746,59 +602,21 @@ $_SESSION['user']['last_activity'] = time();
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
     <?php elseif ($currentPage === 'Documents'): ?>
-
     <?php
-    $conn = new mysqli("localhost", "root", "", "SportOfficeDB");
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-
-    $searchTerm = isset($_GET['search']) ? trim($_GET['search']) : '';
-    $searchTerm = strtolower($searchTerm);
-
-    $stmt = $conn->prepare("CALL SearchUsers(?)");
-    if (!$stmt) {
-        die("Prepare failed: " . $conn->error);
-    }
-
-    $stmt->bind_param("s", $searchTerm);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    $users = $result->fetch_all(MYSQLI_ASSOC);
-    $stmt->close();
-    $conn->close();
+    $users = searchUsers(isset($_GET['search']) ? $_GET['search'] : '');
     ?>
-
         <div class="w-full px-4 sm:px-8 lg:px-25 mx-auto mt-6">
-
             <?php if (count($users) > 0): ?>
                 <div class="space-y-4">
                     <?php foreach ($users as $user): ?>
-
-                        <div class="userFile cursor-pointer" onclick="showUserDocuments('<?= $user['student_id'] ?>', '<?= htmlspecialchars($user['full_name']) ?>')">
+                        <div class="userFile cursor-pointer" onclick="showUserDocuments('<?= htmlspecialchars($user['student_id']) ?>', '<?= htmlspecialchars($user['full_name']) ?>')">
                             <div class="grid grid-cols-12 gap-4 items-center bg-white shadow-md rounded-lg px-5 py-4">
                                 <div class="col-span-12 sm:col-span-1 flex justify-center sm:justify-start">
-                                    <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
-                                         alt="Avatar"
-                                         class="w-10 h-10 rounded-full">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Avatar" class="w-10 h-10 rounded-full">
                                 </div>
                                 <div class="col-span-12 sm:col-span-5">
                                     <div class="block sm:hidden text-xs font-semibold text-gray-500">Student ID</div>
@@ -814,58 +632,27 @@ $_SESSION['user']['last_activity'] = time();
                 </div>
             <?php else: ?>
                 <div class="text-center py-10">
-                    <div class="text-gray-500 font-semibold mb-2">
-                        No documents found
-                    </div>
-                    <div class="text-sm text-gray-400">
-                        Try adjusting your search criteria
-                    </div>
+                    <div class="text-gray-500 font-semibold mb-2">No documents found</div>
+                    <div class="text-sm text-gray-400">Try adjusting your search criteria</div>
                 </div>
             <?php endif; ?>
         </div>
 
-
-
-
-
-
     <?php elseif ($currentPage === 'Evaluation'): ?>
     <?php
-    $conn = new mysqli("localhost", "root", "", "SportOfficeDB");
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-
-    $searchTerm = isset($_GET['search']) ? trim($_GET['search']) : '';
-    $searchTerm = strtolower($searchTerm);
-
-    $stmt = $conn->prepare("CALL SearchUsers(?)");
-    if (!$stmt) {
-        die("Prepare failed: " . $conn->error);
-    }
-
-    $stmt->bind_param("s", $searchTerm);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    $users = $result->fetch_all(MYSQLI_ASSOC);
-    $stmt->close();
-    $conn->close();
+    $users = searchUsers(isset($_GET['search']) ? $_GET['search'] : '');
     ?>
-
-        <div class="w-full px-4 sm:px-8 lg:px-25 mx-auto mt-6">  <!-- Added mt-6 for margin-top -->
+        <div class="w-full px-4 sm:px-8 lg:px-25 mx-auto mt-6">
             <?php if (count($users) > 0): ?>
                 <div class="space-y-4">
                     <?php foreach ($users as $user): ?>
-                        <div class="userFile cursor-pointer" onclick="showEvaluationModal('<?= $user['student_id'] ?>', '<?= htmlspecialchars($user['full_name']) ?>', 'Medical Certificate')">
+                        <div class="userFile cursor-pointer" onclick="showEvaluationModal('<?= htmlspecialchars($user['student_id']) ?>', '<?= htmlspecialchars($user['full_name']) ?>', 'Medical Certificate')">
                             <div class="flex items-center bg-white shadow-md rounded-lg px-5 py-4 hover:bg-gray-50 transition-colors duration-200">
-                                <!-- Document Icon -->
                                 <div class="bg-blue-100 p-3 rounded-lg mr-4">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                     </svg>
                                 </div>
-
                                 <div class="flex-grow">
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
@@ -884,380 +671,304 @@ $_SESSION['user']['last_activity'] = time();
                 </div>
             <?php else: ?>
                 <div class="text-center py-10">
-                    <div class="text-gray-500 font-semibold mb-2">
-                        No evaluations found
-                    </div>
-                    <div class="text-sm text-gray-400">
-                        Try adjusting your search criteria
-                    </div>
+                    <div class="text-gray-500 font-semibold mb-2">No evaluations found</div>
+                    <div class="text-sm text-gray-400">Try adjusting your search criteria</div>
                 </div>
             <?php endif; ?>
         </div>
 
-
-
-
     <?php elseif ($currentPage === 'Account Approvals'): ?>
+    <?php
+    $conn = Database::getInstance();
+    $csrf_token = bin2hex(random_bytes(32));
+    $_SESSION['csrf_token'] = $csrf_token;
 
-        <?php
-
-        if (!file_exists('../vendor/autoload.php')) {
-            die('Error: Composer dependencies not installed. Run "composer install" in the project root.');
-        }
-        require '../vendor/autoload.php'; // Ensure PHPMailer is installed via Composer
-
-        $servername = "localhost";
-        $username = "root";
-        $password = "";
-        $dbname = "SportOfficeDB";
-
-        $conn = new mysqli($servername, $username, $password, $dbname);
-        if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
-        }
-
-        // Function to send email notification
-        function sendEmailNotification($recipientEmail, $recipientName, $status, $password = null) {
-            $mail = new PHPMailer(true);
-            try {
-                // Server settings
-                $mail->isSMTP();
-                $mail->Host = 'smtp.gmail.com';
-                $mail->SMTPAuth = true;
-                $mail->Username = 'your-email@gmail.com'; // Replace with your Gmail address
-                $mail->Password = 'your-app-password'; // Replace with your Gmail App Password
-                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                $mail->Port = 587;
-
-                // Recipients
-                $mail->setFrom('your-email@gmail.com', 'USeP OSAS-Sports Unit');
-                $mail->addAddress($recipientEmail, $recipientName);
-
-                // Content
-                $mail->isHTML(true);
-                $mail->Subject = 'Account Approval Status';
-
-                if ($status == 'approved') {
-                    $mail->Body = "
-            <h2>Account Approval Notification</h2>
-            <p>Dear {$recipientName},</p>
-            <p>Your account request has been <strong>APPROVED</strong>.</p>
-            <p>Please use the following credentials to log in:</p>
-            <p><strong>Email:</strong> {$recipientEmail}<br>
-               <strong>Password:</strong> {$password}</p>
-            <p>You can log in at: <a href='your-login-url'>Login Page</a></p>
-            <p>Thank you!</p>
-            <p>USeP OSAS-Sports Unit</p>
-        ";
-                    $mail->AltBody = "Dear {$recipientName},\n\nYour account request has been APPROVED.\n\nPlease use the following credentials to log in:\nEmail: {$recipientEmail}\nPassword: {$password}\n\nYou can log in at: your-login-url\n\nThank you!\nUSeP OSAS-Sports Unit";
-                } else {
-                    $mail->Body = "
-            <h2>Account Approval Notification</h2>
-            <p>Dear {$recipientName},</p>
-            <p>We regret to inform you that your account request has been <strong>REJECTED</strong>.</p>
-            <p>For further details, please contact the OSAS-Sports Unit.</p>
-            <p>Thank you!</p>
-            <p>USeP OSAS-Sports Unit</p>
-        ";
-                    $mail->AltBody = "Dear {$recipientName},\n\nWe regret to inform you that your account request has been REJECTED.\n\nFor further details, please contact the OSAS-Sports Unit.\n\nThank you!\nUSeP OSAS-Sports Unit";
-                }
-
-                $mail->send();
-                return true;
-            } catch (Exception $e) {
-                error_log("Email could not be sent. Mailer Error: {$mail->ErrorInfo}");
-                return false;
-            }
-        }
-
-        // Handle approval/rejection
-        if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
-            // Check if admin is logged in and has a valid admin_id
-            if (!isset($_SESSION['admin_id'])) {
-                $message = "Error: Admin not logged in.";
-                header("Location: adminApprovals.php?message=" . urlencode($message));
-                exit();
-            }
-
-            $admin_id = $_SESSION['admin_id'];
-            // Verify admin_id exists in admins table
-            $stmt = $conn->prepare("SELECT id FROM admins WHERE id = ?");
-            $stmt->bind_param("i", $admin_id);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            if ($result->num_rows === 0) {
-                $message = "Error: Invalid admin ID.";
-                header("Location: adminApprovals.php?message=" . urlencode($message));
-                exit();
-            }
-            $stmt->close();
-
-            $approval_id = $_POST['approval_id'];
-            $action = $_POST['action'];
-            $status = $action == 'approve' ? 'approved' : 'rejected';
-
-            // Update approval status
-            $stmt = $conn->prepare("UPDATE account_approvals SET approval_status = ?, approved_by = ?, approval_date = NOW() WHERE id = ?");
-            $stmt->bind_param("sii", $status, $admin_id, $approval_id);
-            $stmt->execute();
-
-            // Fetch approval details for email
-            $result = $conn->query("SELECT student_id, full_name, email, status FROM account_approvals WHERE id = $approval_id");
-            $approval = $result->fetch_assoc();
-
-            $password = null;
-            if ($action == 'approve') {
-                // Generate password
-                $password = bin2hex(random_bytes(8));
-                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
-                // Insert into users table
-                $stmt = $conn->prepare("INSERT INTO users (student_id, full_name, email, password, status) VALUES (?, ?, ?, ?, ?)");
-                $stmt->bind_param("sssss", $approval['student_id'], $approval['full_name'], $approval['email'], $hashedPassword, $approval['status']);
-                $stmt->execute();
-            }
-
-            // Send email notification
-            $emailSent = sendEmailNotification($approval['email'], $approval['full_name'], $status, $password);
-
-            $stmt->close();
-            $message = $emailSent ? "Request $status and email sent" : "Request $status but email failed";
-            header("Location: adminApprovals.php?message=" . urlencode($message));
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'], $_POST['approval_id'], $_POST['csrf_token'])) {
+        if ($_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+            $message = "Error: Invalid CSRF token.";
+            header("Location: ?page=Account%20Approvals&message=" . urlencode($message));
             exit();
         }
 
-        // Fetch pending approvals
-        $result = $conn->query("SELECT a.id, a.student_id, a.full_name, a.email, a.status, a.file_name, a.file_type, a.request_date FROM account_approvals a WHERE a.approval_status = 'pending'");
-        ?>
+        $approval_id = filter_input(INPUT_POST, 'approval_id', FILTER_VALIDATE_INT);
+        $action = $_POST['action'];
+        $admin_id = (int)$_SESSION['user']['id'];
 
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <title>Admin Approvals - USeP OSAS-Sports Unit</title>
-            <link rel="stylesheet" href="../public/CSS/admin.css">
-            <link rel="icon" href="../public/image/Usep.png">
-            <link href="https://cdn.jsdelivr.net/npm/boxicons/css/boxicons.min.css" rel="stylesheet" />
-            <style>
-                table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
-                th { background-color: #f4f4f4; }
-                .action-btn { padding: 5px 10px; margin: 0 5px; cursor: pointer; }
-                .approve { background-color: #28a745; color: white; }
-                .reject { background-color: #dc3545; color: white; }
-                .view-btn { padding: 5px 10px; background-color: #007bff; color: white; cursor: pointer; }
-                .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; }
-                .modal-content {
-                    background-color: white;
-                    margin: 2% auto;
-                    padding: 20px;
-                    width: 90vw;
-                    height: calc(90vw * 0.707);
-                    max-width: 1180px;
-                    max-height: 560px;
-                    border-radius: 8px;
-                    position: relative;
-                    display: flex;
-                    flex-direction: column;
-                    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-                }
-                .modal-preview {
-                    flex-grow: 1;
-                    overflow-y: auto;
-                    padding: 10px;
-                    display: flex;
-                    justify-content: center;
-                    align-items: flex-start;
-                }
-                .modal-preview img,
-                .modal-preview iframe {
-                    max-width: 100%;
-                    width: auto;
-                    height: auto;
-                    border: none;
-                }
-                .modal-buttons {
-                    margin-top: 15px;
-                    text-align: center;
-                    padding-top: 15px;
-                    border-top: 1px solid #ddd;
-                }
-                .modal-btn {
-                    padding: 10px 20px;
-                    margin: 0 10px;
-                    cursor: pointer;
-                    border-radius: 4px;
-                    border: none;
-                    font-size: 16px;
-                }
-                .download-btn { background-color: #17a2b8; color: white; }
-                .close-btn { background-color: #6c757d; color: white; }
-                .error-message { color: red; text-align: center; font-size: 18px; }
-                .message { padding: 10px; background-color: #e7f3e7; color: #155724; margin-bottom: 15px; border: 1px solid #c3e6cb; }
-            </style>
-        </head>
-        <body>
-        <div class="container">
-            <h1>Pending Account Approvals</h1>
+        if (!$approval_id || !in_array($action, ['approve', 'reject'])) {
+            $message = "Error: Invalid input.";
+            header("Location: ?page=Account%20Approvals&message=" . urlencode($message));
+            exit();
+        }
+
+        $stmt = $conn->prepare("SELECT id FROM admins WHERE id = ?");
+        $stmt->bind_param("i", $admin_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows === 0) {
+            $stmt->close();
+            $message = "Error: Invalid admin ID.";
+            header("Location: ?page=Account%20Approvals&message=" . urlencode($message));
+            exit();
+        }
+        $stmt->close();
+
+        $status = ($action === 'approve') ? 'approved' : 'rejected';
+        $stmt = $conn->prepare("UPDATE account_approvals SET approval_status = ?, approved_by = ?, approval_date = NOW() WHERE id = ?");
+        $stmt->bind_param("sii", $status, $admin_id, $approval_id);
+
+        if (!$stmt->execute()) {
+            $stmt->close();
+            $message = "Error updating approval status: " . $conn->error;
+            header("Location: ?page=Account%20Approvals&message=" . urlencode($message));
+            exit();
+        }
+        $stmt->close();
+
+        $stmt = $conn->prepare("SELECT student_id, full_name, email, status FROM account_approvals WHERE id = ?");
+        $stmt->bind_param("i", $approval_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $approval = $result->fetch_assoc();
+        $stmt->close();
+
+        $password = null;
+        if ($action === 'approve') {
+            $password = bin2hex(random_bytes(8));
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+            $stmt = $conn->prepare("INSERT INTO users (student_id, full_name, email, password, status) VALUES (?, ?, ?, ?, ?)");
+            $stmt->bind_param("sssss", $approval['student_id'], $approval['full_name'], $approval['email'], $hashedPassword, $approval['status']);
+
+            if (!$stmt->execute()) {
+                $stmt->close();
+                $message = "Error creating user account: " . $conn->error;
+                header("Location: ?page=Account%20Approvals&message=" . urlencode($message));
+                exit();
+            }
+            $stmt->close();
+        }
+
+        $emailSent = sendEmailNotification($approval['email'], $approval['full_name'], $status, $password);
+        $message = $emailSent ? "Request $status successfully." : "Request $status but email failed to send.";
+        header("Location: ?page=Account%20Approvals&message=" . urlencode($message));
+        exit();
+    }
+
+    $result = $conn->query("SELECT a.id, a.student_id, a.full_name, a.email, a.status, a.file_name, a.file_type, a.request_date
+                                FROM account_approvals a
+                                WHERE a.approval_status = 'pending'");
+    ?>
+        <style>
+            .action-btn {
+                padding: 0.5rem 1rem;
+                border-radius: 0.375rem;
+                font-weight: 500;
+                transition: all 0.2s;
+            }
+            .approve-btn {
+                background-color: #10B981;
+                color: white;
+            }
+            .approve-btn:hover {
+                background-color: #059669;
+            }
+            .reject-btn {
+                background-color: #EF4444;
+                color: white;
+            }
+            .reject-btn:hover {
+                background-color: #DC2626;
+            }
+            .view-btn {
+                background-color: #3B82F6;
+                color: white;
+            }
+            .view-btn:hover {
+                background-color: #2563EB;
+            }
+            .message {
+                padding: 1rem;
+                margin-bottom: 1rem;
+                border-radius: 0.375rem;
+            }
+            .success-message {
+                background-color: #D1FAE5;
+                color: #065F46;
+                border: 1px solid #A7F3D0;
+            }
+            .error-message {
+                background-color: #FEE2E2;
+                color: #B91C1C;
+                border: 1px solid #FECACA;
+            }
+            #documentModal {
+                display: none;
+                align-items: center;
+                justify-content: center;
+                position: fixed;
+                inset: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 50;
+            }
+            #documentModal.show {
+                display: flex;
+            }
+        </style>
+        <div class="p-4 sm:p-6">
             <?php if (isset($_GET['message'])): ?>
-                <div class="message"><?php echo htmlspecialchars($_GET['message']); ?></div>
+                <div class="message <?php echo strpos($_GET['message'], 'Error') === false ? 'success-message' : 'error-message'; ?>">
+                    <?php echo htmlspecialchars($_GET['message'], ENT_QUOTES, 'UTF-8'); ?>
+                </div>
             <?php endif; ?>
-            <table>
-                <tr>
-                    <th>Student ID</th>
-                    <th>Full Name</th>
-                    <th>Email</th>
-                    <th>Status</th>
-                    <th>Document</th>
-                    <th>Request Date</th>
-                    <th>Actions</th>
-                </tr>
-                <?php while ($row = $result->fetch_assoc()): ?>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white rounded-lg overflow-hidden">
+                    <thead class="bg-red-500 text-white">
                     <tr>
-                        <td><?php echo htmlspecialchars($row['student_id']); ?></td>
-                        <td><?php echo htmlspecialchars($row['full_name']); ?></td>
-                        <td><?php echo htmlspecialchars($row['email']); ?></td>
-                        <td><?php echo htmlspecialchars($row['status']); ?></td>
-                        <td>
-                            <button class="view-btn" onclick="showDocument(<?php echo $row['id']; ?>, '<?php echo htmlspecialchars(addslashes($row['file_name'])); ?>', '<?php echo $row['file_type']; ?>')">View Document</button>
-                        </td>
-                        <td><?php echo $row['request_date']; ?></td>
-                        <td>
-                            <form method="POST" style="display:inline;">
-                                <input type="hidden" name="approval_id" value="<?php echo $row['id']; ?>">
-                                <input type="hidden" name="action" value="approve">
-                                <button type="submit" class="action-btn approve">Approve</button>
-                            </form>
-                            <form method="POST" style="display:inline;">
-                                <input type="hidden" name="approval_id" value="<?php echo $row['id']; ?>">
-                                <input type="hidden" name="action" value="reject">
-                                <button type="submit" class="action-btn reject">Reject</button>
-                            </form>
-                        </td>
+                        <th class="py-3 px-4 text-left">Student ID</th>
+                        <th class="py-3 px-4 text-left">Full Name</th>
+                        <th class="py-3 px-4 text-left">Email</th>
+                        <th class="py-3 px-4 text-left">Status</th>
+                        <th class="py-3 px-4 text-left">Document</th>
+                        <th class="py-3 px-4 text-left">Request Date</th>
+                        <th class="py-3 px-4 text-left">Actions</th>
                     </tr>
-                <?php endwhile; ?>
-            </table>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                    <?php if ($result->num_rows > 0): ?>
+                        <?php while ($row = $result->fetch_assoc()): ?>
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-3 px-4"><?php echo htmlspecialchars($row['student_id'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td class="py-3 px-4"><?php echo htmlspecialchars($row['full_name'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td class="py-3 px-4"><?php echo htmlspecialchars($row['email'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td class="py-3 px-4"><?php echo htmlspecialchars($row['status'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td class="py-3 px-4">
+                                    <button class="view-btn py-1 px-3 rounded"
+                                            onclick="showDocument(<?php echo (int)$row['id']; ?>, '<?php echo htmlspecialchars(json_encode($row['file_name']), ENT_QUOTES, 'UTF-8'); ?>', '<?php echo htmlspecialchars($row['file_type'], ENT_QUOTES, 'UTF-8'); ?>')">
+                                        View
+                                    </button>
+                                </td>
+                                <td class="py-3 px-4"><?php echo htmlspecialchars($row['request_date'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td class="py-3 px-4">
+                                    <form method="POST" class="inline">
+                                        <input type="hidden" name="approval_id" value="<?php echo (int)$row['id']; ?>">
+                                        <input type="hidden" name="action" value="approve">
+                                        <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
+                                        <button type="submit" class="approve-btn py-1 px-3 rounded mr-2">Approve</button>
+                                    </form>
+                                    <form method="POST" class="inline">
+                                        <input type="hidden" name="approval_id" value="<?php echo (int)$row['id']; ?>">
+                                        <input type="hidden" name="action" value="reject">
+                                        <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
+                                        <button type="submit" class="reject-btn py-1 px-3 rounded">Reject</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="7" class="py-4 px-4 text-center text-gray-500">No pending approval requests</td>
+                        </tr>
+                    <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
-
-        <!-- Modal -->
-        <div id="documentModal" class="modal">
-            <div class="modal-content">
-                <div id="documentPreview" class="modal-preview"></div>
-                <div class="modal-buttons">
-                    <a id="downloadLink" href="#" class="modal-btn download-btn">Download</a>
-                    <button class="modal-btn close-btn" onclick="closeModal()">Close</button>
+        <div id="documentModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl mx-4 max-h-[90vh] flex flex-col">
+                <div class="p-6 relative flex-1 overflow-auto">
+                    <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                    <div id="documentPreview" class="h-full overflow-auto"></div>
+                    <div class="mt-4 flex justify-center space-x-4 sticky bottom-0 bg-white pt-2 pb-2">
+                        <a id="downloadLink" href="#" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">Download</a>
+                        <button onclick="closeModal()" class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded">Close</button>
+                    </div>
                 </div>
             </div>
         </div>
-
         <script>
-            async function showDocument(id, fileName, fileType) {
+            function showDocument(id, fileName, fileType) {
                 const modal = document.getElementById('documentModal');
                 const preview = document.getElementById('documentPreview');
                 const downloadLink = document.getElementById('downloadLink');
-
-                downloadLink.href = `../controller/downloadDocument.php?id=${id}&download=true`;
-                preview.innerHTML = '';
-
-                try {
-                    const response = await fetch(`../controller/downloadDocument.php?id=${id}`);
-                    if (!response.ok) throw new Error('Failed to load document');
-
-                    const blob = await response.blob();
-                    const url = URL.createObjectURL(blob);
-
-                    if (fileType === 'application/pdf') {
-                        preview.innerHTML = `<iframe src="${url}" style="width:100%;height:auto;"></iframe>`;
-                    } else if (fileType.startsWith('image/')) {
-                        preview.innerHTML = `<img src="${url}" alt="${fileName}" />`;
-                    } else {
-                        preview.innerHTML = '<p class="error-message">Preview not available for this file type.</p>';
-                    }
-
-                    modal.style.display = 'block';
-                } catch (error) {
-                    preview.innerHTML = `<p class="error-message">Error loading document: ${error.message}</p>`;
-                    modal.style.display = 'block';
-                }
+                downloadLink.href = `../controller/downloadDocument.php?id=${encodeURIComponent(id)}&download=true`;
+                preview.innerHTML = '<div class="text-center py-10">Loading document...</div>';
+                modal.classList.add('show');
+                fetch(`../controller/downloadDocument.php?id=${encodeURIComponent(id)}`)
+                    .then(response => {
+                        if (!response.ok) throw new Error(`Failed to load document: ${response.statusText}`);
+                        return response.blob();
+                    })
+                    .then(blob => {
+                        const url = URL.createObjectURL(blob);
+                        if (fileType === 'application/pdf') {
+                            preview.innerHTML = `<iframe src="${url}" style="width:100%; height:100%; min-height:400px;" frameborder="0"></iframe>`;
+                        } else if (fileType.startsWith('image/')) {
+                            preview.innerHTML = `<img src="${url}" alt="Document" class="max-w-full h-auto mx-auto" />`;
+                        } else {
+                            preview.innerHTML = `<div class="text-center py-10 text-red-500">Preview not available for this file type. Please download to view.</div>`;
+                        }
+                    })
+                    .catch(error => {
+                        preview.innerHTML = `<div class="text-center py-10 text-red-500">Error loading document: ${error.message}</div>`;
+                    });
             }
-
             function closeModal() {
                 const modal = document.getElementById('documentModal');
                 const preview = document.getElementById('documentPreview');
-                modal.style.display = 'none';
-
+                modal.classList.remove('show');
                 const iframes = preview.getElementsByTagName('iframe');
                 const images = preview.getElementsByTagName('img');
-                for (let iframe of iframes) URL.revokeObjectURL(iframe.src);
-                for (let img of images) URL.revokeObjectURL(img.src);
+                for (let iframe of iframes) {
+                    URL.revokeObjectURL(iframe.src);
+                }
+                for (let img of images) {
+                    URL.revokeObjectURL(img.src);
+                }
                 preview.innerHTML = '';
             }
-
-            window.onclick = function(event) {
-                const modal = document.getElementById('documentModal');
-                if (event.target === modal) closeModal();
-            };
+            document.getElementById('documentModal').addEventListener('click', function(event) {
+                if (event.target === this) {
+                    closeModal();
+                }
+            });
         </script>
-        </body>
-        </html>
-
-    <?php $conn->close(); ?>
-
 
     <?php else: ?>
         <p class="text-center">This is the <?php echo htmlspecialchars($currentPage); ?> content area.</p>
     <?php endif; ?>
 </div>
 
-
 <!-- Documents Modal -->
 <div id="documentsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
     <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
         <div class="p-6">
-            <!-- Close button -->
             <button onclick="closeModal('documentsModal')" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
-
-
-
-            <!-- Centered Student Info Section -->
             <div class="flex flex-col items-center text-center mb-6">
-                <!-- Student Info Row (icon + name + ID) -->
                 <div class="flex items-center gap-4 mb-4">
-                    <!-- Profile Picture Container -->
-                    <div class="bg-blue-100 p-3 rounded-full w-14 h-14 flex items-center justify-center overflow-hidden">
-                        <?php if (!empty($user['profile_picture'])): ?>
-                            <!-- Display uploaded profile picture -->
-                            <img src="<?= htmlspecialchars($user['profile_picture']) ?>"
-                                 alt="Profile Picture"
-                                 class="w-full h-full object-cover rounded-full">
-                        <?php else: ?>
-                            <!-- Fallback to default icon -->
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                            </svg>
-                        <?php endif; ?>
+                    <div class="bg-blue-100 p-3 rounded-full w-14 h-14 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
                     </div>
-
-                    <!-- Name and ID -->
                     <div class="text-left">
-                        <h2 class="text-xl font-semibold text-gray-800" id="modalStudentName"><?= htmlspecialchars($user['full_name'] ?? '') ?></h2>
-                        <p class="text-gray-600" id="modalStudentId"><?= htmlspecialchars($user['student_id'] ?? '2023-00002') ?></p>
+                        <h2 class="text-xl font-semibold text-gray-800" id="modalStudentName"></h2>
+                        <p class="text-gray-600" id="modalStudentId"></p>
                     </div>
                 </div>
-
-                <!-- Student Document Title -->
                 <div class="mt-4 pt-4 border-t border-gray-200 w-full">
                     <h3 class="text-lg font-medium text-gray-700">Student Document</h3>
                 </div>
             </div>
-
-            <!-- Document List -->
             <div class="space-y-4">
-                <!-- Medical Certificate -->
                 <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg">
                     <div class="flex items-center">
                         <div class="bg-green-100 p-2 rounded-lg mr-3">
@@ -1272,8 +983,6 @@ $_SESSION['user']['last_activity'] = time();
                         <button class="px-3 py-1 bg-gray-50 text-gray-600 rounded-md hover:bg-gray-100 text-sm font-medium">Download</button>
                     </div>
                 </div>
-
-                <!-- Birth Certificate -->
                 <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg">
                     <div class="flex items-center">
                         <div class="bg-purple-100 p-2 rounded-lg mr-3">
@@ -1288,8 +997,6 @@ $_SESSION['user']['last_activity'] = time();
                         <button class="px-3 py-1 bg-gray-50 text-gray-600 rounded-md hover:bg-gray-100 text-sm font-medium">Download</button>
                     </div>
                 </div>
-
-                <!-- Certificate of Enrolment -->
                 <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg">
                     <div class="flex items-center">
                         <div class="bg-amber-100 p-2 rounded-lg mr-3">
@@ -1309,181 +1016,81 @@ $_SESSION['user']['last_activity'] = time();
     </div>
 </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <!-- Evaluation Modal -->
 <div id="evaluationsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
     <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
         <div class="p-6 relative">
-
-            <!-- Close button -->
             <button onclick="closeModal('evaluationsModal')" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
-
             <div class="flex flex-col items-center text-center mb-6">
-                <!-- Student Info Row (icon + name + ID) -->
                 <div class="flex items-center gap-4 mb-4">
-                    <!-- Profile Picture Container -->
-                    <div class="bg-blue-100 p-3 rounded-full w-14 h-14 flex items-center justify-center overflow-hidden">
-                        <?php if (!empty($user['profile_picture'])): ?>
-                            <!-- Display uploaded profile picture -->
-                            <img src="<?= htmlspecialchars($user['profile_picture']) ?>"
-                                 alt="Profile Picture"
-                                 class="w-full h-full object-cover rounded-full">
-                        <?php else: ?>
-                            <!-- Fallback to default icon -->
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                            </svg>
-                        <?php endif; ?>
+                    <div class="bg-blue-100 p-3 rounded-full w-14 h-14 flex items-center justify-center">
+                        <svg UIAlertControllerStyleActionSheet="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
                     </div>
-
-                    <!-- Name and ID -->
                     <div class="text-left">
-                        <h2 class="text-xl font-semibold text-gray-800" id="modalStudentNames"><?= htmlspecialchars($user['full_name'] ?? '') ?></h2>
-                        <p class="text-gray-600" id="modalStudentIds"><?= htmlspecialchars($user['student_id'] ?? '2023-00002') ?></p>
+                        <h2 class="text-xl font-semibold text-gray-800" id="modalStudentNames"></h2>
+                        <p class="text-gray-600" id="modalStudentIds"></p>
                     </div>
                 </div>
-
-                <!-- Student Document Title -->
                 <div class="mt-4 pt-4 border-t border-gray-200 w-full">
                     <h3 class="text-lg font-medium text-gray-700">Student Document</h3>
                 </div>
             </div>
-
-            <!-- Student Info Section -->
             <div class="mb-6">
-
-                <!-- Document Type -->
                 <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
                     <div class="text-sm font-medium text-gray-500 mb-1">Document Type</div>
-                    <div class="text-lg font-semibold text-blue-600">Medical Certificate</div>
+                    <div class="text-lg font-semibold text-blue-600" id="modalDocumentType"></div>
                 </div>
-
-
             </div>
-
             <div class="flex justify-center space-x-3">
-                <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors duration-200 font-medium">
-                    Reject
-                </button>
-                <button class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-200 font-medium">
-                    Approve
-                </button>
+                <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors duration-200 font-medium">Reject</button>
+                <button class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-200 font-medium">Approve</button>
             </div>
         </div>
     </div>
 </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- Edit Modal - Place this OUTSIDE the loop -->
+<!-- Edit Modal -->
 <div id="editUserModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50">
     <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative animate-fadeIn">
-        <button onclick="document.getElementById('editUserModal').classList.add('hidden')" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl font-bold">&times;</button>
-
+        <button onclick="document.getElementById('editUserModal').classList.add('hidden')" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl font-bold">×</button>
         <h2 class="text-2xl font-bold text-center mb-4">EDIT USER</h2>
-
         <form method="POST" action="../controller/editUsers.php" class="flex flex-col gap-4">
-
             <input type="text" name="student_id" id="edit-student-id" placeholder="Student ID" required class="p-3 border rounded-lg w-full" readonly>
-
             <input type="text" name="full_name" id="edit-full-name" placeholder="Full Name" required class="p-3 border rounded-lg w-full">
-
             <input type="text" name="address" id="edit-address" placeholder="Address" required class="p-3 border rounded-lg w-full">
-
             <select name="status" id="edit-status" required class="p-3 border rounded-lg w-full">
                 <option value="" disabled>Select Status</option>
                 <option value="undergraduate">Undergraduate</option>
                 <option value="alumni">Alumni</option>
             </select>
-
             <input type="hidden" name="page" value="admin">
             <input type="hidden" name="currentPage" value="Users">
             <input type="hidden" name="source" value="usersPage">
-
-            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg font-semibold w-full">
-                Save Changes
-            </button>
+            <input type="hidden" name="_token" value="<?php echo bin2hex(random_bytes(32)); ?>">
+            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg font-semibold w-full">Save Changes</button>
         </form>
     </div>
 </div>
 
-
-
-<!-- Delete Modal - Ensure this is outside the loop -->
+<!-- Delete Modal -->
 <div id="deleteUserModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50">
     <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative animate-fadeIn">
-
-        <!-- Close Button -->
-        <button onclick="document.getElementById('deleteUserModal').classList.add('hidden')" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl font-bold">&times;</button>
-
-
+        <button onclick="document.getElementById('deleteUserModal').classList.add('hidden')" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl font-bold">×</button>
         <h2 class="text-2xl font-bold text-center mb-4">DELETE USER</h2>
-
-        <h3 class="text-lg text-center text-gray-700 mb-4">
-            Are you sure you want to delete this account?
-        </h3>
-
-        <!-- Delete Form -->
+        <h3 class="text-lg text-center text-gray-700 mb-4">Are you sure you want to delete this account?</h3>
         <form id="deleteUserForm" method="POST" action="../controller/deleteUsers.php" class="flex flex-col gap-4">
-
-            <!-- Hidden input to carry user id -->
             <input type="hidden" id="deleteUserId" name="id">
-
-            <!-- Submit Button -->
-            <button
-                    type="submit"
-                    class="bg-red-500 hover:bg-red-600 text-white py-3 rounded-lg font-semibold w-full">
-                Delete Account
-            </button>
+            <input type="hidden" name="_token" value="<?php echo bin2hex(random_bytes(32)); ?>">
+            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white py-3 rounded-lg font-semibold w-full">Delete Account</button>
         </form>
     </div>
 </div>
-
-
 
 <!-- Logout Modal -->
 <div id="logoutModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 hidden">
@@ -1494,7 +1101,6 @@ $_SESSION['user']['last_activity'] = time();
             <a href="../controller/logout.php" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Yes</a>
         </div>
     </div>
-</div>
 </div>
 
 <script>
