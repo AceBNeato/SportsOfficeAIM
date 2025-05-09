@@ -54,13 +54,15 @@ $_SESSION['user']['last_activity'] = time();
         <nav class="space-y-2 w-full px-2 mt-4">
             <?php
             $currentPage = isset($_GET['page']) ? $_GET['page'] : 'Achievement';
-            $menu = ['Achievement','Documents', 'Evaluation', 'Reports', 'Users', 'Log-out'];
+            $menu = ['Achievement','Documents', 'Evaluation', 'Reports', 'Users', 'Account Approvals','Log-out'];
             $icon = [
                 'Achievement' => "<box-icon name='trophy' type='solid' color='white'></box-icon>",
                 'Documents' => "<box-icon name='file-doc' type='solid' color='white'></box-icon>",
                 'Evaluation' => "<box-icon name='line-chart' color='white'></box-icon>",
                 'Reports' => "<box-icon name='report' type='solid' color='white'></box-icon>",
                 'Users' => "<box-icon name='user-circle' color='white'></box-icon>",
+                'Account Approvals' => "<box-icon name='user-check' color='white'></box-icon>",
+
                 'Log-out' => "<box-icon name='log-out' color='white'></box-icon>"
             ];
 
@@ -182,7 +184,7 @@ $_SESSION['user']['last_activity'] = time();
                     <!-- Avatar column (empty) -->
                     <div class="col-span-1"></div>
 
-                    <!-- Adjusted Student ID column -->
+                    <!-- AFdjusted Student ID column -->
                     <div class="col-span-5 pl-3">Student ID</div>
 
                     <!-- Student Name column -->
@@ -895,11 +897,311 @@ $_SESSION['user']['last_activity'] = time();
 
 
 
+    <?php elseif ($currentPage === 'Account Approvals'): ?>
 
+        <?php
 
+        if (!file_exists('../vendor/autoload.php')) {
+            die('Error: Composer dependencies not installed. Run "composer install" in the project root.');
+        }
+        require '../vendor/autoload.php'; // Ensure PHPMailer is installed via Composer
 
+        $servername = "localhost";
+        $username = "root";
+        $password = "";
+        $dbname = "SportOfficeDB";
 
+        $conn = new mysqli($servername, $username, $password, $dbname);
+        if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
+        }
 
+        // Function to send email notification
+        function sendEmailNotification($recipientEmail, $recipientName, $status, $password = null) {
+            $mail = new PHPMailer(true);
+            try {
+                // Server settings
+                $mail->isSMTP();
+                $mail->Host = 'smtp.gmail.com';
+                $mail->SMTPAuth = true;
+                $mail->Username = 'your-email@gmail.com'; // Replace with your Gmail address
+                $mail->Password = 'your-app-password'; // Replace with your Gmail App Password
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                $mail->Port = 587;
+
+                // Recipients
+                $mail->setFrom('your-email@gmail.com', 'USeP OSAS-Sports Unit');
+                $mail->addAddress($recipientEmail, $recipientName);
+
+                // Content
+                $mail->isHTML(true);
+                $mail->Subject = 'Account Approval Status';
+
+                if ($status == 'approved') {
+                    $mail->Body = "
+            <h2>Account Approval Notification</h2>
+            <p>Dear {$recipientName},</p>
+            <p>Your account request has been <strong>APPROVED</strong>.</p>
+            <p>Please use the following credentials to log in:</p>
+            <p><strong>Email:</strong> {$recipientEmail}<br>
+               <strong>Password:</strong> {$password}</p>
+            <p>You can log in at: <a href='your-login-url'>Login Page</a></p>
+            <p>Thank you!</p>
+            <p>USeP OSAS-Sports Unit</p>
+        ";
+                    $mail->AltBody = "Dear {$recipientName},\n\nYour account request has been APPROVED.\n\nPlease use the following credentials to log in:\nEmail: {$recipientEmail}\nPassword: {$password}\n\nYou can log in at: your-login-url\n\nThank you!\nUSeP OSAS-Sports Unit";
+                } else {
+                    $mail->Body = "
+            <h2>Account Approval Notification</h2>
+            <p>Dear {$recipientName},</p>
+            <p>We regret to inform you that your account request has been <strong>REJECTED</strong>.</p>
+            <p>For further details, please contact the OSAS-Sports Unit.</p>
+            <p>Thank you!</p>
+            <p>USeP OSAS-Sports Unit</p>
+        ";
+                    $mail->AltBody = "Dear {$recipientName},\n\nWe regret to inform you that your account request has been REJECTED.\n\nFor further details, please contact the OSAS-Sports Unit.\n\nThank you!\nUSeP OSAS-Sports Unit";
+                }
+
+                $mail->send();
+                return true;
+            } catch (Exception $e) {
+                error_log("Email could not be sent. Mailer Error: {$mail->ErrorInfo}");
+                return false;
+            }
+        }
+
+        // Handle approval/rejection
+        if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
+            // Check if admin is logged in and has a valid admin_id
+            if (!isset($_SESSION['admin_id'])) {
+                $message = "Error: Admin not logged in.";
+                header("Location: adminApprovals.php?message=" . urlencode($message));
+                exit();
+            }
+
+            $admin_id = $_SESSION['admin_id'];
+            // Verify admin_id exists in admins table
+            $stmt = $conn->prepare("SELECT id FROM admins WHERE id = ?");
+            $stmt->bind_param("i", $admin_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if ($result->num_rows === 0) {
+                $message = "Error: Invalid admin ID.";
+                header("Location: adminApprovals.php?message=" . urlencode($message));
+                exit();
+            }
+            $stmt->close();
+
+            $approval_id = $_POST['approval_id'];
+            $action = $_POST['action'];
+            $status = $action == 'approve' ? 'approved' : 'rejected';
+
+            // Update approval status
+            $stmt = $conn->prepare("UPDATE account_approvals SET approval_status = ?, approved_by = ?, approval_date = NOW() WHERE id = ?");
+            $stmt->bind_param("sii", $status, $admin_id, $approval_id);
+            $stmt->execute();
+
+            // Fetch approval details for email
+            $result = $conn->query("SELECT student_id, full_name, email, status FROM account_approvals WHERE id = $approval_id");
+            $approval = $result->fetch_assoc();
+
+            $password = null;
+            if ($action == 'approve') {
+                // Generate password
+                $password = bin2hex(random_bytes(8));
+                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+                // Insert into users table
+                $stmt = $conn->prepare("INSERT INTO users (student_id, full_name, email, password, status) VALUES (?, ?, ?, ?, ?)");
+                $stmt->bind_param("sssss", $approval['student_id'], $approval['full_name'], $approval['email'], $hashedPassword, $approval['status']);
+                $stmt->execute();
+            }
+
+            // Send email notification
+            $emailSent = sendEmailNotification($approval['email'], $approval['full_name'], $status, $password);
+
+            $stmt->close();
+            $message = $emailSent ? "Request $status and email sent" : "Request $status but email failed";
+            header("Location: adminApprovals.php?message=" . urlencode($message));
+            exit();
+        }
+
+        // Fetch pending approvals
+        $result = $conn->query("SELECT a.id, a.student_id, a.full_name, a.email, a.status, a.file_name, a.file_type, a.request_date FROM account_approvals a WHERE a.approval_status = 'pending'");
+        ?>
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Admin Approvals - USeP OSAS-Sports Unit</title>
+            <link rel="stylesheet" href="../public/CSS/admin.css">
+            <link rel="icon" href="../public/image/Usep.png">
+            <link href="https://cdn.jsdelivr.net/npm/boxicons/css/boxicons.min.css" rel="stylesheet" />
+            <style>
+                table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
+                th { background-color: #f4f4f4; }
+                .action-btn { padding: 5px 10px; margin: 0 5px; cursor: pointer; }
+                .approve { background-color: #28a745; color: white; }
+                .reject { background-color: #dc3545; color: white; }
+                .view-btn { padding: 5px 10px; background-color: #007bff; color: white; cursor: pointer; }
+                .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; }
+                .modal-content {
+                    background-color: white;
+                    margin: 2% auto;
+                    padding: 20px;
+                    width: 90vw;
+                    height: calc(90vw * 0.707);
+                    max-width: 1180px;
+                    max-height: 560px;
+                    border-radius: 8px;
+                    position: relative;
+                    display: flex;
+                    flex-direction: column;
+                    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                }
+                .modal-preview {
+                    flex-grow: 1;
+                    overflow-y: auto;
+                    padding: 10px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: flex-start;
+                }
+                .modal-preview img,
+                .modal-preview iframe {
+                    max-width: 100%;
+                    width: auto;
+                    height: auto;
+                    border: none;
+                }
+                .modal-buttons {
+                    margin-top: 15px;
+                    text-align: center;
+                    padding-top: 15px;
+                    border-top: 1px solid #ddd;
+                }
+                .modal-btn {
+                    padding: 10px 20px;
+                    margin: 0 10px;
+                    cursor: pointer;
+                    border-radius: 4px;
+                    border: none;
+                    font-size: 16px;
+                }
+                .download-btn { background-color: #17a2b8; color: white; }
+                .close-btn { background-color: #6c757d; color: white; }
+                .error-message { color: red; text-align: center; font-size: 18px; }
+                .message { padding: 10px; background-color: #e7f3e7; color: #155724; margin-bottom: 15px; border: 1px solid #c3e6cb; }
+            </style>
+        </head>
+        <body>
+        <div class="container">
+            <h1>Pending Account Approvals</h1>
+            <?php if (isset($_GET['message'])): ?>
+                <div class="message"><?php echo htmlspecialchars($_GET['message']); ?></div>
+            <?php endif; ?>
+            <table>
+                <tr>
+                    <th>Student ID</th>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Document</th>
+                    <th>Request Date</th>
+                    <th>Actions</th>
+                </tr>
+                <?php while ($row = $result->fetch_assoc()): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($row['student_id']); ?></td>
+                        <td><?php echo htmlspecialchars($row['full_name']); ?></td>
+                        <td><?php echo htmlspecialchars($row['email']); ?></td>
+                        <td><?php echo htmlspecialchars($row['status']); ?></td>
+                        <td>
+                            <button class="view-btn" onclick="showDocument(<?php echo $row['id']; ?>, '<?php echo htmlspecialchars(addslashes($row['file_name'])); ?>', '<?php echo $row['file_type']; ?>')">View Document</button>
+                        </td>
+                        <td><?php echo $row['request_date']; ?></td>
+                        <td>
+                            <form method="POST" style="display:inline;">
+                                <input type="hidden" name="approval_id" value="<?php echo $row['id']; ?>">
+                                <input type="hidden" name="action" value="approve">
+                                <button type="submit" class="action-btn approve">Approve</button>
+                            </form>
+                            <form method="POST" style="display:inline;">
+                                <input type="hidden" name="approval_id" value="<?php echo $row['id']; ?>">
+                                <input type="hidden" name="action" value="reject">
+                                <button type="submit" class="action-btn reject">Reject</button>
+                            </form>
+                        </td>
+                    </tr>
+                <?php endwhile; ?>
+            </table>
+        </div>
+
+        <!-- Modal -->
+        <div id="documentModal" class="modal">
+            <div class="modal-content">
+                <div id="documentPreview" class="modal-preview"></div>
+                <div class="modal-buttons">
+                    <a id="downloadLink" href="#" class="modal-btn download-btn">Download</a>
+                    <button class="modal-btn close-btn" onclick="closeModal()">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            async function showDocument(id, fileName, fileType) {
+                const modal = document.getElementById('documentModal');
+                const preview = document.getElementById('documentPreview');
+                const downloadLink = document.getElementById('downloadLink');
+
+                downloadLink.href = `../controller/downloadDocument.php?id=${id}&download=true`;
+                preview.innerHTML = '';
+
+                try {
+                    const response = await fetch(`../controller/downloadDocument.php?id=${id}`);
+                    if (!response.ok) throw new Error('Failed to load document');
+
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+
+                    if (fileType === 'application/pdf') {
+                        preview.innerHTML = `<iframe src="${url}" style="width:100%;height:auto;"></iframe>`;
+                    } else if (fileType.startsWith('image/')) {
+                        preview.innerHTML = `<img src="${url}" alt="${fileName}" />`;
+                    } else {
+                        preview.innerHTML = '<p class="error-message">Preview not available for this file type.</p>';
+                    }
+
+                    modal.style.display = 'block';
+                } catch (error) {
+                    preview.innerHTML = `<p class="error-message">Error loading document: ${error.message}</p>`;
+                    modal.style.display = 'block';
+                }
+            }
+
+            function closeModal() {
+                const modal = document.getElementById('documentModal');
+                const preview = document.getElementById('documentPreview');
+                modal.style.display = 'none';
+
+                const iframes = preview.getElementsByTagName('iframe');
+                const images = preview.getElementsByTagName('img');
+                for (let iframe of iframes) URL.revokeObjectURL(iframe.src);
+                for (let img of images) URL.revokeObjectURL(img.src);
+                preview.innerHTML = '';
+            }
+
+            window.onclick = function(event) {
+                const modal = document.getElementById('documentModal');
+                if (event.target === modal) closeModal();
+            };
+        </script>
+        </body>
+        </html>
+
+    <?php $conn->close(); ?>
 
 
     <?php else: ?>

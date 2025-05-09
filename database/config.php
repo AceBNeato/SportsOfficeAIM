@@ -20,6 +20,28 @@ if (!$conn->query($sql)) {
 // 3. Select the database
 $conn->select_db($dbname);
 
+
+$sql = "CREATE TABLE IF NOT EXISTS account_approvals (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id VARCHAR(50) NOT NULL,
+    full_name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    status ENUM('undergraduate', 'alumni') DEFAULT 'undergraduate',
+    file_name VARCHAR(255) NOT NULL,
+    file_data LONGBLOB NOT NULL,
+    file_type VARCHAR(50) NOT NULL,
+    file_size INT NOT NULL,
+    request_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    approval_status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+    approved_by INT,
+    approval_date TIMESTAMP NULL,
+    FOREIGN KEY (approved_by) REFERENCES admins(id) ON DELETE SET NULL,
+    UNIQUE (student_id, email)
+);";
+if (!$conn->query($sql)) {
+    die("Error creating users table: " . $conn->error);
+}
+
 // 4. Create users table
 $sql = "CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -122,3 +144,4 @@ if ($result) {
 
 $conn->close();
 ?>
+

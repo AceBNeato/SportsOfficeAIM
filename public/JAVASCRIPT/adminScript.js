@@ -28,13 +28,74 @@ function openModal(modalId) {
     }
 }
 
+
+
 function closeModal(modalId) {
     const modal = document.getElementById(modalId);
+    const preview = document.getElementById('documentPreview');
+    modal.style.display = 'none';
     if (modal) {
         modal.classList.add('hidden');
         document.body.style.overflow = 'auto';
     }
+    const iframes = preview.getElementsByTagName('iframe');
+    const images = preview.getElementsByTagName('img');
+    for (let iframe of iframes) URL.revokeObjectURL(iframe.src);
+    for (let img of images) URL.revokeObjectURL(img.src);
+    preview.innerHTML = '';
 }
+
+window.onclick = function(event) {
+    const modal = document.getElementById('documentModal');
+    if (event.target === modal) closeModal();
+};
+
+async function showDocument(id, fileName, fileType) {
+    const modal = document.getElementById('documentModal');
+    const preview = document.getElementById('documentPreview');
+    const downloadLink = document.getElementById('downloadLink');
+
+    downloadLink.href = `../controller/downloadDocument.php?id=${id}&download=true`;
+    preview.innerHTML = '';
+
+    try {
+        const response = await fetch(`../controller/downloadDocument.php?id=${id}`);
+        if (!response.ok) throw new Error('Failed to load document');
+
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+
+        if (fileType === 'application/pdf') {
+            preview.innerHTML = `<iframe src="${url}" style="width:100%;height:100%;"></iframe>`;
+        } else if (fileType.startsWith('image/')) {
+            preview.innerHTML = `<img src="${url}" alt="${fileName}" />`;
+        } else {
+            preview.innerHTML = '<p class="error-message">Preview not available for this file type.</p>';
+        }
+
+        modal.style.display = 'block';
+    } catch (error) {
+        preview.innerHTML = `<p class="error-message">Error loading document: ${error.message}</p>`;
+        modal.style.display = 'block';
+    }
+}
+
+function closeModal() {
+    const modal = document.getElementById('documentModal');
+    const preview = document.getElementById('documentPreview');
+    modal.style.display = 'none';
+
+    const iframes = preview.getElementsByTagName('iframe');
+    const images = preview.getElementsByTagName('img');
+    for (let iframe of iframes) URL.revokeObjectURL(iframe.src);
+    for (let img of images) URL.revokeObjectURL(img.src);
+    preview.innerHTML = '';
+}
+
+window.onclick = function(event) {
+    const modal = document.getElementById('documentModal');
+    if (event.target === modal) closeModal();
+};
 
 function togglePasswordVisibility(inputId) {
     const input = document.getElementById(inputId);

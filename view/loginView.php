@@ -161,7 +161,7 @@ error_log("Login page loaded. Error message: " . ($errorMessage ?: 'none'));
             width: 90%;
             max-width: 400px;
             height: auto;
-            object-fit: contain;
+            objectDRAMAcover;
         }
 
         .privacy-modal h2, .privacy-modal h3 {
@@ -176,12 +176,12 @@ error_log("Login page loaded. Error message: " . ($errorMessage ?: 'none'));
 
         .privacy-link {
             color: #ff6b6b;
-            text-decoration: none; /* No underline by default */
+            text-decoration: none;
             cursor: pointer;
         }
 
         .privacy-link:hover {
-            text-decoration: underline; /* Underline on hover */
+            text-decoration: underline;
         }
 
         .privacy-button {
@@ -199,6 +199,26 @@ error_log("Login page loaded. Error message: " . ($errorMessage ?: 'none'));
 
         .privacy-button:hover {
             background-color: #c94545;
+        }
+
+        .password-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 1.2em;
+            color: #333;
+            user-select: none;
+        }
+
+        .toggle-password:hover {
+            color: #007bff;
         }
     </style>
 </head>
@@ -240,7 +260,7 @@ error_log("Login page loaded. Error message: " . ($errorMessage ?: 'none'));
                 </label>
                 <div class="password-container">
                     <input type="password" id="password" name="password" placeholder="Enter Password" required>
-                    <i class="bx bx-show toggle-password" aria-label="Show password" role="button"></i>
+                    <i class="bx bx-hide toggle-password" aria-label="Show password" role="button"></i>
                 </div>
                 <button type="submit">LOGIN</button>
             </form>
@@ -269,7 +289,7 @@ error_log("Login page loaded. Error message: " . ($errorMessage ?: 'none'));
         <p>
             3. <strong>Data Privacy:</strong> We are committed to protecting your personal information. Please refer to our <a href="https://www.usep.edu.ph/usep-data-privacy-statement/">Privacy Policy</a> for details.
         </p>
-        
+
         <p>
             For any questions or concerns, please contact the USeP OSAS-Sports Unit administration.
         </p>
@@ -336,10 +356,11 @@ error_log("Login page loaded. Error message: " . ($errorMessage ?: 'none'));
 
         if (togglePassword && passwordInput) {
             togglePassword.addEventListener('click', function() {
-                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                passwordInput.setAttribute('type', type);
-                this.classList.toggle('bx-show');
-                this.classList.toggle('bx-hide');
+                const isPasswordVisible = passwordInput.getAttribute('type') === 'password';
+                passwordInput.setAttribute('type', isPasswordVisible ? 'text' : 'password');
+                togglePassword.classList.toggle('bx-hide', isPasswordVisible);
+                togglePassword.classList.toggle('bx-show', !isPasswordVisible);
+                togglePassword.setAttribute('aria-label', isPasswordVisible ? 'Hide password' : 'Show password');
             });
         }
 
@@ -417,8 +438,40 @@ error_log("Login page loaded. Error message: " . ($errorMessage ?: 'none'));
 
         return isValid;
     }
+
+    // Password toggle functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const togglePassword = document.querySelector('.toggle-password');
+        const passwordInput = document.getElementById('password');
+
+        if (togglePassword && passwordInput) {
+            togglePassword.addEventListener('click', function() {
+                // Toggle password visibility
+                const isPasswordVisible = passwordInput.type === 'password';
+                passwordInput.type = isPasswordVisible ? 'text' : 'password';
+
+                // Toggle icon classes
+                togglePassword.classList.toggle('bx-hide', !isPasswordVisible);
+                togglePassword.classList.toggle('bx-show', isPasswordVisible);
+
+                // Update aria-label for accessibility
+                togglePassword.setAttribute('aria-label', isPasswordVisible ? 'Hide password' : 'Show password');
+
+                // Set focus back to password input for better UX
+                passwordInput.focus();
+            });
+
+            // Add keydown event for accessibility (toggle on Enter or Space)
+            togglePassword.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    togglePassword.click();
+                }
+            });
+        } else {
+            console.warn('Password input or toggle button not found.');
+        }
+    });
 </script>
 </body>
 </html>
-
-

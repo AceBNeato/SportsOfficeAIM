@@ -1,0 +1,16 @@
+{
+    "name": "deru/sports-office-aim",
+    "description": "composer require phpmailer/phpmailer",
+    "autoload": {
+        "psr-4": {
+            "Deru\\SportsOfficeAim\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Arthur Dale Enrique Micaroz",
+            "email": "arthurdaleenrique@gmail.com"
+        }
+    ],
+    "require": {}
+}
