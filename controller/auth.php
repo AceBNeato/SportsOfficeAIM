@@ -1,9 +1,17 @@
 <?php
 session_start();
 
-// Enable error reporting
+// Enable error reporting for debugging
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+
+// Secure session configuration
+ini_set('session.use_strict_mode', 1);
+ini_set('session.cookie_httponly', 1);
+if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
+    ini_set('session.cookie_secure', 1);
+}
+ini_set('session.cookie_samesite', 'Strict');
 
 // Database configuration
 $host = 'localhost';
@@ -15,10 +23,20 @@ $pass = '';
 $conn = new mysqli($host, $user, $pass, $db);
 if ($conn->connect_error) {
     error_log("Connection failed: " . $conn->connect_error);
-    die("System error. Please try again later.");
+    $_SESSION['login_error'] = "System error. Please try again later.";
+    header("Location: ../view/loginView.php");
+    exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Validate CSRF token
+    if (!isset($_POST['csrf_token']) || !isset($_SESSION['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        error_log("CSRF Token Mismatch: POST=" . ($_POST['csrf_token'] ?? 'Not set') . ", Session=" . ($_SESSION['csrf_token'] ?? 'Not set'));
+        $_SESSION['login_error'] = "Invalid session. Please try again.";
+        header("Location: ../view/loginView.php");
+        exit;
+    }
+
     // Sanitize inputs
     $email = filter_var(trim($_POST['email'] ?? ''), FILTER_SANITIZE_EMAIL);
     $password = $_POST['password'] ?? '';
@@ -138,9 +156,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $address = $user_details['address'];
         $id = $user_details['id'];
         $student_id = null;
-        $year_section = null; // Admins typically don't have year/section
+        $year_section = null;
     } else {
-        // Query for regular user
         $query = "SELECT id, student_id, full_name, address, email, password FROM users WHERE email = ?";
         $stmt = $conn->prepare($query);
         if (!$stmt) {
@@ -173,7 +190,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $submission_query = "SELECT year_section FROM submissions WHERE user_id = ? LIMIT 1";
         $submission_stmt = $conn->prepare($submission_query);
         if ($submission_stmt) {
-            $submission_stmt->bind_param("s", $user_id);
+            $submission_stmt->bind_param("i", $id); // Changed to 'i' for integer
             $submission_stmt->execute();
             $submission_result = $submission_stmt->get_result();
             if ($submission_result->num_rows > 0) {
@@ -195,12 +212,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     $image_stmt->close();
 
-    // Secure session configuration
-    ini_set('session.cookie_httponly', 1);
-    if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
-        ini_set('session.cookie_secure', 1);
-    }
-    ini_set('session.cookie_samesite', 'Strict');
+    // Regenerate session ID for security
     session_regenerate_id(true);
 
     // Set the session variables
@@ -222,6 +234,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Also store in submissions session for form autofill
     $_SESSION['submissions']['year_section'] = $year_section ?? '';
+
+    // Regenerate CSRF token after successful login
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
     // Debug log
     error_log("User logged in - Email: $email, Role: $role, Has Image: " . ($has_profile_image ? 'Yes' : 'No') .

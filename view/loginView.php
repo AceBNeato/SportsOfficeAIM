@@ -1,17 +1,27 @@
-<!DOCTYPE html>
 <?php
+// Secure session configuration
+ini_set('session.use_strict_mode', 1);
+ini_set('session.cookie_httponly', 1);
+if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
+    ini_set('session.cookie_secure', 1);
+}
+ini_set('session.cookie_samesite', 'Strict');
+
+// Start session
 session_start();
+
+// Generate CSRF token if not already set
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+$csrf_token = $_SESSION['csrf_token'];
 
 // Debug: Check if the user is already logged in
 if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
-    // Debug log
     error_log('Session already active: ' . print_r($_SESSION, true));
-
-    // Check user role and redirect accordingly
     if (isset($_SESSION['user']['role'])) {
         $role = strtolower(trim($_SESSION['user']['role']));
         error_log("User role: $role");
-
         if ($role === 'admin') {
             header('Location: adminView.php');
             exit();
@@ -31,6 +41,7 @@ unset($_SESSION['login_error']);
 // Debug
 error_log("Login page loaded. Error message: " . ($errorMessage ?: 'none'));
 ?>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -104,12 +115,10 @@ error_log("Login page loaded. Error message: " . ($errorMessage ?: 'none'));
             color: #b71c1c;
         }
 
-        /* Ensure modal is centered */
         .modal-overlay.active {
             display: flex;
         }
 
-        /* Privacy Modal Styles */
         .privacy-modal-overlay {
             display: flex;
             position: fixed;
@@ -161,7 +170,7 @@ error_log("Login page loaded. Error message: " . ($errorMessage ?: 'none'));
             width: 90%;
             max-width: 400px;
             height: auto;
-            objectDRAMAcover;
+            object-fit: cover;
         }
 
         .privacy-modal h2, .privacy-modal h3 {
@@ -255,6 +264,7 @@ error_log("Login page loaded. Error message: " . ($errorMessage ?: 'none'));
 
             <div id="error-messages" class="error-messages" hidden></div>
             <form method="POST" action="../controller/auth.php" onsubmit="return validateForm(event)" novalidate>
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
                 <label>
                     <input type="email" name="email" placeholder="Enter Email" required>
                 </label>
@@ -276,23 +286,11 @@ error_log("Login page loaded. Error message: " . ($errorMessage ?: 'none'));
             <i class="bx bx-x"></i>
         </button>
         <h2 style="text-align: center;">Terms of Use</h2>
-
-        <p>
-            Welcome to the USeP OSAS-Sports Unit system. By accessing or using this website, you agree to be bound by the following terms and conditions:
-        </p>
-        <p>
-            1. <strong>Account Responsibility:</strong> You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.
-        </p>
-        <p>
-            2. <strong>Prohibited Activities:</strong> You may not use this system for any unlawful purpose or in any way that violates these terms, including unauthorized access or data manipulation.
-        </p>
-        <p>
-            3. <strong>Data Privacy:</strong> We are committed to protecting your personal information. Please refer to our <a href="https://www.usep.edu.ph/usep-data-privacy-statement/">Privacy Policy</a> for details.
-        </p>
-
-        <p>
-            For any questions or concerns, please contact the USeP OSAS-Sports Unit administration.
-        </p>
+        <p>Welcome to the USeP OSAS-Sports Unit system. By accessing or using this website, you agree to be bound by the following terms and conditions:</p>
+        <p>1. <strong>Account Responsibility:</strong> You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.</p>
+        <p>2. <strong>Prohibited Activities:</strong> You may not use this system for any unlawful purpose or in any way that violates these terms, including unauthorized access or data manipulation.</p>
+        <p>3. <strong>Data Privacy:</strong> We are committed to protecting your personal information. Please refer to our <a href="https://www.usep.edu.ph/usep-data-privacy-statement/">Privacy Policy</a> for details.</p>
+        <p>For any questions or concerns, please contact the USeP OSAS-Sports Unit administration.</p>
     </div>
 </div>
 
@@ -314,39 +312,36 @@ error_log("Login page loaded. Error message: " . ($errorMessage ?: 'none'));
 <!-- Scripts -->
 <script src="../public/JAVASCRIPT/loginScript.js"></script>
 <script>
-    // Modal functionality
     document.addEventListener('DOMContentLoaded', function() {
-        // Get Terms modal elements
+        // Terms modal elements
         const termsModal = document.getElementById('termsModal');
         const termsLink = document.getElementById('termsLink');
         const closeModal = document.getElementById('closeModal');
 
-        // Open Terms modal when Terms of Use is clicked
+        // Open Terms modal
         termsLink.addEventListener('click', function(e) {
             e.preventDefault();
             termsModal.classList.add('active');
-            document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
+            document.body.style.overflow = 'hidden';
         });
 
-        // Close Terms modal when close button is clicked
+        // Close Terms modal
         closeModal.addEventListener('click', function() {
             termsModal.classList.remove('active');
-            document.body.style.overflow = ''; // Re-enable scrolling
+            document.body.style.overflow = '';
         });
 
-        // Close Terms modal when clicking outside the modal content
         termsModal.addEventListener('click', function(e) {
             if (e.target === termsModal) {
                 termsModal.classList.remove('active');
-                document.body.style.overflow = ''; // Re-enable scrolling
+                document.body.style.overflow = '';
             }
         });
 
-        // Close Terms modal when pressing Escape key
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && termsModal.classList.contains('active')) {
                 termsModal.classList.remove('active');
-                document.body.style.overflow = ''; // Re-enable scrolling
+                document.body.style.overflow = '';
             }
         });
 
@@ -362,6 +357,13 @@ error_log("Login page loaded. Error message: " . ($errorMessage ?: 'none'));
                 togglePassword.classList.toggle('bx-show', !isPasswordVisible);
                 togglePassword.setAttribute('aria-label', isPasswordVisible ? 'Hide password' : 'Show password');
             });
+
+            togglePassword.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    togglePassword.click();
+                }
+            });
         }
 
         // Privacy Modal functionality
@@ -369,107 +371,58 @@ error_log("Login page loaded. Error message: " . ($errorMessage ?: 'none'));
         const continueButton = document.getElementById('continueButton');
         const privacyLink = document.querySelector('.privacy-link');
 
-        // The privacy modal is already visible by default
-
-        // Close privacy modal when continue button is clicked
-        continueButton.addEventListener('click', function() {
+        if (sessionStorage.getItem('privacyModalShown')) {
             privacyModal.style.display = 'none';
-            document.body.style.overflow = ''; // Re-enable scrolling
-        });
+        } else {
+            document.body.style.overflow = 'hidden';
+            continueButton.addEventListener('click', function() {
+                sessionStorage.setItem('privacyModalShown', 'true');
+                privacyModal.style.display = 'none';
+                document.body.style.overflow = '';
+            });
+        }
 
-        // Link to privacy policy
         if (privacyLink) {
             privacyLink.addEventListener('click', function() {
                 window.open('https://www.usep.edu.ph/usep-data-privacy-statement/', '_blank');
             });
         }
 
-        // Check if the privacy modal has been shown before (using sessionStorage)
-        if (sessionStorage.getItem('privacyModalShown')) {
-            privacyModal.style.display = 'none';
-        } else {
-            // Modal is already visible
-            document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
+        // Form validation
+        function validateForm(event) {
+            const email = document.querySelector('input[name="email"]').value;
+            const password = document.querySelector('input[name="password"]').value;
+            const errorMessages = document.getElementById('error-messages');
+            let isValid = true;
+            let messages = [];
 
-            // Set the flag in sessionStorage when the user clicks continue
-            continueButton.addEventListener('click', function() {
-                sessionStorage.setItem('privacyModalShown', 'true');
-            });
-        }
-    });
+            errorMessages.innerHTML = '';
+            errorMessages.hidden = true;
 
-    // Form validation function
-    function validateForm(event) {
-        const email = document.querySelector('input[name="email"]').value;
-        const password = document.querySelector('input[name="password"]').value;
-        const errorMessages = document.getElementById('error-messages');
-        let isValid = true;
-        let messages = [];
+            if (!email) {
+                messages.push('Email is required');
+                isValid = false;
+            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                messages.push('Please enter a valid email address');
+                isValid = false;
+            }
 
-        // Clear previous error messages
-        errorMessages.innerHTML = '';
-        errorMessages.hidden = true;
+            if (!password) {
+                messages.push('Password is required');
+                isValid = false;
+            }
 
-        // Validate email
-        if (!email) {
-            messages.push('Email is required');
-            isValid = false;
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            messages.push('Please enter a valid email address');
-            isValid = false;
-        }
+            if (!isValid) {
+                errorMessages.hidden = false;
+                messages.forEach(message => {
+                    const p = document.createElement('p');
+                    p.textContent = message;
+                    errorMessages.appendChild(p);
+                });
+                event.preventDefault();
+            }
 
-        // Validate password
-        if (!password) {
-            messages.push('Password is required');
-            isValid = false;
-        }
-
-        // Display error messages if any
-        if (!isValid) {
-            errorMessages.hidden = false;
-            messages.forEach(message => {
-                const p = document.createElement('p');
-                p.textContent = message;
-                errorMessages.appendChild(p);
-            });
-            event.preventDefault();
-        }
-
-        return isValid;
-    }
-
-    // Password toggle functionality
-    document.addEventListener('DOMContentLoaded', function() {
-        const togglePassword = document.querySelector('.toggle-password');
-        const passwordInput = document.getElementById('password');
-
-        if (togglePassword && passwordInput) {
-            togglePassword.addEventListener('click', function() {
-                // Toggle password visibility
-                const isPasswordVisible = passwordInput.type === 'password';
-                passwordInput.type = isPasswordVisible ? 'text' : 'password';
-
-                // Toggle icon classes
-                togglePassword.classList.toggle('bx-hide', !isPasswordVisible);
-                togglePassword.classList.toggle('bx-show', isPasswordVisible);
-
-                // Update aria-label for accessibility
-                togglePassword.setAttribute('aria-label', isPasswordVisible ? 'Hide password' : 'Show password');
-
-                // Set focus back to password input for better UX
-                passwordInput.focus();
-            });
-
-            // Add keydown event for accessibility (toggle on Enter or Space)
-            togglePassword.addEventListener('keydown', function(event) {
-                if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault();
-                    togglePassword.click();
-                }
-            });
-        } else {
-            console.warn('Password input or toggle button not found.');
+            return isValid;
         }
     });
 </script>
