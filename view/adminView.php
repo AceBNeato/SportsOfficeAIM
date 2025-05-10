@@ -1,9 +1,4 @@
 <?php
-// Include PHPMailer
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-
-
 
 // Centralized database connection
 class Database {
@@ -677,6 +672,10 @@ function searchUsers($searchTerm) {
             <?php endif; ?>
         </div>
 
+
+
+
+
     <?php elseif ($currentPage === 'Account Approvals'): ?>
     <?php
     $conn = Database::getInstance();
@@ -756,187 +755,397 @@ function searchUsers($searchTerm) {
     }
 
     $result = $conn->query("SELECT a.id, a.student_id, a.full_name, a.email, a.status, a.file_name, a.file_type, a.request_date
-                                FROM account_approvals a
-                                WHERE a.approval_status = 'pending'");
+                    FROM account_approvals a
+                    WHERE a.approval_status = 'pending'");
     ?>
-        <style>
-            .action-btn {
-                padding: 0.5rem 1rem;
-                border-radius: 0.375rem;
-                font-weight: 500;
-                transition: all 0.2s;
+
+    <style>
+        :root {
+            --primary: #B91C1C;
+            --success: #10B981;
+            --danger: #EF4444;
+            --info: #3B82F6;
+            --gray: #6B7280;
+        }
+
+        .container {
+            max-width: 80rem;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .action-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            transition: background-color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+            cursor: pointer;
+        }
+
+        .approve-btn {
+            background-color: var(--success);
+            color: white;
+        }
+        .approve-btn:hover {
+            background-color: #059669;
+        }
+
+        .reject-btn {
+            background-color: var(--danger);
+            color: white;
+        }
+        .reject-btn:hover {
+            background-color: #DC2626;
+        }
+
+        .view-btn {
+            background-color: var(--info);
+            color: white;
+        }
+        .view-btn:hover {
+            background-color: #2563EB;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 0.375rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .success-alert {
+            background-color: #D1FAE5;
+            color: #065F46;
+        }
+
+        .error-alert {
+            background-color: #FEE2E2;
+            color: #B91C1C;
+        }
+
+        .alert-close {
+            margin-left: auto;
+            cursor: pointer;
+        }
+
+        #documentModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        #documentModal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 0.5rem;
+            max-width: 90%;
+            max-height: 95vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .confirmation-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .confirmation-modal.show {
+            display: flex;
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                flex-direction: column;
+                max-height: 90vh;
+                width: 95%;
             }
-            .approve-btn {
-                background-color: #10B981;
-                color: white;
+
+            .modal-sidebar {
+                border-top: 1px solid #e5e7eb;
+                border-right: none;
             }
-            .approve-btn:hover {
-                background-color: #059669;
+        }
+
+        @media (min-width: 769px) {
+            .modal-content {
+                width: 80%;
+                max-width: 1200px;
             }
-            .reject-btn {
-                background-color: #EF4444;
-                color: white;
+
+            .modal-sidebar {
+                border-right: 1px solid #e5e7eb;
             }
-            .reject-btn:hover {
-                background-color: #DC2626;
-            }
-            .view-btn {
-                background-color: #3B82F6;
-                color: white;
-            }
-            .view-btn:hover {
-                background-color: #2563EB;
-            }
-            .message {
-                padding: 1rem;
-                margin-bottom: 1rem;
-                border-radius: 0.375rem;
-            }
-            .success-message {
-                background-color: #D1FAE5;
-                color: #065F46;
-                border: 1px solid #A7F3D0;
-            }
-            .error-message {
-                background-color: #FEE2E2;
-                color: #B91C1C;
-                border: 1px solid #FECACA;
-            }
-            #documentModal {
-                display: none;
-                align-items: center;
-                justify-content: center;
-                position: fixed;
-                inset: 0;
-                background-color: rgba(0, 0, 0, 0.5);
-                z-index: 50;
-            }
-            #documentModal.show {
-                display: flex;
-            }
-        </style>
-        <div class="p-4 sm:p-6">
-            <?php if (isset($_GET['message'])): ?>
-                <div class="message <?php echo strpos($_GET['message'], 'Error') === false ? 'success-message' : 'error-message'; ?>">
-                    <?php echo htmlspecialchars($_GET['message'], ENT_QUOTES, 'UTF-8'); ?>
+        }
+    </style>
+
+    <div class="container">
+        <!-- Message Alert -->
+        <?php if (isset($_GET['message'])): ?>
+            <div class="alert <?php echo strpos($_GET['message'], 'Error') === false ? 'success-alert' : 'error-alert'; ?>">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<?php echo strpos($_GET['message'], 'Error') === false ? 'M5 13l4 4L19 7' : 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'; ?>"></path>
+                </svg>
+                <span><?php echo htmlspecialchars($_GET['message'], ENT_QUOTES, 'UTF-8'); ?></span>
+                <span class="alert-close" onclick="this.parentElement.classList.add('hidden')">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </span>
+            </div>
+        <?php endif; ?>
+
+        <!-- Approval Requests -->
+        <div class="grid gap-4">
+            <?php if ($result->num_rows > 0): ?>
+                <?php while ($row = $result->fetch_assoc()): ?>
+                    <div class="card">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-800"><?php echo htmlspecialchars($row['full_name'], ENT_QUOTES, 'UTF-8'); ?></h3>
+                                <div class="mt-2 space-y-1 text-gray-600">
+                                    <p><span class="font-medium">Student ID:</span> <?php echo htmlspecialchars($row['student_id'], ENT_QUOTES, 'UTF-8'); ?></p>
+                                    <p><span class="font-medium">Email:</span> <?php echo htmlspecialchars($row['email'], ENT_QUOTES, 'UTF-8'); ?></p>
+                                    <p><span class="font-medium">Status:</span> <?php echo htmlspecialchars($row['status'], ENT_QUOTES, 'UTF-8'); ?></p>
+                                    <p><span class="font-medium">Request Date:</span> <?php echo htmlspecialchars($row['request_date'], ENT_QUOTES, 'UTF-8'); ?></p>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between md:justify-end space-x-3">
+                                <button class="action-btn view-btn" onclick="showDocument(<?php echo (int)$row['id']; ?>, '<?php echo htmlspecialchars(json_encode($row['file_name']), ENT_QUOTES, 'UTF-8'); ?>', '<?php echo htmlspecialchars($row['file_type'], ENT_QUOTES, 'UTF-8'); ?>')">
+                                    <i class="fas fa-eye"></i> View Document
+                                </button>
+                                <form method="POST" onsubmit="return showConfirmation('approve', '<?php echo htmlspecialchars($row['full_name'], ENT_QUOTES, 'UTF-8'); ?>', '<?php echo (int)$row['id']; ?>')">
+                                    <input type="hidden" name="approval_id" value="<?php echo (int)$row['id']; ?>">
+                                    <input type="hidden" name="action" value="approve">
+                                    <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
+                                    <button type="submit" class="action-btn approve-btn">
+                                        <i class="fas fa-check"></i> Approve
+                                    </button>
+                                </form>
+                                <form method="POST" onsubmit="return showConfirmation('reject', '<?php echo htmlspecialchars($row['full_name'], ENT_QUOTES, 'UTF-8'); ?>', '<?php echo (int)$row['id']; ?>')">
+                                    <input type="hidden" name="approval_id" value="<?php echo (int)$row['id']; ?>">
+                                    <input type="hidden" name="action" value="reject">
+                                    <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
+                                    <button type="submit" class="action-btn reject-btn">
+                                        <i class="fas fa-times"></i> Reject
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                <?php endwhile; ?>
+            <?php else: ?>
+                <div class="card text-center text-gray-500 font-medium py-6">
+                    No pending approval requests
                 </div>
             <?php endif; ?>
-            <div class="overflow-x-auto">
-                <table class="min-w-full bg-white rounded-lg overflow-hidden">
-                    <thead class="bg-red-500 text-white">
-                    <tr>
-                        <th class="py-3 px-4 text-left">Student ID</th>
-                        <th class="py-3 px-4 text-left">Full Name</th>
-                        <th class="py-3 px-4 text-left">Email</th>
-                        <th class="py-3 px-4 text-left">Status</th>
-                        <th class="py-3 px-4 text-left">Document</th>
-                        <th class="py-3 px-4 text-left">Request Date</th>
-                        <th class="py-3 px-4 text-left">Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200">
-                    <?php if ($result->num_rows > 0): ?>
-                        <?php while ($row = $result->fetch_assoc()): ?>
-                            <tr class="hover:bg-gray-50">
-                                <td class="py-3 px-4"><?php echo htmlspecialchars($row['student_id'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                <td class="py-3 px-4"><?php echo htmlspecialchars($row['full_name'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                <td class="py-3 px-4"><?php echo htmlspecialchars($row['email'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                <td class="py-3 px-4"><?php echo htmlspecialchars($row['status'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                <td class="py-3 px-4">
-                                    <button class="view-btn py-1 px-3 rounded"
-                                            onclick="showDocument(<?php echo (int)$row['id']; ?>, '<?php echo htmlspecialchars(json_encode($row['file_name']), ENT_QUOTES, 'UTF-8'); ?>', '<?php echo htmlspecialchars($row['file_type'], ENT_QUOTES, 'UTF-8'); ?>')">
-                                        View
-                                    </button>
-                                </td>
-                                <td class="py-3 px-4"><?php echo htmlspecialchars($row['request_date'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                <td class="py-3 px-4">
-                                    <form method="POST" class="inline">
-                                        <input type="hidden" name="approval_id" value="<?php echo (int)$row['id']; ?>">
-                                        <input type="hidden" name="action" value="approve">
-                                        <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
-                                        <button type="submit" class="approve-btn py-1 px-3 rounded mr-2">Approve</button>
-                                    </form>
-                                    <form method="POST" class="inline">
-                                        <input type="hidden" name="approval_id" value="<?php echo (int)$row['id']; ?>">
-                                        <input type="hidden" name="action" value="reject">
-                                        <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
-                                        <button type="submit" class="reject-btn py-1 px-3 rounded">Reject</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        <?php endwhile; ?>
-                    <?php else: ?>
-                        <tr>
-                            <td colspan="7" class="py-4 px-4 text-center text-gray-500">No pending approval requests</td>
-                        </tr>
-                    <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
         </div>
-        <div id="documentModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl mx-4 max-h-[90vh] flex flex-col">
-                <div class="p-6 relative flex-1 overflow-auto">
-                    <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    </div>
+
+    <!-- Document Preview Modal -->
+    <div id="documentModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-1000 hidden">
+        <div class="modal-content">
+            <div class="flex-1 flex flex-col">
+                <div class="p-4 border-b flex justify-between items-center">
+                    <h3 class="text-xl font-semibold text-gray-800" id="documentModalTitle">Document Preview</h3>
+                    <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
-                    <div id="documentPreview" class="h-full overflow-auto"></div>
-                    <div class="mt-4 flex justify-center space-x-4 sticky bottom-0 bg-white pt-2 pb-2">
-                        <a id="downloadLink" href="#" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">Download</a>
-                        <button onclick="closeModal()" class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded">Close</button>
+                </div>
+                <div class="flex-1 p-6 overflow-auto">
+                    <div id="documentPreview" class="w-full h-full flex items-center justify-center">
+                        <div class="text-center" aria-live="polite">
+                            <svg class="animate-spin h-8 w-8 text-red-500 mx-auto" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <p class="mt-2 text-gray-500">Loading document...</p>
+                        </div>
                     </div>
                 </div>
             </div>
+            <div class="modal-sidebar p-6 w-64 bg-gray-50 flex flex-col gap-3">
+                <a id="downloadLink" href="#" class="action-btn view-btn">
+                    <i class="fas fa-download"></i> Download
+                </a>
+                <button onclick="closeModal()" class="action-btn bg-gray-500 hover:bg-gray-600 text-white">
+                    <i class="fas fa-times"></i> Close
+                </button>
+            </div>
         </div>
-        <script>
-            function showDocument(id, fileName, fileType) {
-                const modal = document.getElementById('documentModal');
-                const preview = document.getElementById('documentPreview');
-                const downloadLink = document.getElementById('downloadLink');
-                downloadLink.href = `../controller/downloadDocument.php?id=${encodeURIComponent(id)}&download=true`;
-                preview.innerHTML = '<div class="text-center py-10">Loading document...</div>';
-                modal.classList.add('show');
-                fetch(`../controller/downloadDocument.php?id=${encodeURIComponent(id)}`)
-                    .then(response => {
-                        if (!response.ok) throw new Error(`Failed to load document: ${response.statusText}`);
-                        return response.blob();
-                    })
-                    .then(blob => {
-                        const url = URL.createObjectURL(blob);
-                        if (fileType === 'application/pdf') {
-                            preview.innerHTML = `<iframe src="${url}" style="width:100%; height:100%; min-height:400px;" frameborder="0"></iframe>`;
-                        } else if (fileType.startsWith('image/')) {
-                            preview.innerHTML = `<img src="${url}" alt="Document" class="max-w-full h-auto mx-auto" />`;
-                        } else {
-                            preview.innerHTML = `<div class="text-center py-10 text-red-500">Preview not available for this file type. Please download to view.</div>`;
-                        }
-                    })
-                    .catch(error => {
-                        preview.innerHTML = `<div class="text-center py-10 text-red-500">Error loading document: ${error.message}</div>`;
-                    });
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="confirmation-modal">
+        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4" id="confirmationTitle"></h3>
+            <p class="text-gray-600 mb-6" id="confirmationMessage"></p>
+            <div class="flex justify-end space-x-4">
+                <button onclick="cancelConfirmation()" class="action-btn bg-gray-500 hover:bg-gray-600 text-white">
+                    Cancel
+                </button>
+                <button id="confirmActionBtn" class="action-btn" onclick="confirmAction()">
+                    Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentForm = null;
+
+        function showDocument(id, fileName, fileType) {
+            const modal = document.getElementById('documentModal');
+            const preview = document.getElementById('documentPreview');
+            const downloadLink = document.getElementById('downloadLink');
+            const modalTitle = document.getElementById('documentModalTitle');
+
+            document.body.style.overflow = 'hidden';
+            modalTitle.textContent = `Document: ${JSON.parse(fileName)}`;
+            downloadLink.href = `../controller/downloadDocument.php?id=${encodeURIComponent(id)}&download=true`;
+            preview.innerHTML = `
+                <div class="flex items-center justify-center min-h-full py-10">
+                    <div class="text-center">
+                        <svg class="animate-spin h-8 w-8 text-red-500 mx-auto" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <p class="mt-2 text-gray-500">Loading document...</p>
+                    </div>
+                </div>`;
+            modal.classList.add('show');
+
+            fetch(`../controller/downloadDocument.php?id=${encodeURIComponent(id)}`)
+                .then(response => {
+                    if (!response.ok) throw new Error(`Failed to load document: ${response.statusText}`);
+                    return response.blob();
+                })
+                .then(blob => {
+                    const url = URL.createObjectURL(blob);
+                    if (fileType === 'application/pdf') {
+                        preview.innerHTML = `<iframe src="${url}" style="width:100%; height:100%; min-height:600px;" frameborder="0"></iframe>`;
+                    } else if (fileType.startsWith('image/')) {
+                        preview.innerHTML = `<img src="${url}" alt="Document" class="max-w-full h-auto mx-auto" />`;
+                    } else {
+                        preview.innerHTML = `<div class="text-center py-10 text-red-500">Preview not available for this file type. Please download to view.</div>`;
+                    }
+                })
+                .catch(error => {
+                    preview.innerHTML = `<div class="text-center py-10 text-red-500">Error loading document: ${error.message}</div>`;
+                });
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('documentModal');
+            const preview = document.getElementById('documentPreview');
+
+            document.body.style.overflow = '';
+            modal.classList.remove('show');
+            const iframes = preview.getElementsByTagName('iframe');
+            const images = preview.getElementsByTagName('img');
+            for (let iframe of iframes) {
+                URL.revokeObjectURL(iframe.src);
             }
-            function closeModal() {
-                const modal = document.getElementById('documentModal');
-                const preview = document.getElementById('documentPreview');
-                modal.classList.remove('show');
-                const iframes = preview.getElementsByTagName('iframe');
-                const images = preview.getElementsByTagName('img');
-                for (let iframe of iframes) {
-                    URL.revokeObjectURL(iframe.src);
-                }
-                for (let img of images) {
-                    URL.revokeObjectURL(img.src);
-                }
-                preview.innerHTML = '';
+            for (let img of images) {
+                URL.revokeObjectURL(img.src);
             }
-            document.getElementById('documentModal').addEventListener('click', function(event) {
-                if (event.target === this) {
-                    closeModal();
-                }
-            });
-        </script>
+            preview.innerHTML = '';
+        }
+
+        function showConfirmation(action, fullName, approvalId) {
+            const modal = document.getElementById('confirmationModal');
+            const title = document.getElementById('confirmationTitle');
+            const message = document.getElementById('confirmationMessage');
+            const confirmBtn = document.getElementById('confirmActionBtn');
+
+            title.textContent = `${action.charAt(0).toUpperCase() + action.slice(1)} Request`;
+            message.textContent = `Are you sure you want to ${action} the account request for ${fullName}?`;
+            confirmBtn.className = `action-btn ${action === 'approve' ? 'approve-btn' : 'reject-btn'}`;
+            currentForm = document.querySelector(`form:has(input[value="${approvalId}"][name="approval_id"]):has(input[value="${action}"][name="action"])`);
+
+            modal.classList.add('show');
+            return false;
+        }
+
+        function confirmAction() {
+            if (currentForm) {
+                currentForm.submit();
+            }
+        }
+
+        function cancelConfirmation() {
+            document.getElementById('confirmationModal').classList.remove('show');
+            currentForm = null;
+        }
+
+        document.getElementById('documentModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeModal();
+            }
+        });
+
+        document.getElementById('confirmationModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                cancelConfirmation();
+            }
+        });
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <?php else: ?>
         <p class="text-center">This is the <?php echo htmlspecialchars($currentPage); ?> content area.</p>
