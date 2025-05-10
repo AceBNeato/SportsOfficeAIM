@@ -236,11 +236,3 @@ form select {
 
 
 
-@media (min-width: 768px) {
-    #documentModal .bg-white {
-        max-width: 80rem; /* Custom width, e.g., 1280px */
-        max-height: 95vh;
-        margin-left: auto;
-        margin-right: auto;
-    }
-}

@@ -676,6 +676,7 @@ function searchUsers($searchTerm) {
 
 
 
+
     <?php elseif ($currentPage === 'Account Approvals'): ?>
     <?php
     $conn = Database::getInstance();
@@ -869,6 +870,27 @@ function searchUsers($searchTerm) {
             overflow: hidden;
         }
 
+        .modal-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .modal-header h3 {
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
         .confirmation-modal {
             position: fixed;
             top: 0;
@@ -975,40 +997,32 @@ function searchUsers($searchTerm) {
         </div>
     </div>
 
-    <!-- Document Preview Modal -->
-    <div id="documentModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-1000 hidden">
-        <div class="modal-content">
-            <div class="flex-1 flex flex-col">
-                <div class="p-4 border-b flex justify-between items-center">
-                    <h3 class="text-xl font-semibold text-gray-800" id="documentModalTitle">Document Preview</h3>
+        <!-- Document Preview Modal -->
+        <div id="documentModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-1000 hidden">
+            <div class="modal-content flex flex-col bg-white rounded-lg max-w-4xl w-full max-h-[95vh] mx-auto my-auto">
+                <div class="modal-header flex justify-between items-center p-6 border-b border-gray-200">
+                    <h3 class="text-2xl font-semibold text-gray-800" id="documentModalTitle">Document Preview</h3>
                     <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700">
-                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
                 </div>
-                <div class="flex-1 p-6 overflow-auto">
-                    <div id="documentPreview" class="w-full h-full flex items-center justify-center">
-                        <div class="text-center" aria-live="polite">
-                            <svg class="animate-spin h-8 w-8 text-red-500 mx-auto" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            <p class="mt-2 text-gray-500">Loading document...</p>
-                        </div>
+                <div class="flex-1 p-4 overflow-auto flex items-center justify-center">
+                    <div id="documentPreview" class="w-full h-full">
+                        <iframe src="blob:http://localhost/e7717e22-d6f2-47c3-850f-55d440976e85" style="width:100%; height:100%; min-height:80vh;" frameborder="0"></iframe>
                     </div>
                 </div>
-            </div>
-            <div class="modal-sidebar p-6 w-64 bg-gray-50 flex flex-col gap-3">
-                <a id="downloadLink" href="#" class="action-btn view-btn">
-                    <i class="fas fa-download"></i> Download
-                </a>
-                <button onclick="closeModal()" class="action-btn bg-gray-500 hover:bg-gray-600 text-white">
-                    <i class="fas fa-times"></i> Close
-                </button>
+                <div class="modal-footer p-6 bg-gray-50 flex justify-center gap-4">
+                    <a id="downloadLink" href="#" class="action-btn bg-blue-600 hover:bg-blue-700 text-white text-lg py-3 px-6 rounded-lg flex items-center gap-2">
+                        <i class="fas fa-download"></i> Download
+                    </a>
+                    <button onclick="closeModal()" class="action-btn bg-gray-500 hover:bg-gray-600 text-white text-lg py-3 px-6 rounded-lg flex items-center gap-2">
+                        <i class="fas fa-times"></i> Close
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
 
     <!-- Confirmation Modal -->
     <div id="confirmationModal" class="confirmation-modal">
@@ -1026,109 +1040,105 @@ function searchUsers($searchTerm) {
         </div>
     </div>
 
-    <script>
-        let currentForm = null;
+        <script>
+            let currentForm = null;
 
-        function showDocument(id, fileName, fileType) {
-            const modal = document.getElementById('documentModal');
-            const preview = document.getElementById('documentPreview');
-            const downloadLink = document.getElementById('downloadLink');
-            const modalTitle = document.getElementById('documentModalTitle');
+            function showDocument(id, fileName, fileType) {
+                const modal = document.getElementById('documentModal');
+                const preview = document.getElementById('documentPreview');
+                const downloadLink = document.getElementById('downloadLink');
+                const modalTitle = document.getElementById('documentModalTitle');
 
-            document.body.style.overflow = 'hidden';
-            modalTitle.textContent = `Document: ${JSON.parse(fileName)}`;
-            downloadLink.href = `../controller/downloadDocument.php?id=${encodeURIComponent(id)}&download=true`;
-            preview.innerHTML = `
-                <div class="flex items-center justify-center min-h-full py-10">
-                    <div class="text-center">
-                        <svg class="animate-spin h-8 w-8 text-red-500 mx-auto" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        <p class="mt-2 text-gray-500">Loading document...</p>
-                    </div>
-                </div>`;
-            modal.classList.add('show');
+                document.body.style.overflow = 'hidden';
+                modalTitle.textContent = `Document: ${JSON.parse(fileName)}`;
+                downloadLink.href = `../controller/downloadDocument.php?id=${encodeURIComponent(id)}&download=true`;
+                preview.innerHTML = `
+        <div class="flex items-center justify-center min-h-full py-10">
+            <div class="text-center">
+                <svg class="animate-spin h-8 w-8 text-red-500 mx-auto" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <p class="mt-2 text-gray-500">Loading document...</p>
+            </div>
+        </div>`;
+                modal.classList.add('show');
 
-            fetch(`../controller/downloadDocument.php?id=${encodeURIComponent(id)}`)
-                .then(response => {
-                    if (!response.ok) throw new Error(`Failed to load document: ${response.statusText}`);
-                    return response.blob();
-                })
-                .then(blob => {
-                    const url = URL.createObjectURL(blob);
-                    if (fileType === 'application/pdf') {
-                        preview.innerHTML = `<iframe src="${url}" style="width:100%; height:100%; min-height:600px;" frameborder="0"></iframe>`;
-                    } else if (fileType.startsWith('image/')) {
-                        preview.innerHTML = `<img src="${url}" alt="Document" class="max-w-full h-auto mx-auto" />`;
-                    } else {
-                        preview.innerHTML = `<div class="text-center py-10 text-red-500">Preview not available for this file type. Please download to view.</div>`;
-                    }
-                })
-                .catch(error => {
-                    preview.innerHTML = `<div class="text-center py-10 text-red-500">Error loading document: ${error.message}</div>`;
-                });
-        }
-
-        function closeModal() {
-            const modal = document.getElementById('documentModal');
-            const preview = document.getElementById('documentPreview');
-
-            document.body.style.overflow = '';
-            modal.classList.remove('show');
-            const iframes = preview.getElementsByTagName('iframe');
-            const images = preview.getElementsByTagName('img');
-            for (let iframe of iframes) {
-                URL.revokeObjectURL(iframe.src);
+                fetch(`../controller/downloadDocument.php?id=${encodeURIComponent(id)}`)
+                    .then(response => {
+                        if (!response.ok) throw new Error(`Failed to load document: ${response.statusText}`);
+                        return response.blob();
+                    })
+                    .then(blob => {
+                        const url = URL.createObjectURL(blob);
+                        if (fileType === 'application/pdf') {
+                            preview.innerHTML = `<iframe src="${url}" style="width:100%; height:100%; min-height:80vh;" frameborder="0"></iframe>`;
+                        } else if (fileType.startsWith('image/')) {
+                            preview.innerHTML = `<img src="${url}" alt="Document" class="w-full h-full object-contain" />`;
+                        } else {
+                            preview.innerHTML = `<div class="text-center py-10 text-red-500">Preview not available for this file type. Please download to view.</div>`;
+                        }
+                    })
+                    .catch(error => {
+                        preview.innerHTML = `<div class="text-center py-10 text-red-500">Error loading document: ${error.message}</div>`;
+                    });
             }
-            for (let img of images) {
-                URL.revokeObjectURL(img.src);
+
+            function closeModal() {
+                const modal = document.getElementById('documentModal');
+                const preview = document.getElementById('documentPreview');
+
+                document.body.style.overflow = '';
+                modal.classList.remove('show');
+                const iframes = preview.getElementsByTagName('iframe');
+                const images = preview.getElementsByTagName('img');
+                for (let iframe of iframes) {
+                    URL.revokeObjectURL(iframe.src);
+                }
+                for (let img of images) {
+                    URL.revokeObjectURL(img.src);
+                }
+                preview.innerHTML = '';
             }
-            preview.innerHTML = '';
-        }
 
-        function showConfirmation(action, fullName, approvalId) {
-            const modal = document.getElementById('confirmationModal');
-            const title = document.getElementById('confirmationTitle');
-            const message = document.getElementById('confirmationMessage');
-            const confirmBtn = document.getElementById('confirmActionBtn');
+            function showConfirmation(action, fullName, approvalId) {
+                const modal = document.getElementById('confirmationModal');
+                const title = document.getElementById('confirmationTitle');
+                const message = document.getElementById('confirmationMessage');
+                const confirmBtn = document.getElementById('confirmActionBtn');
 
-            title.textContent = `${action.charAt(0).toUpperCase() + action.slice(1)} Request`;
-            message.textContent = `Are you sure you want to ${action} the account request for ${fullName}?`;
-            confirmBtn.className = `action-btn ${action === 'approve' ? 'approve-btn' : 'reject-btn'}`;
-            currentForm = document.querySelector(`form:has(input[value="${approvalId}"][name="approval_id"]):has(input[value="${action}"][name="action"])`);
+                title.textContent = `${action.charAt(0).toUpperCase() + action.slice(1)} Request`;
+                message.textContent = `Are you sure you want to ${action} the account request for ${fullName}?`;
+                confirmBtn.className = `action-btn ${action === 'approve' ? 'approve-btn' : 'reject-btn'}`;
+                currentForm = document.querySelector(`form:has(input[value="${approvalId}"][name="approval_id"]):has(input[value="${action}"][name="action"])`);
 
-            modal.classList.add('show');
-            return false;
-        }
-
-        function confirmAction() {
-            if (currentForm) {
-                currentForm.submit();
+                modal.classList.add('show');
+                return false;
             }
-        }
 
-        function cancelConfirmation() {
-            document.getElementById('confirmationModal').classList.remove('show');
-            currentForm = null;
-        }
-
-        document.getElementById('documentModal').addEventListener('click', function(event) {
-            if (event.target === this) {
-                closeModal();
+            function confirmAction() {
+                if (currentForm) {
+                    currentForm.submit();
+                }
             }
-        });
 
-        document.getElementById('confirmationModal').addEventListener('click', function(event) {
-            if (event.target === this) {
-                cancelConfirmation();
+            function cancelConfirmation() {
+                document.getElementById('confirmationModal').classList.remove('show');
+                currentForm = null;
             }
-        });
-    </script>
-  
 
+            document.getElementById('documentModal').addEventListener('click', function(event) {
+                if (event.target === this) {
+                    closeModal();
+                }
+            });
 
-
+            document.getElementById('confirmationModal').addEventListener('click', function(event) {
+                if (event.target === this) {
+                    cancelConfirmation();
+                }
+            });
+        </script>
 
 
 
