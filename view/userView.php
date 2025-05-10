@@ -1,58 +1,58 @@
-<?php
-// Start the session if not already started
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+    <?php
+    // Start the session if not already started
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+    // Check if user is logged in
+        if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+            header("Location: ../view/loginView.php");
+            exit;
+        }
+
+    // Check session timeout (30 minutes)
+        $session_timeout = 1800;
+        if (isset($_SESSION['user']['last_activity']) && (time() - $_SESSION['user']['last_activity'] > $session_timeout)) {
+            session_unset();
+            session_destroy();
+            header("Location: ../view/loginView.php?timeout=1");
+            exit;
+        }
+
+    // Update last activity
+        $_SESSION['user']['last_activity'] = time();
+
+    // OPTIONAL: Debug year_section value
+        if (!isset($_SESSION['submissions']['year_section'])) {
+            error_log("DEBUG: year_section not set in session.");
+        } else {
+            error_log("DEBUG: year_section = " . $_SESSION['submissions']['year_section']);
+        }
+
+
     }
 
-// Check if user is logged in
+    // Check if user is logged in
     if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
         header("Location: ../view/loginView.php");
         exit;
     }
 
-// Check session timeout (30 minutes)
-    $session_timeout = 1800;
+    // Check session timeout (30 minutes)
+    $session_timeout = 1800; // 30 minutes in seconds
     if (isset($_SESSION['user']['last_activity']) && (time() - $_SESSION['user']['last_activity'] > $session_timeout)) {
+        // Session expired
         session_unset();
         session_destroy();
         header("Location: ../view/loginView.php?timeout=1");
         exit;
     }
 
-// Update last activity
+    // Update last activity time
     $_SESSION['user']['last_activity'] = time();
-
-// OPTIONAL: Debug year_section value
-    if (!isset($_SESSION['submissions']['year_section'])) {
-        error_log("DEBUG: year_section not set in session.");
-    } else {
-        error_log("DEBUG: year_section = " . $_SESSION['submissions']['year_section']);
-    }
-
-
-}
-
-// Check if user is logged in
-if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-    header("Location: ../view/loginView.php");
-    exit;
-}
-
-// Check session timeout (30 minutes)
-$session_timeout = 1800; // 30 minutes in seconds
-if (isset($_SESSION['user']['last_activity']) && (time() - $_SESSION['user']['last_activity'] > $session_timeout)) {
-    // Session expired
-    session_unset();
-    session_destroy();
-    header("Location: ../view/loginView.php?timeout=1");
-    exit;
-}
-
-// Update last activity time
-$_SESSION['user']['last_activity'] = time();
-?>
+    ?>
 
 <!DOCTYPE html>
 <html lang="en">

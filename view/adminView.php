@@ -932,6 +932,26 @@ function searchUsers($searchTerm) {
                 border-right: 1px solid #e5e7eb;
             }
         }
+
+        #documentPreview iframe {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            width: 100%;
+            height: auto; /* Allow iframe to grow based on content */
+            min-height: 80vh; /* Ensure a taller minimum height */
+            display: block; /* Remove extra spacing */
+            border: none; /* Clean appearance */
+        }
+
+        /* Ensure the preview container supports dynamic height */
+        #documentPreview {
+            width: 100%;
+            height: auto; /* Allow container to grow */
+            min-height: 80vh; /* Match iframe's minimum height */
+        }
+
+
+
     </style>
 
     <div class="container">
@@ -997,9 +1017,8 @@ function searchUsers($searchTerm) {
         </div>
     </div>
 
-        <!-- Document Preview Modal -->
         <div id="documentModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-1000 hidden">
-            <div class="modal-content flex flex-col bg-white rounded-lg max-w-4xl w-full max-h-[95vh] mx-auto my-auto">
+            <div class="modal-content flex flex-col bg-white rounded-lg max-w-4xl w-full mx-auto my-auto">
                 <div class="modal-header flex justify-between items-center p-6 border-b border-gray-200">
                     <h3 class="text-2xl font-semibold text-gray-800" id="documentModalTitle">Document Preview</h3>
                     <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700">
@@ -1008,19 +1027,31 @@ function searchUsers($searchTerm) {
                         </svg>
                     </button>
                 </div>
-                <div class="flex-1 p-4 overflow-auto flex items-center justify-center">
-                    <div id="documentPreview" class="w-full h-full">
-                        <iframe src="blob:http://localhost/e7717e22-d6f2-47c3-850f-55d440976e85" style="width:100%; height:100%; min-height:80vh;" frameborder="0"></iframe>
-                    </div>
+
+                <div id="documentPreview" class="w-full flex-1 overflow-auto bg-gray-50">
+                    <iframe
+                            src="blob:http://localhost/e7717e22-d6f2-47c3-850f-55d440976e85#zoom=page-fit"
+                            frameborder="0"
+                            class="w-full h-[50vh] sm:h-[60vh] lg:h-[70vh]"
+                            title="Document Preview"
+                    ></iframe>
                 </div>
-                <div class="modal-footer p-6 bg-gray-50 flex justify-center gap-4">
-                    <a id="downloadLink" href="#" class="action-btn bg-blue-600 hover:bg-blue-700 text-white text-lg py-3 px-6 rounded-lg flex items-center gap-2">
-                        <i class="fas fa-download"></i> Download
+
+                <div class="modal-footer p-4 bg-gray-100 flex justify-center gap-4 rounded-b-xl -mt-2">
+                    <a id="downloadLink" href="#" class="action-btn bg-blue-600 hover:bg-blue-700 text-white text-lg py-3 px-6 rounded-lg flex items-center gap-2 transition-colors duration-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        Download
                     </a>
-                    <button onclick="closeModal()" class="action-btn bg-gray-500 hover:bg-gray-600 text-white text-lg py-3 px-6 rounded-lg flex items-center gap-2">
-                        <i class="fas fa-times"></i> Close
+                    <button onclick="closeModal()" class="action-btn bg-gray-500 hover:bg-gray-600 text-white text-lg py-3 px-6 rounded-lg flex items-center gap-2 transition-colors duration-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        Close
                     </button>
                 </div>
+
             </div>
         </div>
 
@@ -1138,6 +1169,37 @@ function searchUsers($searchTerm) {
                     cancelConfirmation();
                 }
             });
+
+            function adjustIframeHeight() {
+                const iframe = document.querySelector('#documentPreview iframe');
+                if (!iframe) return;
+
+                try {
+                    // Access the PDF's content document
+                    const pdfDoc = iframe.contentDocument || iframe.contentWindow.document;
+                    const pdfViewer = pdfDoc.querySelector('pdf-viewer') || pdfDoc.body;
+                    if (pdfViewer) {
+                        const height = pdfViewer.scrollHeight || pdfViewer.offsetHeight;
+                        iframe.style.height = `${height}px`; /* Set iframe height to PDF's full height */
+                        // Optionally adjust the parent container
+                        const documentPreview = document.querySelector('#documentPreview');
+                        documentPreview.style.height = `${height}px`;
+                    } else {
+                        // Fallback height if PDF viewer isn't found
+                        iframe.style.height = '80vh';
+                    }
+                } catch (e) {
+                    console.error('Error accessing iframe content:', e);
+                    // Fallback: Set a taller default height
+                    iframe.style.height = '80vh';
+                }
+            }
+
+            // Run when iframe loads
+            document.querySelector('#documentPreview iframe').addEventListener('load', adjustIframeHeight);
+
+            // Re-run on window resize for responsiveness
+            window.addEventListener('resize', adjustIframeHeight);
         </script>
 
 
