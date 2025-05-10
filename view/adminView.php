@@ -950,7 +950,18 @@ function searchUsers($searchTerm) {
             min-height: 80vh; /* Match iframe's minimum height */
         }
 
-
+        .modal-footer {
+            padding: 0 1rem 1rem 1rem; /* No top padding, 1rem on other sides */
+            background-color: #f3f4f6; /* bg-gray-100 */
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            border-bottom-left-radius: 0.5rem;
+            border-bottom-right-radius: 0.5rem;
+        }
+        .modal-footer {
+            padding-top: 0; /* Remove top padding */
+        }
 
     </style>
 
@@ -1017,43 +1028,96 @@ function searchUsers($searchTerm) {
         </div>
     </div>
 
-        <div id="documentModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-1000 hidden">
-            <div class="modal-content flex flex-col bg-white rounded-lg max-w-4xl w-full mx-auto my-auto">
-                <div class="modal-header flex justify-between items-center p-6 border-b border-gray-200">
-                    <h3 class="text-2xl font-semibold text-gray-800" id="documentModalTitle">Document Preview</h3>
-                    <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700">
+        <div
+                id="documentModal"
+                class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
+                role="dialog"
+                aria-labelledby="documentModalTitle"
+                aria-modal="true"
+        >
+            <div
+                    class="modal-content flex flex-col bg-white rounded-lg max-w-4xl w-full mx-auto my-4 max-h-[80vh] overflow-hidden"
+            >
+                <!-- Modal Header -->
+                <div
+                        class="modal-header flex justify-between items-center p-6 border-b border-gray-200"
+                >
+                    <h3
+                            class="text-2xl font-semibold text-gray-800"
+                            id="documentModalTitle"
+                    >
+                        Document Preview
+                    </h3>
+                    <button
+                            onclick="closeModal()"
+                            class="text-gray-500 hover:text-gray-700 focus:outline-none"
+                            aria-label="Close modal"
+                    >
                         <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"
+                            />
                         </svg>
                     </button>
                 </div>
 
-                <div id="documentPreview" class="w-full flex-1 overflow-auto bg-gray-50">
+                <!-- Modal Body (Document Preview) -->
+                <div
+                        id="documentPreview"
+                        class="w-full flex-1 overflow-auto bg-gray-50"
+                >
                     <iframe
                             src="blob:http://localhost/e7717e22-d6f2-47c3-850f-55d440976e85#zoom=page-fit"
                             frameborder="0"
-                            class="w-full h-[50vh] sm:h-[60vh] lg:h-[70vh]"
+                            class="w-full h-[50vh] sm:h-[60vh] max-h-[60vh]"
                             title="Document Preview"
                     ></iframe>
                 </div>
 
-                <div class="modal-footer p-4 bg-gray-100 flex justify-center gap-4 rounded-b-xl -mt-2">
-                    <a id="downloadLink" href="#" class="action-btn bg-blue-600 hover:bg-blue-700 text-white text-lg py-3 px-6 rounded-lg flex items-center gap-2 transition-colors duration-200">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                <!-- Modal Footer -->
+                <div
+                        class="modal-footer p-4 bg-gray-100 flex justify-center gap-4 rounded-b-lg"
+                        style="padding-top: 0;"
+                >
+                    <a
+                            id="downloadLink"
+                            href="#"
+                            class="action-btn bg-blue-600 hover:bg-blue-700 text-white text-base py-2 px-4 rounded-lg flex items-center gap-2 transition-colors duration-200 focus:outline-none"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                            />
                         </svg>
                         Download
                     </a>
-                    <button onclick="closeModal()" class="action-btn bg-gray-500 hover:bg-gray-600 text-white text-lg py-3 px-6 rounded-lg flex items-center gap-2 transition-colors duration-200">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    <button
+                            onclick="closeModal()"
+                            class="action-btn bg-gray-500 hover:bg-gray-600 text-white text-base py-2 px-4 rounded-lg flex items-center gap-2 transition-colors duration-200 focus:outline-none"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"
+                            />
                         </svg>
                         Close
                     </button>
                 </div>
-
             </div>
         </div>
+
+
+
+
 
     <!-- Confirmation Modal -->
     <div id="confirmationModal" class="confirmation-modal">
