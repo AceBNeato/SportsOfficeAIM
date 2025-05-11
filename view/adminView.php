@@ -672,6 +672,21 @@ function searchUsers($searchTerm) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <?php elseif ($currentPage === 'Account Approvals'): ?>
 
     <?php
@@ -751,8 +766,6 @@ function searchUsers($searchTerm) {
         $emailSent = sendEmailNotification($approval['email'], $approval['full_name'], $status, $password);
         $message = $emailSent ? "Request $status successfully." : "Request $status but email failed to send.";
 
-        // Regenerate CSRF token after successful submission
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
         header("Location: ?page=Account%20Approvals&message=" . urlencode($message));
         exit();
@@ -762,6 +775,13 @@ function searchUsers($searchTerm) {
                     FROM account_approvals a
                     WHERE a.approval_status = 'pending'");
     ?>
+
+
+
+
+
+
+
 
         <style>
             :root {
@@ -1238,7 +1258,44 @@ function searchUsers($searchTerm) {
 
 
 
-        ]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
