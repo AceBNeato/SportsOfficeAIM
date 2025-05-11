@@ -642,6 +642,38 @@ function searchUsers($searchTerm) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <?php elseif ($currentPage === 'Account Approvals'): ?>
 
     <?php
@@ -1184,6 +1216,31 @@ function searchUsers($searchTerm) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        ]
 
 
 
