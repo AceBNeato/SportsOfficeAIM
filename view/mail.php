@@ -17,13 +17,13 @@ function sendApprovalEmail($recipientEmail, $fullName, $studentId) {
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
         $mail->Username = 'aumicaroz00066@usep.edu.ph'; // Your Gmail address
-        $mail->Password = 'acvaxwxzoretwbtb'; // Your Gmail App Password
+        $mail->Password = 'phaijpfzdlesvmjy'; // Your Gmail App Password
         $mail->SMTPSecure = 'ssl';
         $mail->Port = 465;
 
         // Recipients
         $mail->setFrom('aumicaroz00066@usep.edu.ph', 'SportOfficeDB Admin');
-        $mail->addAddress($recipientEmail);
+        $mail->addAddress('aumicaroz00066@usep.edu.ph');
         $mail->addReplyTo('aumicaroz00066@usep.edu.ph', 'SportOfficeDB Admin');
 
         // Content
@@ -59,13 +59,13 @@ function sendRejectionEmail($recipientEmail, $fullName) {
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
         $mail->Username = 'aumicaroz00066@usep.edu.ph';
-        $mail->Password = 'acvaxwxzoretwbtb';
+        $mail->Password = 'phaijpfzdlesvmjy';
         $mail->SMTPSecure = 'ssl';
         $mail->Port = 465;
 
         // Recipients
         $mail->setFrom('aumicaroz00066@usep.edu.ph', 'SportOfficeDB Admin');
-        $mail->addAddress($recipientEmail);
+        $mail->addAddress('aumicaroz00066@usep.edu.ph');
         $mail->addReplyTo('aumicaroz00066@usep.edu.ph', 'SportOfficeDB Admin');
 
         // Content
@@ -101,7 +101,7 @@ if (isset($_POST["send"])) {
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
         $mail->Username = 'aumicaroz00066@usep.edu.ph';
-        $mail->Password = 'acvaxwxzoretwbtb';
+        $mail->Password = 'phaijpfzdlesvmjy';
         $mail->SMTPSecure = 'ssl';
         $mail->Port = 465;
 
