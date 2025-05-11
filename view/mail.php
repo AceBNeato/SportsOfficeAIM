@@ -1,47 +1,130 @@
-<?php
 
-//Import PHPMailer classes into the global namespace
-//These must be at the top of your script, not inside a function
+<?php
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-//required files
 require 'phpmailer/src/Exception.php';
 require 'phpmailer/src/PHPMailer.php';
 require 'phpmailer/src/SMTP.php';
 
-//Create an instance; passing `true` enables exceptions
+// Function to send approval email
+function sendApprovalEmail($recipientEmail, $fullName, $studentId) {
+    try {
+        $mail = new PHPMailer(true);
+
+        // Server settings
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = 'aumicaroz00066@usep.edu.ph'; // Your Gmail address
+        $mail->Password = 'acvaxwxzoretwbtb'; // Your Gmail App Password
+        $mail->SMTPSecure = 'ssl';
+        $mail->Port = 465;
+
+        // Recipients
+        $mail->setFrom('aumicaroz00066@usep.edu.ph', 'SportOfficeDB Admin');
+        $mail->addAddress($recipientEmail);
+        $mail->addReplyTo('aumicaroz00066@usep.edu.ph', 'SportOfficeDB Admin');
+
+        // Content
+        $mail->isHTML(true);
+        $mail->Subject = 'Account Approval Notification';
+        $mail->Body = "
+            <h3>Account Approved</h3>
+            <p>Dear $fullName,</p>
+            <p>Your account request has been approved. You can now log in using the following credentials:</p>
+            <ul>
+                <li><strong>Student ID:</strong> $studentId</li>
+                <li><strong>Email:</strong> $recipientEmail</li>
+                <li><strong>Password:</strong> $studentId (Your default password is your student ID. Please change it after logging in for security purposes.)</li>
+            </ul>
+            <p>Best regards,<br>SportOfficeDB Team</p>
+        ";
+
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        error_log("PHPMailer Error: {$mail->ErrorInfo}");
+        return false;
+    }
+}
+
+// Function to send rejection email
+function sendRejectionEmail($recipientEmail, $fullName) {
+    try {
+        $mail = new PHPMailer(true);
+
+        // Server settings
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = 'aumicaroz00066@usep.edu.ph';
+        $mail->Password = 'acvaxwxzoretwbtb';
+        $mail->SMTPSecure = 'ssl';
+        $mail->Port = 465;
+
+        // Recipients
+        $mail->setFrom('aumicaroz00066@usep.edu.ph', 'SportOfficeDB Admin');
+        $mail->addAddress($recipientEmail);
+        $mail->addReplyTo('aumicaroz00066@usep.edu.ph', 'SportOfficeDB Admin');
+
+        // Content
+        $mail->isHTML(true);
+        $mail->Subject = 'Account Request Rejected';
+        $mail->Body = "
+            <h3>Account Request Rejected</h3>
+            <p>Dear $fullName,</p>
+            <p>Your account request has been rejected. If you have any questions, please contact the administrator.</p>
+            <p>Best regards,<br>SportOfficeDB Team</p>
+        ";
+
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        error_log("PHPMailer Error: {$mail->ErrorInfo}");
+        return false;
+    }
+}
+
+// Handle direct POST requests (for testing or manual email sending)
 if (isset($_POST["send"])) {
+    $recipientEmail = $_POST["email"];
+    $fullName = $_POST["name"];
+    $subject = $_POST["subject"];
+    $message = $_POST["message"];
 
-    $mail = new PHPMailer(true);
+    try {
+        $mail = new PHPMailer(true);
 
-    //Server settings
-    $mail->isSMTP();                              //Send using SMTP
-    $mail->Host       = 'smtp.gmail.com';       //Set the SMTP server to send through
-    $mail->SMTPAuth   = true;             //Enable SMTP authentication
-    $mail->Username   = 'aumicaroz00066@usep.edu.ph';   //SMTP write your email
-    $mail->Password   = 'acvaxwxzoretwbtb';      //SMTP password
-    $mail->SMTPSecure = 'ssl';            //Enable implicit SSL encryption
-    $mail->Port       = 465;
+        // Server settings
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = 'aumicaroz00066@usep.edu.ph';
+        $mail->Password = 'acvaxwxzoretwbtb';
+        $mail->SMTPSecure = 'ssl';
+        $mail->Port = 465;
 
-    //Recipients
-    $mail->setFrom( $_POST["email"], $_POST["name"]); // Sender Email and name
-    $mail->addAddress('aumicaroz00066@usep.edu.ph');     //Add a recipient email
-    $mail->addReplyTo($_POST["email"], $_POST["name"]); // reply to sender email
+        // Recipients
+        $mail->setFrom($recipientEmail, $fullName);
+        $mail->addAddress($recipientEmail);
+        $mail->addReplyTo($recipientEmail, $fullName);
 
-    //Content
-    $mail->isHTML(true);               //Set email format to HTML
-    $mail->Subject = $_POST["subject"];   // email subject headings
-    $mail->Body    = $_POST["message"]; //email message
+        // Content
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body = $message;
 
-    // Success sent message alert
-    $mail->send();
-    echo
-    " 
-    <script> 
-     alert('Message was sent successfully!');
-     document.location.href = 'index.php';
-    </script>
-    ";
+        $mail->send();
+        echo "<script>
+            alert('Message was sent successfully!');
+            document.location.href = 'index.php';
+        </script>";
+    } catch (Exception $e) {
+        echo "<script>
+            alert('Failed to send message. Error: {$mail->ErrorInfo}');
+            document.location.href = '../view/adminView.php?page=Account%20Approvals';
+        </script>";
+    }
 }
 ?>
