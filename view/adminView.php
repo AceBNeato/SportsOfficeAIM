@@ -48,44 +48,7 @@ if (isset($_SESSION['user']['last_activity']) && (time() - $_SESSION['user']['la
 $_SESSION['user']['last_activity'] = time();
 
 // PHPMailer-based email notification
-function sendEmailNotification($email, $fullName, $status, $password = null) {
-    $mail = new PHPMailer(true);
 
-    try {
-        // Server settings (update with your SMTP details)
-        $mail->isSMTP();
-        $mail->Host = 'smtp.example.com';
-        $mail->SMTPAuth = true;
-        $mail->Username = 'your-email@example.com';
-        $mail->Password = 'your-email-password';
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port = 587;
-
-        // Recipients
-        $mail->setFrom('no-reply@sportsoffice.com', 'Sports Office');
-        $mail->addAddress($email, $fullName);
-
-        // Content
-        $mail->isHTML(true);
-        $mail->Subject = "Account Approval Status: " . ucfirst($status);
-        $body = "<p>Dear $fullName,</p>";
-        $body .= "<p>Your account approval request has been <strong>$status</strong>.</p>";
-
-        if ($status === 'approved' && $password) {
-            $body .= "<p>You can now log in using the following credentials:</p>";
-            $body .= "<p>Email: $email<br>Password: $password</p>";
-        }
-
-        $body .= "<p>Thank you,<br>Sports Office Team</p>";
-        $mail->Body = $body;
-
-        $mail->send();
-        return true;
-    } catch (Exception $e) {
-        error_log("Email could not be sent. Error: {$mail->ErrorInfo}");
-        return false;
-    }
-}
 
 // Helper function for user search
 function searchUsers($searchTerm) {
