@@ -48,44 +48,6 @@ if (isset($_SESSION['user']['last_activity']) && (time() - $_SESSION['user']['la
 $_SESSION['user']['last_activity'] = time();
 
 // PHPMailer-based email notification
-function sendEmailNotification($email, $fullName, $status, $password = null) {
-    $mail = new PHPMailer(true);
-
-    try {
-        // Server settings (update with your SMTP details)
-        $mail->isSMTP();
-        $mail->Host = 'smtp.example.com';
-        $mail->SMTPAuth = true;
-        $mail->Username = 'your-email@example.com';
-        $mail->Password = 'your-email-password';
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port = 587;
-
-        // Recipients
-        $mail->setFrom('no-reply@sportsoffice.com', 'Sports Office');
-        $mail->addAddress($email, $fullName);
-
-        // Content
-        $mail->isHTML(true);
-        $mail->Subject = "Account Approval Status: " . ucfirst($status);
-        $body = "<p>Dear $fullName,</p>";
-        $body .= "<p>Your account approval request has been <strong>$status</strong>.</p>";
-
-        if ($status === 'approved' && $password) {
-            $body .= "<p>You can now log in using the following credentials:</p>";
-            $body .= "<p>Email: $email<br>Password: $password</p>";
-        }
-
-        $body .= "<p>Thank you,<br>Sports Office Team</p>";
-        $mail->Body = $body;
-
-        $mail->send();
-        return true;
-    } catch (Exception $e) {
-        error_log("Email could not be sent. Error: {$mail->ErrorInfo}");
-        return false;
-    }
-}
 
 // Helper function for user search
 function searchUsers($searchTerm) {
@@ -1038,13 +1000,18 @@ function searchUsers($searchTerm) {
                                     <button class="action-btn view-btn" onclick="showDocument(<?php echo (int)$row['id']; ?>, '<?php echo htmlspecialchars(json_encode($row['file_name']), ENT_QUOTES, 'UTF-8'); ?>', '<?php echo htmlspecialchars($row['file_type'], ENT_QUOTES, 'UTF-8'); ?>')">
                                         <i class="fas fa-eye"></i> View Document
                                     </button>
-                                    <form method="POST" onsubmit="return showConfirmation('approve', '<?php echo htmlspecialchars($row['full_name'], ENT_QUOTES, 'UTF-8'); ?>', '<?php echo (int)$row['id']; ?>')">
+                                    <form method="POST" action="../controller/send_Email.php" onsubmit="return showConfirmation('approve', '<?php echo htmlspecialchars($row['full_name'], ENT_QUOTES, 'UTF-8'); ?>', '<?php echo (int)$row['id']; ?>')">
                                         <input type="hidden" name="approval_id" value="<?php echo (int)$row['id']; ?>">
                                         <input type="hidden" name="action" value="approve">
-                                        <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
+                                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
                                         <button type="submit" class="action-btn approve-btn">
                                             <i class="fas fa-check"></i> Approve
                                         </button>
+                                    </form>
+                                    <form method="POST" action="../controller/send_Email.php" onsubmit="return showConfirmation('reject', '<?php echo htmlspecialchars($row['full_name'], ENT_QUOTES, 'UTF-8'); ?>', '<?php echo (int)$row['id']; ?>')">
+                                        <input type="hidden" name="approval_id" value="<?php echo (int)$row['id']; ?>">
+                                        <input type="hidden" name="action" value="reject">
+                                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
                                     </form>
                                     <form method="POST" onsubmit="return showConfirmation('reject', '<?php echo htmlspecialchars($row['full_name'], ENT_QUOTES, 'UTF-8'); ?>', '<?php echo (int)$row['id']; ?>')">
                                         <input type="hidden" name="approval_id" value="<?php echo (int)$row['id']; ?>">
