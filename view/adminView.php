@@ -1,7 +1,5 @@
 <?php
 
-// Centralized database connection
-global $csrf_token;
 
 class Database {
     private static $instance = null;
@@ -1036,7 +1034,7 @@ function searchUsers($searchTerm) {
                                     <form method="POST" onsubmit="return showConfirmation('approve', '<?php echo htmlspecialchars($row['full_name'], ENT_QUOTES, 'UTF-8'); ?>', '<?php echo (int)$row['id']; ?>')">
                                         <input type="hidden" name="approval_id" value="<?php echo (int)$row['id']; ?>">
                                         <input type="hidden" name="action" value="approve">
-                                        <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
+
                                         <button type="submit" class="action-btn approve-btn">
                                             <i class="fas fa-check"></i> Approve
                                         </button>
@@ -1044,7 +1042,7 @@ function searchUsers($searchTerm) {
                                     <form method="POST" onsubmit="return showConfirmation('reject', '<?php echo htmlspecialchars($row['full_name'], ENT_QUOTES, 'UTF-8'); ?>', '<?php echo (int)$row['id']; ?>')">
                                         <input type="hidden" name="approval_id" value="<?php echo (int)$row['id']; ?>">
                                         <input type="hidden" name="action" value="reject">
-                                        <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
+
                                         <button type="submit" class="action-btn reject-btn">
                                             <i class="fas fa-times"></i> Reject
                                         </button>
