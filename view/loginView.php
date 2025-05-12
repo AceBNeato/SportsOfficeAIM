@@ -270,7 +270,7 @@ error_log("Login page loaded. Error message: " . ($errorMessage ?: 'none'));
                 </label>
                 <div class="password-container">
                     <input type="password" id="password" name="password" placeholder="Enter Password" required>
-                    <i class="bx bx-hide toggle-password" aria-label="Show password" role="button"></i>
+                    <i class="bx bx-hide toggle-password" aria-label="Show password" role="button" tabindex="0"></i>
                 </div>
                 <button type="submit">LOGIN</button>
             </form>
@@ -310,7 +310,7 @@ error_log("Login page loaded. Error message: " . ($errorMessage ?: 'none'));
 </div>
 
 <!-- Scripts -->
-<script src="../public/JAVASCRIPT/loginScript.js"></script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Terms modal elements

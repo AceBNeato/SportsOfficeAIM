@@ -984,6 +984,7 @@ function searchUsers($searchTerm) {
                 <?php if ($result && $result->num_rows > 0): ?>
                     <?php while ($row = $result->fetch_assoc()): ?>
                         <div class="card">
+
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div>
                                     <h3 class="text-lg font-semibold text-gray-800"><?php echo htmlspecialchars($row['full_name'], ENT_QUOTES, 'UTF-8'); ?></h3>
@@ -994,18 +995,21 @@ function searchUsers($searchTerm) {
                                         <p><span class="font-medium">Request Date:</span> <?php echo htmlspecialchars($row['request_date'], ENT_QUOTES, 'UTF-8'); ?></p>
                                     </div>
                                 </div>
+
                                 <div class="flex items-center justify-between md:justify-end space-x-2">
                                     <button class="action-btn view-btn" onclick="showDocument(<?php echo (int)$row['id']; ?>, '<?php echo htmlspecialchars(json_encode($row['file_name']), ENT_QUOTES, 'UTF-8'); ?>', '<?php echo htmlspecialchars($row['file_type'], ENT_QUOTES, 'UTF-8'); ?>')">
                                         <i class="fas fa-eye"></i> View Document
                                     </button>
-                                    <form method="POST" action="../controller/approveRequest.php" onsubmit="return showConfirmation('approve', '<?php echo htmlspecialchars($row['full_name'], ENT_QUOTES, 'UTF-8'); ?>', '<?php echo (int)$row['id']; ?>')">
+
+                                    <form method="POST" action="../controller/approveRequest.php" onsubmit="return showConfirmation('approve', '<?php echo htmlspecialchars($row['full_name'], ENT_QUOTES, 'UTF-8'); ?>', '<?php echo (int)$row['id']; ?>', this)">
                                         <input type="hidden" name="approval_id" value="<?php echo (int)$row['id']; ?>">
                                         <input type="hidden" name="action" value="approve">
                                         <button type="submit" class="action-btn approve-btn">
                                             <i class="fas fa-check"></i> Approve
                                         </button>
                                     </form>
-                                    <form method="POST" action="../controller/approveRequest.php" onsubmit="return showConfirmation('reject', '<?php echo htmlspecialchars($row['full_name'], ENT_QUOTES, 'UTF-8'); ?>', '<?php echo (int)$row['id']; ?>')">
+
+                                    <form method="POST" action="../controller/rejectRequest.php" onsubmit="return showConfirmation('reject', '<?php echo htmlspecialchars($row['full_name'], ENT_QUOTES, 'UTF-8'); ?>', '<?php echo (int)$row['id']; ?>', this)">
                                         <input type="hidden" name="approval_id" value="<?php echo (int)$row['id']; ?>">
                                         <input type="hidden" name="action" value="reject">
                                         <button type="submit" class="action-btn reject-btn">
@@ -1013,7 +1017,7 @@ function searchUsers($searchTerm) {
                                         </button>
                                     </form>
                                 </div>
-                            </div>
+
                         </div>
                     <?php endwhile; ?>
                 <?php else: ?>
@@ -1130,7 +1134,9 @@ function searchUsers($searchTerm) {
                 preview.innerHTML = '';
             }
 
-            function showConfirmation(action, fullName, approvalId) {
+            let currentForm = null;
+
+            function showConfirmation(action, fullName, approvalId, form) {
                 const modal = document.getElementById('confirmationModal');
                 const title = document.getElementById('confirmationTitle');
                 const message = document.getElementById('confirmationMessage');
@@ -1139,22 +1145,21 @@ function searchUsers($searchTerm) {
                 title.textContent = `${action.charAt(0).toUpperCase() + action.slice(1)} Request`;
                 message.textContent = `Are you sure you want to ${action} the account request for ${fullName}?`;
 
-                if (action === 'approve') {
-                    message.textContent += ' This will send an automated email to the user with their login credentials.';
-                    confirmBtn.className = 'action-btn approve-btn';
-                } else if (action === 'reject') {
+                if (action === 'reject') {
                     message.textContent += ' This will notify the user that their request has been rejected.';
                     confirmBtn.className = 'action-btn reject-btn';
+                } else {
+                    confirmBtn.className = 'action-btn approve-btn';
                 }
 
-                currentForm = document.querySelector(`form input[name="approval_id"][value="${approvalId}"]`).closest('form');
+                currentForm = form; // Store the passed form directly
                 modal.classList.add('show');
-                return false;
+                return false; // Prevent default form submission
             }
 
             function confirmAction() {
                 if (currentForm) {
-                    currentForm.submit();
+                    currentForm.submit(); // Submit the stored form
                 }
             }
 
@@ -1162,7 +1167,6 @@ function searchUsers($searchTerm) {
                 document.getElementById('confirmationModal').classList.remove('show');
                 currentForm = null;
             }
-
             document.getElementById('documentModal').addEventListener('click', function(event) {
                 if (event.target === this) {
                     closeModal();
