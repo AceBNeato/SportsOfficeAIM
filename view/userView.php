@@ -672,7 +672,6 @@
 
 
 
-
                 <?php elseif ($currentPage === 'Submissions'): ?>
                 <!-- Enhanced Submissions Content -->
                 <div class="submissions-container">
@@ -797,55 +796,13 @@
                                             </label>
                                             <div id="file_info" class="file-info hidden">
                                                 <span class="file-info-label">Selected file:</span> <span id="file_name"></span>
+                                                <button type="button" id="preview_button" class="ml-2 px-2 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 transition-colors" onclick="previewFile()">Preview</button>
                                             </div>
                                         </div>
                                     </div>
-
-                                    <style>
-                                        .file-upload-area {
-                                            display: flex;
-                                            flex-direction: column;
-                                            align-items: center;
-                                            justify-content: center;
-                                            text-align: center;
-                                        }
-
-                                        .file-upload-label {
-                                            display: flex;
-                                            flex-direction: column;
-                                            align-items: center;
-                                            width: 100%;
-                                        }
-
-                                        .upload-icon-container {
-                                            display: flex;
-                                            justify-content: center;
-                                            align-items: center;
-                                            margin-bottom: 0.5rem;
-                                        }
-
-                                        .file-upload-label svg {
-                                            height: 2.5rem;
-                                            width: 2.5rem;
-                                            color: #9ca3af;
-                                        }
-
-                                        .upload-instruction {
-                                            font-size: 1rem;
-                                            font-weight: 500;
-                                            color: #374151;
-                                            margin-bottom: 0.25rem;
-                                        }
-
-                                        .upload-requirements {
-                                            font-size: 0.875rem;
-                                            color: #6b7280;
-                                        }
-                                    </style>
                                 </div>
                             </div>
 
-                            <!-- Section: Description -->
                             <!-- Section: Description -->
                             <div class="form-section">
                                 <h3 class="section-title">
@@ -863,20 +820,6 @@
                                 </div>
                             </div>
 
-                            <script>
-                                const description = document.getElementById("description");
-                                const warning = document.getElementById("desc-warning");
-
-                                description.addEventListener("input", () => {
-                                    if (description.value.trim().length < 10) {
-                                        warning.style.display = "block";
-                                    } else {
-                                        warning.style.display = "none";
-                                    }
-                                });
-                            </script>
-
-
                             <!-- Submit Button -->
                             <div class="form-submit">
                                 <button type="submit">
@@ -887,6 +830,37 @@
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+
+                <!-- File Preview Modal -->
+                <div id="filePreviewModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden" role="dialog" aria-labelledby="filePreviewModalTitle" aria-modal="true">
+                    <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-3xl border border-gray-200 mx-4 flex flex-col">
+                        <div class="modal-header relative mb-4">
+                            <h2 id="filePreviewModalTitle" class="text-lg font-semibold text-gray-800">Preview File</h2>
+                            <button onclick="closeModal('filePreviewModal')" class="modal-close-btn absolute top-0 right-0 text-gray-400 hover:text-gray-600 transition-colors" aria-label="Close modal">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div id="filePreviewContent" class="w-full flex-1 overflow-auto bg-gray-50">
+                            <!-- Content will be injected here -->
+                        </div>
+                        <div class="modal-footer mt-4 flex justify-center gap-3 bg-gray-100 p-4 rounded-b-2xl">
+                            <a id="fileDownloadLink" href="#" class="action-btn bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg flex items-center gap-2 transition-colors duration-200 focus:outline-none hidden">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                </svg>
+                                Download
+                            </a>
+                            <button onclick="closeModal('filePreviewModal')" class="action-btn bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg flex items-center gap-2 transition-colors duration-200 focus:outline-none">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                                Close
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -1141,6 +1115,43 @@
                             padding: 1.5rem;
                         }
                     }
+
+                    /* Modal Styles */
+                    .modal-header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        padding: 0.75rem 1rem;
+                        border-bottom: 1px solid #e5e7eb;
+                    }
+
+                    .modal-close-btn {
+                        cursor: pointer;
+                    }
+
+                    .modal-footer {
+                        padding: 0.75rem;
+                        background-color: #f3f4f6;
+                        display: flex;
+                        justify-content: center;
+                        gap: 0.75rem;
+                        border-bottom-left-radius: 0.5rem;
+                        border-bottom-right-radius: 0.5rem;
+                        flex-shrink: 0;
+                    }
+
+                    .action-btn {
+                        padding: 0.75rem 1.25rem;
+                        border-radius: 0.375rem;
+                        font-weight: 500;
+                        transition: background-color 0.2s;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        border: none;
+                        cursor: pointer;
+                        font-size: 0.9rem;
+                    }
                 </style>
 
                 <script>
@@ -1157,6 +1168,7 @@
                             } else {
                                 otherTypeContainer.classList.add('hidden');
                                 otherTypeInput.removeAttribute('required');
+                                otherTypeInput.value = '';
                             }
                         });
 
@@ -1164,6 +1176,7 @@
                         const fileInput = document.getElementById('uploaded_file');
                         const fileInfo = document.getElementById('file_info');
                         const fileName = document.getElementById('file_name');
+                        const previewButton = document.getElementById('preview_button');
 
                         fileInput.addEventListener('change', function() {
                             if (this.files.length > 0) {
@@ -1172,15 +1185,18 @@
 
                                 fileName.textContent = `${file.name} (${fileSize} MB)`;
                                 fileInfo.classList.remove('hidden');
+                                previewButton.classList.remove('hidden');
 
                                 // Validate file size (5MB max)
                                 if (file.size > 5 * 1024 * 1024) {
                                     alert('File size exceeds 5MB limit. Please choose a smaller file.');
                                     this.value = ''; // Clear the input
                                     fileInfo.classList.add('hidden');
+                                    previewButton.classList.add('hidden');
                                 }
                             } else {
                                 fileInfo.classList.add('hidden');
+                                previewButton.classList.add('hidden');
                             }
                         });
 
@@ -1206,83 +1222,107 @@
                                 fileInput.dispatchEvent(event);
                             }
                         });
-                    });
-                </script>
 
-                    <script>
-                        document.addEventListener("DOMContentLoaded", function () {
-                            const documentTypeSelect = document.getElementById("document_type");
-                            const otherTypeContainer = document.getElementById("other_type_container");
+                        // Description validation
+                        const description = document.getElementById("description");
+                        const warning = document.getElementById("desc-warning");
 
-                            documentTypeSelect.addEventListener("change", function () {
-                                if (this.value === "Others") {
-                                    otherTypeContainer.classList.remove("hidden");
-                                } else {
-                                    otherTypeContainer.classList.add("hidden");
-                                    document.getElementById("other_type").value = "";
-                                }
-                            });
-
-                            const uploadedFileInput = document.getElementById("uploaded_file");
-                            const fileInfo = document.getElementById("file_info");
-                            const fileNameSpan = document.getElementById("file_name");
-
-                            uploadedFileInput.addEventListener("change", function () {
-                                if (this.files.length > 0) {
-                                    fileNameSpan.textContent = this.files[0].name;
-                                    fileInfo.classList.remove("hidden");
-                                } else {
-                                    fileInfo.classList.add("hidden");
-                                    fileNameSpan.textContent = "";
-                                }
-                            });
+                        description.addEventListener("input", () => {
+                            if (description.value.trim().length < 10) {
+                                warning.style.display = "block";
+                            } else {
+                                warning.style.display = "none";
+                            }
                         });
-                    </script>
+                    });
 
+                    // File preview function
+                    function previewFile() {
+                        const fileInput = document.getElementById('uploaded_file');
+                        const modal = document.getElementById('filePreviewModal');
+                        const preview = document.getElementById('filePreviewContent');
+                        const downloadLink = document.getElementById('fileDownloadLink');
 
+                        if (!fileInput.files.length) {
+                            alert('Please select a file first.');
+                            return;
+                        }
 
+                        const file = fileInput.files[0];
+                        const url = URL.createObjectURL(file);
 
+                        // Show loading state
+                        preview.innerHTML = `
+            <div class="flex items-center justify-center min-h-full py-6">
+                <div class="text-center">
+                    <svg class="animate-spin h-6 w-6 text-blue-500 mx-auto" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <p class="mt-2 text-gray-500 text-sm">Loading file...</p>
+                </div>
+            </div>
+        `;
+                        modal.classList.remove('hidden');
 
+                        // Simulate fetch with File API
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const blob = new Blob([e.target.result], { type: file.type || 'application/octet-stream' });
+                            const contentType = file.type || 'application/octet-stream';
 
+                            downloadLink.href = url;
+                            downloadLink.classList.remove('hidden');
 
+                            if (contentType === 'application/pdf') {
+                                preview.innerHTML = `<iframe src="${url}#zoom=auto" style="width:100%; height:100%; max-height:100%;" frameborder="0" title="File Preview" aria-label="PDF file preview"></iframe>`;
+                            } else if (contentType.startsWith('image/')) {
+                                preview.innerHTML = `<img src="${url}" alt="Uploaded File" class="w-full h-full object-contain" aria-label="Image preview" />`;
+                            } else {
+                                preview.innerHTML = `
+                    <div class="text-center py-6 text-red-500 text-sm">
+                        Preview not available for this file type. Please download to view.
+                    </div>
+                `;
+                                downloadLink.classList.remove('hidden');
+                            }
+                        };
+                        reader.onerror = function() {
+                            preview.innerHTML = `
+                <div class="text-center py-6 text-red-500 text-sm">
+                    Error loading file.
+                </div>
+            `;
+                            downloadLink.classList.remove('hidden');
+                        };
+                        reader.readAsArrayBuffer(file);
 
+                        // Add click event to close modal when clicking outside
+                        modal.addEventListener('click', (e) => {
+                            if (e.target === modal) {
+                                closeModal('filePreviewModal');
+                            }
+                        }, { once: true });
+                    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                    // Close modal function
+                    function closeModal(modalId) {
+                        const modal = document.getElementById(modalId);
+                        const preview = document.getElementById('filePreviewContent');
+                        modal.classList.add('hidden');
+                        if (preview) {
+                            const iframes = preview.getElementsByTagName('iframe');
+                            const images = preview.getElementsByTagName('img');
+                            for (let iframe of iframes) {
+                                URL.revokeObjectURL(iframe.src);
+                            }
+                            for (let img of images) {
+                                URL.revokeObjectURL(img.src);
+                            }
+                            preview.innerHTML = '';
+                        }
+                    }
+                </script>
 
 
 
@@ -1300,7 +1340,6 @@
                 <?php elseif ($currentPage === 'Track'): ?>
                 <!-- Track content -->
                 <div class="p-6 bg-gray-100 min-h-screen">
-
                     <div class="space-y-4">
                         <?php
                         // Database connection (use secure credentials in production, e.g., environment variables)
@@ -1318,11 +1357,11 @@
                         // Fetch submissions for the logged-in user
                         $user_id = $_SESSION['user']['id']; // Assuming user ID is stored in session
                         $stmt = $conn->prepare("
-                SELECT id, document_type, submission_date, status, description, file_name, other_type 
-                FROM submissions 
-                WHERE user_id = ? 
-                ORDER BY submission_date DESC
-            ");
+            SELECT id, document_type, submission_date, status, description, file_name, other_type 
+            FROM submissions 
+            WHERE user_id = ? 
+            ORDER BY submission_date DESC
+        ");
                         $stmt->bind_param("i", $user_id);
                         $stmt->execute();
                         $result = $stmt->get_result();
@@ -1343,8 +1382,8 @@
 
                         if ($result->num_rows > 0) {
                             while ($doc = $result->fetch_assoc()) {
-                                // Format the submission date
-                                $submission_date = date("m-d-Y", strtotime($doc['submission_date']));
+                                // Format the submission date with fallback
+                                $submission_date = $doc['submission_date'] ? date("m-d-Y", strtotime($doc['submission_date'])) : 'N/A';
 
                                 // Map status to Tailwind CSS classes
                                 $status_class = match ($doc['status']) {
@@ -1376,14 +1415,14 @@
                                     </div>
                                     <!-- Status -->
                                     <div class="ml-5">
-                            <span class="inline-block px-4 py-1.5 text-sm font-semibold rounded-full <?php echo $status_class; ?>">
-                                <?php echo htmlspecialchars($status_display); ?>
-                            </span>
+                        <span class="inline-block px-4 py-1.5 text-sm font-semibold rounded-full <?php echo $status_class; ?>">
+                            <?php echo htmlspecialchars($status_display); ?>
+                        </span>
                                     </div>
                                     <!-- Action Buttons -->
                                     <div class="ml-5 flex space-x-3">
                                         <!-- View Button -->
-                                        <button onclick="openDocumentModal('<?php echo htmlspecialchars($doc['document_type']); ?>', '<?php echo htmlspecialchars($submission_date); ?>', '<?php echo htmlspecialchars($status_display); ?>', '<?php echo htmlspecialchars($doc['description']); ?>', '<?php echo $doc['status']; ?>')" class="text-gray-500 hover:text-gray-700 transition-colors" aria-label="View document <?php echo htmlspecialchars($doc['document_type']); ?>">
+                                        <button onclick="openDocumentModal('<?php echo htmlspecialchars($doc['document_type']); ?>', '<?php echo htmlspecialchars($submission_date); ?>', '<?php echo htmlspecialchars($status_display); ?>', '<?php echo htmlspecialchars($doc['description']); ?>', '<?php echo htmlspecialchars($doc['file_name']); ?>', '<?php echo $doc['id']; ?>')" class="text-gray-500 hover:text-gray-700 transition-colors" aria-label="View document <?php echo htmlspecialchars($doc['document_type']); ?>">
                                             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -1410,88 +1449,131 @@
                     </div>
                 </div>
 
+                <!-- Edit Submission Modal -->
+                <div id="editSubmissionModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden">
+                    <div class="bg-white rounded-2xl shadow-2xl p-4 w-full max-w-lg border border-gray-200 mx-4">
+                        <!-- Header -->
+                        <div class="relative mb-4">
+                            <h2 class="text-lg font-semibold text-gray-800">Edit Submission</h2>
+                            <p class="text-xs text-gray-500 mt-1">Update your document details</p>
+                            <button onclick="closeModal('editSubmissionModal')" class="absolute top-0 right-0 text-gray-400 hover:text-gray-600 transition-colors">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
 
-
-
-
-
-
-
-
-                    <!-- Edit Submission Modal -->
-                    <div id="editSubmissionModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden">
-                        <div class="bg-white rounded-2xl shadow-2xl p-4 w-full max-w-lg border border-gray-200 mx-4">
-                            <!-- Header -->
-                            <div class="relative mb-4">
-                                <h2 class="text-lg font-semibold text-gray-800">Edit Submission</h2>
-                                <p class="text-xs text-gray-500 mt-1">Update your document details</p>
-                                <button onclick="closeModal('editSubmissionModal')" class="absolute top-0 right-0 text-gray-400 hover:text-gray-600 transition-colors">
-                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        <!-- Profile Info -->
+                        <div class="flex items-center gap-2 mb-4 px-3 py-2 bg-gray-50 rounded-lg border border-gray-100">
+                            <div class="w-8 h-8 flex-shrink-0 overflow-hidden rounded-full border border-gray-300">
+                                <?php if ($profile_image_data && $profile_image_type): ?>
+                                    <img src="data:<?php echo htmlspecialchars($profile_image_type); ?>;base64,<?php echo base64_encode($profile_image_data); ?>"
+                                         alt="Profile" class="w-full h-full object-cover">
+                                <?php else: ?>
+                                    <svg class="w-5 h-5 text-gray-400 mx-auto my-1.5" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                                     </svg>
-                                </button>
+                                <?php endif; ?>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <p class="text-xs font-medium text-gray-800 truncate"><?php echo htmlspecialchars($_SESSION['user']['full_name']); ?></p>
+                                <p class="text-xs text-gray-500 truncate">ID: <?php echo htmlspecialchars($_SESSION['user']['student_id']); ?></p>
+                            </div>
+                        </div>
+
+                        <!-- Form -->
+                        <form id="editSubmissionForm" action="../controller/update_submission.php" method="POST" enctype="multipart/form-data">
+                            <input type="hidden" name="submission_id" id="edit_submission_id">
+
+                            <!-- Document Info -->
+                            <div class="flex justify-between items-center mb-3 gap-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-medium text-gray-500 whitespace-nowrap">Document Type:</span>
+                                    <p id="edit_document_type_display" class="text-xs font-medium text-gray-800 truncate"></p>
+                                </div>
+                                <div id="edit_status_display" class="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600 whitespace-nowrap"></div>
                             </div>
 
-                            <!-- Profile Info -->
-                            <div class="flex items-center gap-2 mb-4 px-3 py-2 bg-gray-50 rounded-lg border border-gray-100">
-                                <div class="w-8 h-8 flex-shrink-0 overflow-hidden rounded-full border border-gray-300">
-                                    <?php if ($profile_image_data && $profile_image_type): ?>
-                                        <img src="data:<?php echo htmlspecialchars($profile_image_type); ?>;base64,<?php echo base64_encode($profile_image_data); ?>"
-                                             alt="Profile" class="w-full h-full object-cover">
-                                    <?php else: ?>
-                                        <svg class="w-5 h-5 text-gray-400 mx-auto my-1.5" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                                        </svg>
-                                    <?php endif; ?>
-                                </div>
-                                <div class="min-w-0 flex-1">
-                                    <p class="text-xs font-medium text-gray-800 truncate"><?php echo htmlspecialchars($_SESSION['user']['full_name']); ?></p>
-                                    <p class="text-xs text-gray-500 truncate">ID: <?php echo htmlspecialchars($_SESSION['user']['student_id']); ?></p>
-                                </div>
+                            <div class="w-full max-w-xs mx-auto">
+                                <label for="edit_description" class="text-sm font-medium text-gray-700 block text-center">Description</label>
+                                <span id="edit_desc_warning" class="text-xs text-red-500 hidden block text-center">Minimum 10 characters</span>
+                                <textarea id="edit_description" name="description" rows="4"
+                                          class="w-full p-3 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none"
+                                          style="min-height: 80px; overflow-y: auto;"
+                                          required></textarea>
                             </div>
 
-                            <!-- Form -->
-                            <form id="editSubmissionForm" action="../controller/update_submission.php" method="POST" enctype="multipart/form-data">
-                                <input type="hidden" name="submission_id" id="edit_submission_id">
-
-                                <!-- Document Info -->
-                                <div class="flex justify-between items-center mb-3 gap-3">
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-xs font-medium text-gray-500 whitespace-nowrap">Document Type:</span>
-                                        <p id="edit_document_type_display" class="text-xs font-medium text-gray-800 truncate"></p>
+                            <!-- File Upload -->
+                            <div class="w-full max-w-xs mx-auto mt-3">
+                                <label for="uploaded_file" class="text-sm font-medium text-gray-700 block text-center">Upload New File (Optional)</label>
+                                <div class="file-upload-area border border-gray-300 rounded-md p-4 text-center">
+                                    <input type="file" id="uploaded_file" name="uploaded_file" class="hidden" accept=".pdf,.doc,.docx,.jpg,.png">
+                                    <label for="uploaded_file" class="file-upload-label cursor-pointer">
+                                        <div class="upload-icon-container mx-auto w-12 h-12 text-gray-500">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" class="w-full h-full">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                                            </svg>
+                                        </div>
+                                        <span class="upload-instruction block text-sm text-gray-600">Click to upload or drag and drop</span>
+                                        <span class="upload-requirements block text-xs text-gray-500">PDF, DOC, DOCX, JPG, PNG (Max 5MB)</span>
+                                    </label>
+                                    <div id="file_info" class="file-info hidden mt-2">
+                                        <span class="file-info-label text-sm text-gray-600">Selected file:</span> <span id="file_name" class="text-sm text-gray-800"></span>
                                     </div>
-                                    <div id="edit_status_display" class="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600 whitespace-nowrap"></div>
+                                    <span id="edit_file_warning" class="text-xs text-red-500 hidden block mt-2">Please select a valid file (PDF, DOC, DOCX, JPG, PNG, max 5MB)</span>
                                 </div>
+                            </div>
+                            <div class="w-full max-w-xs mx-auto mt-3">
+                                <!-- Action Buttons -->
+                                <div id="edit_action_buttons" class="flex flex-wrap gap-2 mt-2 justify-center"></div>
+                            </div>
+                            <!-- Footer Info -->
+                            <div class="flex justify-center items-center border-t border-gray-200 pt-3 w-full">
+                                <p class="text-xs text-gray-500 text-center">
+                                    <span>Submitted: </span>
+                                    <span id="edit_submission_date" class="font-medium text-gray-600"></span>
+                                </p>
+                            </div>
 
-                                    <div class="w-full max-w-xs mx-auto"> <!-- Adjust max-w-xs to match your button width -->
-                                        <label for="edit_description" class="text-sm font-medium text-gray-700 block text-center">Description</label>
-                                        <span id="edit_desc_warning" class="text-xs text-red-500 hidden block text-center">Minimum 10 characters</span>
-                                        <textarea id="edit_description" name="description" rows="4"
-                                                  class="w-full p-3 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none"
-                                                  style="min-height: 80px; overflow-y: auto;"
-                                                  required></textarea>
-                                    </div>
-                                    <!-- Action Buttons -->
-                                    <div id="edit_action_buttons" class="flex flex-wrap gap-2 mt-2 justify-center"></div>
-                                    <!-- Footer Info -->
-                                    <div class="flex justify-center items-center border-t border-gray-200 pt-3 w-full">
-                                        <p class="text-xs text-gray-500 text-center">
-                                            <span>Submitted: </span>
-                                            <span id="edit_submission_date" class="font-medium text-gray-600"></span>
-                                        </p>
-                                    </div>
+                            <!-- Submit Button -->
+                            <button type="submit"
+                                    class="w-full py-2 bg-blue-600 text-white rounded-md text-xs font-semibold hover:bg-blue-700 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 mt-3">
+                                Save Changes
+                            </button>
+                        </form>
+                    </div>
+                </div>
 
-
-                                <!-- Submit Button -->
-                                <button type="submit"
-                                        class="w-full py-2 bg-blue-600 text-white rounded-md text-xs font-semibold hover:bg-blue-700 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1">
-                                    Save Changes
-                                </button>
-                            </form>
+                <!-- File View Modal -->
+                <div id="fileViewModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden" role="dialog" aria-labelledby="file-view-title">
+                    <div class="modal-content bg-white rounded-2xl shadow-2xl p-6 w-full max-w-3xl border border-gray-200 mx-4 flex flex-col">
+                        <div class="modal-header relative mb-4">
+                            <h2 id="file-view-title" class="text-lg font-semibold text-gray-800">View File</h2>
+                            <button onclick="closeModal('fileViewModal')" class="modal-close-btn absolute top-0 right-0 text-gray-400 hover:text-gray-600 transition-colors" aria-label="Close modal">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div id="fileViewPreview" class="w-full flex-1 overflow-auto bg-gray-50">
+                            <!-- Content will be injected here -->
+                        </div>
+                        <div class="modal-footer mt-4 flex justify-center gap-3 bg-gray-100 p-4 rounded-b-2xl">
+                            <a id="fileDownloadLink" href="#" class="action-btn bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg flex items-center gap-2 transition-colors duration-200 focus:outline-none hidden">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                </svg>
+                                Download
+                            </a>
+                            <button onclick="closeModal('fileViewModal')" class="action-btn bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg flex items-center gap-2 transition-colors duration-200 focus:outline-none">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                                Close
+                            </button>
                         </div>
                     </div>
-
-
+                </div>
 
                 <!-- JavaScript for Modal and Form Handling -->
                 <script>
@@ -1500,33 +1582,51 @@
                         document.getElementById('edit_submission_id').value = submissionId;
                         document.getElementById('edit_document_type_display').textContent = documentType === 'Others' && otherType ? otherType : documentType;
                         document.getElementById('edit_description').value = description;
-                        document.getElementById('edit_submission_date').textContent = submissionDate; // Use passed submission date
+                        document.getElementById('edit_submission_date').textContent = submissionDate;
+
+                        // Reset file input and file info
+                        const fileInput = document.getElementById('uploaded_file');
+                        const fileInfo = document.getElementById('file_info');
+                        const fileNameSpan = document.getElementById('file_name');
+                        const fileWarning = document.getElementById('edit_file_warning');
+                        fileInput.value = '';
+                        fileInfo.classList.add('hidden');
+                        fileNameSpan.textContent = '';
+                        fileWarning.classList.add('hidden');
 
                         // Handle status-specific display and buttons
                         const statusDisplay = document.getElementById('edit_status_display');
                         const actionButtons = document.getElementById('edit_action_buttons');
+                        const escapedFileName = fileName ? fileName.replace(/'/g, "\\'") : '';
+
+                        // Common "View File" button for all statuses
+                        const viewFileButton = fileName ? `
+            <button type="button" onclick="openFileViewModal('${submissionId}', '${escapedFileName}')" class="px-2 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 shadow-sm transition-colors" aria-label="View file for submission">View File</button>
+        ` : '';
 
                         if (status === 'pending') {
                             statusDisplay.innerHTML = `<p class="text-sm font-medium text-yellow-800 bg-yellow-100 px-4 py-2 rounded-full inline-block">Not been Approved</p>`;
                             actionButtons.innerHTML = `
-                    <button type="button" onclick="deleteSubmission(${submissionId})" class="px-2 py-1 bg-gray-200 text-gray-700 rounded text-sm hover:bg-gray-300 shadow-sm transition-colors">Delete</button>
-                    <button type="button" onclick="uploadNewFile(${submissionId})" class="px-2 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600 shadow-sm transition-colors">Upload New</button>
-                `;
+                <button type="button" onclick="deleteSubmission(${submissionId})" class="px-2 py-1 bg-gray-200 text-gray-700 rounded text-sm hover:bg-gray-300 shadow-sm transition-colors">Delete</button>
+                ${viewFileButton}
+            `;
                         } else if (status === 'approved') {
                             statusDisplay.innerHTML = `<p class="text-sm font-medium text-green-800 bg-green-100 px-4 py-2 rounded-full inline-block">Approved</p>`;
                             actionButtons.innerHTML = `
-                    <button type="button" onclick="deleteSubmission(${submissionId})" class="px-2 py-1 bg-gray-200 text-gray-700 rounded text-sm hover:bg-gray-300 shadow-sm transition-colors">Delete</button>
-                    <a href="../controller/download_submission.php?id=${submissionId}" class="px-2 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600 shadow-sm transition-colors">Download</a>
-                `;
+                <button type="button" onclick="deleteSubmission(${submissionId})" class="px-2 py-1 bg-gray-200 text-gray-700 rounded text-sm hover:bg-gray-300 shadow-sm transition-colors">Delete</button>
+                <a href="../controller/download_submission.php?id=${submissionId}" class="px-2 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600 shadow-sm transition-colors" aria-label="Download file">Download</a>
+                ${viewFileButton}
+            `;
                             if (approvalDate) {
                                 statusDisplay.innerHTML += `<p class="text-sm text-gray-600 mt-2">Date of Approval: ${approvalDate}</p>`;
                             }
                         } else if (status === 'rejected') {
                             statusDisplay.innerHTML = `<p class="text-sm font-medium text-red-800 bg-red-100 px-4 py-2 rounded-full inline-block">Rejected</p>`;
                             actionButtons.innerHTML = `
-                    <button type="button" onclick="deleteSubmission(${submissionId})" class="px-2 py-1 bg-gray-200 text-gray-700 rounded text-sm hover:bg-gray-300 shadow-sm transition-colors">Delete</button>
-                    <button type="button" onclick="returnToSubmit(${submissionId})" class="px-2 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600 shadow-sm transition-colors">Return to Submit</button>
-                `;
+                <button type="button" onclick="deleteSubmission(${submissionId})" class="px-2 py-1 bg-gray-200 text-gray-700 rounded text-sm hover:bg-gray-300 shadow-sm transition-colors">Delete</button>
+                <button type="button" onclick="returnToSubmit(${submissionId})" class="px-2 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600 shadow-sm transition-colors">Return to Submit</button>
+                ${viewFileButton}
+            `;
                         }
 
                         // Show the modal with smooth transition
@@ -1536,36 +1636,222 @@
 
                         // Validate description length on input
                         const descriptionInput = document.getElementById('edit_description');
-                        const warning = document.getElementById('edit_desc_warning');
+                        const descWarning = document.getElementById('edit_desc_warning');
                         descriptionInput.addEventListener('input', () => {
                             if (descriptionInput.value.trim().length < 10) {
-                                warning.classList.remove('hidden');
+                                descWarning.classList.remove('hidden');
                             } else {
-                                warning.classList.add('hidden');
+                                descWarning.classList.add('hidden');
+                            }
+                        });
+
+                        // Validate file input on change
+                        fileInput.addEventListener('change', () => {
+                            const file = fileInput.files[0];
+                            fileInfo.classList.add('hidden');
+                            fileNameSpan.textContent = '';
+                            fileWarning.classList.add('hidden');
+
+                            if (file) {
+                                const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'image/jpeg', 'image/png'];
+                                const maxSize = 5 * 1024 * 1024; // 5MB
+                                if (!validTypes.includes(file.type)) {
+                                    fileWarning.textContent = 'Invalid file type. Please select PDF, DOC, DOCX, JPG, or PNG.';
+                                    fileWarning.classList.remove('hidden');
+                                    fileInput.value = '';
+                                } else if (file.size > maxSize) {
+                                    fileWarning.textContent = 'File too large. Maximum size is 5MB.';
+                                    fileWarning.classList.remove('hidden');
+                                    fileInput.value = '';
+                                } else {
+                                    fileInfo.classList.remove('hidden');
+                                    fileNameSpan.textContent = file.name;
+                                }
                             }
                         });
                     }
 
-                    function openDocumentModal(type, date, status, description, statusValue) {
+                    function openFileViewModal(submissionId, fileName) {
+                        // Prevent modal stacking by closing other modals
+                        const existingModals = document.querySelectorAll('.fixed.inset-0');
+                        existingModals.forEach(modal => {
+                            if (modal.id !== 'fileViewModal') modal.remove();
+                        });
+
+                        const modal = document.getElementById('fileViewModal');
+                        const preview = document.getElementById('fileViewPreview');
+                        const downloadLink = document.getElementById('fileDownloadLink');
+
+                        // Set download link to original file
+                        downloadLink.href = `../controller/download_submission.php?id=${encodeURIComponent(submissionId)}&download=true`;
+                        downloadLink.classList.remove('hidden');
+
+                        // Show loading state
+                        preview.innerHTML = `
+            <div class="flex items-center justify-center min-h-full py-6">
+                <div class="text-center">
+                    <svg class="animate-spin h-6 w-6 text-blue-500 mx-auto" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <p class="mt-2 text-gray-500 text-sm">Loading file...</p>
+                </div>
+            </div>
+        `;
+                        modal.classList.remove('hidden');
+                        setTimeout(() => modal.classList.add('opacity-100'), 50);
+
+                        // Fetch the file, requesting PDF conversion if possible
+                        fetch(`../controller/download_submission.php?id=${encodeURIComponent(submissionId)}&convert=pdf`)
+                            .then(response => {
+                                if (!response.ok) throw new Error(`Failed to load file: ${response.statusText}`);
+                                return response.blob();
+                            })
+                            .then(blob => {
+                                const url = URL.createObjectURL(blob);
+                                const contentType = blob.type || 'application/octet-stream';
+                                const fileExtension = fileName.split('.').pop().toLowerCase();
+
+                                if (contentType === 'application/pdf' || fileExtension === 'pdf') {
+                                    preview.innerHTML = `<iframe src="${url}#zoom=auto" style="width:100%; height:100%; max-height:100%;" frameborder="0" title="File Preview" aria-label="PDF file preview"></iframe>`;
+                                } else if (contentType.startsWith('image/') || ['jpg', 'jpeg', 'png'].includes(fileExtension)) {
+                                    preview.innerHTML = `<img src="${url}" alt="Uploaded File" class="w-full h-full object-contain" aria-label="Image preview" />`;
+                                } else {
+                                    preview.innerHTML = `
+                        <div class="text-center py-6 text-red-500 text-sm">
+                            Preview not available for this file type (.${fileExtension}). Please download the original file.
+                        </div>
+                    `;
+                                    downloadLink.classList.remove('hidden');
+                                }
+                            })
+                            .catch(error => {
+                                preview.innerHTML = `
+                    <div class="text-center py-6 text-red-500 text-sm">
+                        Error loading file: ${error.message}. Please download the original file.
+                    </div>
+                `;
+                                downloadLink.classList.remove('hidden');
+                            });
+
+                        // Add click event to close modal when clicking outside
+                        modal.addEventListener('click', (e) => {
+                            if (e.target === modal) {
+                                closeModal('fileViewModal');
+                            }
+                        }, { once: true });
+                    }
+
+                    function openDocumentModal(type, date, status, description, fileName, submissionId) {
+                        const existingModals = document.querySelectorAll('.fixed.inset-0');
+                        existingModals.forEach(modal => modal.remove());
+
                         const modal = document.createElement('div');
                         modal.className = 'fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50';
-                        modal.innerHTML = `
-                <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-md text-center">
-                    <h2 class="text-xl font-semibold mb-4 text-gray-900">Document Details</h2>
-                    <p class="text-sm text-gray-700"><strong>Type:</strong> ${type}</p>
-                    <p class="text-sm text-gray-700"><strong>Date:</strong> ${date}</p>
-                    <p class="text-sm text-gray-700"><strong>Status:</strong> ${status}</p>
-                    <p class="text-sm text-gray-700"><strong>Description:</strong> ${description}</p>
-                    <button onclick="this.parentElement.parentElement.remove()" class="mt-6 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors">Close</button>
+                        modal.setAttribute('role', 'dialog');
+                        modal.setAttribute('aria-labelledby', 'modal-title');
+
+                        const escapedDescription = description.replace(/</g, '<').replace(/>/g, '>');
+                        let filePreview = '';
+
+                        if (fileName) {
+                            const fileExtension = fileName.split('.').pop().toLowerCase();
+                            const fileUrl = `../controller/download_submission.php?id=${encodeURIComponent(submissionId)}&convert=pdf`;
+
+                            // Show loading state initially
+                            filePreview = `
+                <div class="flex items-center justify-center min-h-[200px] py-6">
+                    <div class="text-center">
+                        <svg class="animate-spin h-6 w-6 text-blue-500 mx-auto" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <p class="mt-2 text-gray-500 text-sm">Loading file...</p>
+                    </div>
                 </div>
+                <div id="documentPreview" class="w-full h-64 mt-4"></div>
             `;
+
+                            // Fetch the file and determine how to display it
+                            setTimeout(() => {
+                                fetch(fileUrl)
+                                    .then(response => {
+                                        if (!response.ok) throw new Error(`Failed to load file: ${response.statusText}`);
+                                        return response.blob();
+                                    })
+                                    .then(blob => {
+                                        const url = URL.createObjectURL(blob);
+                                        const contentType = blob.type || 'application/octet-stream';
+                                        const previewDiv = modal.querySelector('#documentPreview');
+
+                                        if (contentType === 'application/pdf' || fileExtension === 'pdf') {
+                                            previewDiv.innerHTML = `<iframe src="${url}#zoom=auto" class="w-full h-full" title="PDF Preview" aria-label="PDF document preview"></iframe>`;
+                                        } else if (contentType.startsWith('image/') || ['jpg', 'jpeg', 'png'].includes(fileExtension)) {
+                                            previewDiv.innerHTML = `<img src="${url}" alt="Uploaded File" class="w-full h-full object-contain" aria-label="Image preview">`;
+                                        } else {
+                                            previewDiv.innerHTML = `
+                                <div class="text-center py-6 text-red-500 text-sm">
+                                    Preview not available for this file type (.${fileExtension}). Please download the original file.
+                                    <a href="../controller/download_submission.php?id=${submissionId}" class="text-blue-600 hover:underline block mt-2" aria-label="Download file">Download</a>
+                                </div>
+                            `;
+                                        }
+                                    })
+                                    .catch(error => {
+                                        const previewDiv = modal.querySelector('#documentPreview');
+                                        previewDiv.innerHTML = `
+                            <div class="text-center py-6 text-red-500 text-sm">
+                                Error loading file preview: ${error.message}. Please download the original file.
+                                <a href="../controller/download_submission.php?id=${submissionId}" class="text-blue-600 hover:underline block mt-2" aria-label="Download file">Download</a>
+                            </div>
+                        `;
+                                    });
+                            }, 0);
+                        } else {
+                            filePreview = `<p class="text-sm text-gray-700 mt-4">No file available for preview.</p>`;
+                        }
+
+                        modal.innerHTML = `
+            <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg text-center">
+                <h2 id="modal-title" class="text-xl font-semibold mb-4 text-gray-900">Document Details</h2>
+                <p class="text-sm text-gray-700"><strong>Type:</strong> ${type}</p>
+                <p class="text-sm text-gray-700"><strong>Date:</strong> ${date}</p>
+                <p class="text-sm text-gray-700"><strong>Status:</strong> ${status}</p>
+                <p class="text-sm text-gray-700 break-words"><strong>Description:</strong> ${escapedDescription}</p>
+                ${filePreview}
+                <button onclick="this.parentElement.parentElement.remove()" class="mt-6 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors">Close</button>
+            </div>
+        `;
+
+                        modal.addEventListener('click', (e) => {
+                            if (e.target === modal) {
+                                modal.remove();
+                            }
+                        });
+
                         document.body.appendChild(modal);
                     }
 
                     function closeModal(modalId) {
                         const modal = document.getElementById(modalId);
-                        modal.classList.remove('opacity-100');
-                        setTimeout(() => modal.classList.add('hidden'), 300);
+                        const preview = modal?.querySelector('#fileViewPreview') || modal?.querySelector('#documentPreview');
+                        if (modal) {
+                            modal.classList.remove('opacity-100');
+                            setTimeout(() => {
+                                modal.classList.add('hidden');
+                                if (preview) {
+                                    const iframes = preview.getElementsByTagName('iframe');
+                                    const images = preview.getElementsByTagName('img');
+                                    for (let iframe of iframes) {
+                                        URL.revokeObjectURL(iframe.src);
+                                    }
+                                    for (let img of images) {
+                                        URL.revokeObjectURL(img.src);
+                                    }
+                                    preview.innerHTML = '';
+                                }
+                            }, 300);
+                        }
                     }
 
                     function deleteSubmission(submissionId) {
@@ -1589,27 +1875,6 @@
                                     alert('An error occurred while deleting the submission.');
                                 });
                         }
-                    }
-
-                    function uploadNewFile(submissionId) {
-                        fetch('../controller/get_submission.php?id=' + encodeURIComponent(submissionId), {
-                            method: 'GET',
-                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-                        })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    openEditModal(submissionId, data.document_type, data.other_type, data.description, data.file_name, 'pending', data.submission_date, null);
-                                    // Clear file input to encourage new upload
-                                    document.getElementById('edit_file').value = '';
-                                } else {
-                                    alert('Error fetching submission data: ' + data.message);
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                                alert('An error occurred while fetching submission data.');
-                            });
                     }
 
                     function returnToSubmit(submissionId) {
@@ -1639,9 +1904,34 @@
                         e.preventDefault();
 
                         const description = document.getElementById('edit_description').value;
+                        const fileInput = document.getElementById('uploaded_file');
+                        const descWarning = document.getElementById('edit_desc_warning');
+                        const fileWarning = document.getElementById('edit_file_warning');
+
+                        // Validate description
                         if (description.trim().length < 10) {
-                            document.getElementById('edit_desc_warning').classList.remove('hidden');
+                            descWarning.classList.remove('hidden');
                             return;
+                        } else {
+                            descWarning.classList.add('hidden');
+                        }
+
+                        // Validate file if provided
+                        if (fileInput.files.length > 0) {
+                            const file = fileInput.files[0];
+                            const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'image/jpeg', 'image/png'];
+                            const maxSize = 5 * 1024 * 1024; // 5MB
+                            if (!validTypes.includes(file.type)) {
+                                fileWarning.textContent = 'Invalid file type. Please select PDF, DOC, DOCX, JPG, or PNG.';
+                                fileWarning.classList.remove('hidden');
+                                fileInput.value = '';
+                                return;
+                            } else if (file.size > maxSize) {
+                                fileWarning.textContent = 'File too large. Maximum size is 5MB.';
+                                fileWarning.classList.remove('hidden');
+                                fileInput.value = '';
+                                return;
+                            }
                         }
 
                         const formData = new FormData(this);
@@ -1673,9 +1963,6 @@
                             });
                     });
                 </script>
-
-
-
 
 
 

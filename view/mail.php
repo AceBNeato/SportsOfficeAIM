@@ -18,14 +18,14 @@ function sendApprovalEmail($recipientEmail, $fullName, $studentId) {
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
-        $mail->Username = 'aumicaroz00066@usep.edu.ph';
-        $mail->Password = 'phaijpfzdlesvmjy';
+        $mail->Username = 'tagummabinisportoffice@gmail.com';
+        $mail->Password = 'wecx ezju zcin ymmn';
         $mail->SMTPSecure = 'ssl';
         $mail->Port = 465;
 
-        $mail->setFrom('aumicaroz00066@usep.edu.ph', 'SportOfficeDB Admin');
+        $mail->setFrom('tagummabinisportoffice@gmail.com', 'SportOfficeDB Admin');
         $mail->addAddress($recipientEmail);
-        $mail->addReplyTo('aumicaroz00066@usep.edu.ph', 'SportOfficeDB Admin');
+        $mail->addReplyTo('tagummabinisportoffice@gmail.com', 'SportOfficeDB Admin');
 
         $mail->isHTML(true);
         $mail->Subject = 'Account Approval Notification';
@@ -38,7 +38,7 @@ function sendApprovalEmail($recipientEmail, $fullName, $studentId) {
                 <li><strong>Email:</strong> $recipientEmail</li>
                 <li><strong>Password:</strong> $studentId (Please change your password after logging in for security purposes.)</li>
             </ul>
-            <p><a href='https://yourwebsite.com/login'>Log in here</a></p>
+            <p><a href='SportsOfficeAIM/view/loginView.php'>Log in here</a></p>
             <p>Best regards,<br>SportOfficeDB Team</p>
         ";
 
@@ -63,14 +63,14 @@ function sendRejectionEmail($recipientEmail, $fullName) {
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
-        $mail->Username = 'aumicaroz00066@usep.edu.ph';
-        $mail->Password = 'phaijpfzdlesvmjy';
+        $mail->Username = 'tagummabinisportoffice@gmail.com';
+        $mail->Password = 'wecx ezju zcin ymmn';
         $mail->SMTPSecure = 'ssl';
         $mail->Port = 465;
 
-        $mail->setFrom('aumicaroz00066@usep.edu.ph', 'SportOfficeDB Admin');
+        $mail->setFrom('tagummabinisportoffice@gmail.com', 'SportOfficeDB Admin');
         $mail->addAddress($recipientEmail);
-        $mail->addReplyTo('aumicaroz00066@usep.edu.ph', 'SportOfficeDB Admin');
+        $mail->addReplyTo('tagummabinisportoffice@gmail.com', 'SportOfficeDB Admin');
 
         $mail->isHTML(true);
         $mail->Subject = 'Account Request Rejected';
@@ -78,7 +78,7 @@ function sendRejectionEmail($recipientEmail, $fullName) {
             <h3>Account Request Rejected</h3>
             <p>Dear $fullName,</p>
             <p>We regret to inform you that your account request has been rejected. This may be due to incomplete or invalid documentation.</p>
-            <p>Please contact the administrator at <a href='mailto:admin@yourwebsite.com'>admin@yourwebsite.com</a> for further details or to resubmit your request.</p>
+            <p>Please contact the administrator at <a href='mailto:tagummabinisportoffice@gmail.com'>tagummabinisportoffice@gmail.com</a> for further details or to resubmit your request.</p>
             <p>Best regards,<br>SportOfficeDB Team</p>
         ";
 

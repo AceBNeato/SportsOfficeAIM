@@ -75,6 +75,7 @@ $sql = "CREATE TABLE IF NOT EXISTS submissions (
     description TEXT NOT NULL,
     submission_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+    comments TEXT,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 )";
 if (!$conn->query($sql)) {

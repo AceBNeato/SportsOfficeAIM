@@ -1,42 +1,36 @@
 <?php
-session_start();
-
-// Database connection
-$host = "localhost";
-$username = "root";
-$password = "";
-$dbname = "SportOfficeDB";
-
-$conn = new mysqli($host, $username, $password, $dbname);
+$conn = new mysqli("localhost", "root", "", "SportOfficeDB");
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-if (!isset($_GET['id']) || !isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-    die("Unauthorized access");
-}
+$id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+$download = isset($_GET['download']) && $_GET['download'] === 'true';
+$convert = isset($_GET['convert']) && $_GET['convert'] === 'pdf';
 
-$submission_id = (int)$_GET['id'];
-$user_id = $_SESSION['user']['id'];
-
-$stmt = $conn->prepare("SELECT file_name, file_data FROM submissions WHERE id = ? AND user_id = ?");
-$stmt->bind_param("ii", $submission_id, $user_id);
+$stmt = $conn->prepare("SELECT file_name FROM submissions WHERE id = ?");
+$stmt->bind_param("i", $id);
 $stmt->execute();
 $result = $stmt->get_result();
-
-if ($result->num_rows > 0) {
-    $row = $result->fetch_assoc();
-    $file_name = $row['file_name'];
-    $file_data = $row['file_data'];
-
-    header('Content-Type: application/octet-stream');
-    header('Content-Disposition: attachment; filename="' . $file_name . '"');
-    header('Content-Length: ' . strlen($file_data));
-    echo $file_data;
-} else {
-    die("File not found or access denied");
+if ($row = $result->fetch_assoc()) {
+    $filePath = "../uploads/" . $row['file_name'];
+    if (file_exists($filePath)) {
+        if ($download) {
+            header('Content-Type: application/octet-stream');
+            header('Content-Disposition: attachment; filename="' . basename($filePath) . '"');
+            readfile($filePath);
+        } else {
+            $mime = mime_content_type($filePath);
+            if ($convert && $mime !== 'application/pdf') {
+                // Placeholder: Add logic to convert to PDF if needed
+                $mime = 'application/pdf';
+            }
+            header('Content-Type: ' . $mime);
+            readfile($filePath);
+        }
+        exit;
+    }
 }
-
-$stmt->close();
-$conn->close();
-?><?php
+http_response_code(404);
+echo "File not found.";
+?>
