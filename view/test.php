@@ -1,6 +1,6 @@
 
 <?php
-// Database configuration
+// Database configurationkyawar
 $host = "localhost";
 $username = "root";
 $password = "";
