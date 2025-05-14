@@ -1,9 +1,13 @@
 <?php
-session_start();
 header('Content-Type: application/json');
 
-if (!isset($_SESSION['user']['id'])) {
-    echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+session_start();
+
+// Log session data for debugging
+file_put_contents('debug.log', "Session Data: " . print_r($_SESSION, true) . "\n", FILE_APPEND);
+
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    echo json_encode(['success' => false, 'message' => 'Unauthorized access']);
     exit;
 }
 
@@ -14,97 +18,104 @@ $dbname = "SportOfficeDB";
 
 $conn = new mysqli($host, $username, $password, $dbname);
 if ($conn->connect_error) {
-    echo json_encode(['success' => false, 'message' => 'Database connection failed']);
+    file_put_contents('debug.log', "DB Connection Error: " . $conn->connect_error . "\n", FILE_APPEND);
+    echo json_encode(['success' => false, 'message' => 'Database connection failed: ' . $conn->connect_error]);
     exit;
 }
 
 $submission_id = isset($_POST['submission_id']) ? (int)$_POST['submission_id'] : 0;
 $description = isset($_POST['description']) ? trim($_POST['description']) : '';
-$user_id = $_SESSION['user']['id'];
 
-if ($submission_id <= 0 || empty($description) || strlen($description) < 10) {
-    echo json_encode(['success' => false, 'message' => 'Invalid input']);
+file_put_contents('debug.log', "Input Data: submission_id=$submission_id, description='$description'\n", FILE_APPEND);
+
+if ($submission_id <= 0 || empty($description)) {
+    echo json_encode(['success' => false, 'message' => "Invalid input: submission_id=$submission_id, description='$description'"]);
     exit;
 }
 
-// Verify the submission belongs to the user
-$stmt = $conn->prepare("SELECT user_id, file_name FROM submissions WHERE id = ?");
+if (strlen($description) < 10) {
+    echo json_encode(['success' => false, 'message' => 'Description must be at least 10 characters long']);
+    exit;
+}
+
+// Verify ownership
+$user_id = $_SESSION['user']['id'];
+$stmt = $conn->prepare("SELECT user_id FROM submissions WHERE id = ?");
+if (!$stmt) {
+    file_put_contents('debug.log', "Prepare Error: " . $conn->error . "\n", FILE_APPEND);
+    echo json_encode(['success' => false, 'message' => 'SQL Prepare Error: ' . $conn->error]);
+    exit;
+}
 $stmt->bind_param("i", $submission_id);
 $stmt->execute();
 $result = $stmt->get_result();
-if ($result->num_rows === 0) {
-    echo json_encode(['success' => false, 'message' => 'Submission not found']);
-    $stmt->close();
-    $conn->close();
-    exit;
-}
-
 $row = $result->fetch_assoc();
-if ($row['user_id'] !== $user_id) {
-    echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-    $stmt->close();
-    $conn->close();
+if ($result->num_rows === 0 || $row['user_id'] != $user_id) {
+    file_put_contents('debug.log', "Ownership Check Failed: session_user_id=$user_id, db_user_id=" . ($row['user_id'] ?? 'null') . "\n", FILE_APPEND);
+    echo json_encode(['success' => false, 'message' => "Unauthorized access to submission: session_user_id=$user_id, db_user_id=" . ($row['user_id'] ?? 'null')]);
     exit;
 }
+$stmt->close();
 
-$old_file_name = $row['file_name'];
-$file_path = null;
+// Handle file upload if present
+$file_data = null;
 $file_name = null;
+$file_size = null;
 
-// Handle file upload if provided
 if (isset($_FILES['uploaded_file']) && $_FILES['uploaded_file']['error'] === UPLOAD_ERR_OK) {
-    $allowed_types = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'image/jpeg', 'image/png'];
-    $file_type = $_FILES['uploaded_file']['type'];
-    $file_size = $_FILES['uploaded_file']['size'];
+    $file = $_FILES['uploaded_file'];
+    $valid_types = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'image/jpeg', 'image/png'];
     $max_size = 5 * 1024 * 1024; // 5MB
 
-    if (!in_array($file_type, $allowed_types)) {
-        echo json_encode(['success' => false, 'message' => 'Invalid file type']);
-        $stmt->close();
-        $conn->close();
+    file_put_contents('debug.log', "File Data: name=" . $file['name'] . ", size=" . $file['size'] . ", type=" . $file['type'] . ", error=" . $file['error'] . "\n", FILE_APPEND);
+
+    if (!in_array($file['type'], $valid_types)) {
+        echo json_encode(['success' => false, 'message' => 'Invalid file type. Only PDF, DOC, DOCX, JPG, PNG are allowed.']);
         exit;
     }
 
-    if ($file_size > $max_size) {
-        echo json_encode(['success' => false, 'message' => 'File too large']);
-        $stmt->close();
-        $conn->close();
+    if ($file['size'] > $max_size) {
+        echo json_encode(['success' => false, 'message' => 'File size exceeds 5MB limit.']);
         exit;
     }
 
-    $upload_dir = '../Uploads/';
-    $file_ext = pathinfo($_FILES['uploaded_file']['name'], PATHINFO_EXTENSION);
-    $file_name = uniqid() . '.' . $file_ext;
-    $file_path = $upload_dir . $file_name;
-
-    if (!move_uploaded_file($_FILES['uploaded_file']['tmp_name'], $file_path)) {
-        echo json_encode(['success' => false, 'message' => 'File upload failed']);
-        $stmt->close();
-        $conn->close();
+    $file_data = file_get_contents($file['tmp_name']);
+    if ($file_data === false) {
+        file_put_contents('debug.log', "File Read Error: Failed to read " . $file['tmp_name'] . "\n", FILE_APPEND);
+        echo json_encode(['success' => false, 'message' => 'Failed to read uploaded file data.']);
         exit;
     }
-
-    // Delete old file if it exists
-    if ($old_file_name && file_exists($upload_dir . $old_file_name)) {
-        unlink($upload_dir . $old_file_name);
-    }
+    $file_name = $file['name'];
+    $file_size = $file['size'];
 }
 
 // Update submission
-$update_query = "UPDATE submissions SET description = ?, file_name = COALESCE(?, file_name), submission_date = NOW() WHERE id = ? AND user_id = ?";
-$stmt = $conn->prepare($update_query);
-$file_name_to_bind = $file_name; // Use a variable to hold the value (null or file name)
-$stmt->bind_param("ssii", $description, $file_name_to_bind, $submission_id, $user_id);
-
-if ($stmt->execute()) {
-    echo json_encode(['success' => true]);
-} else {
-    // Rollback file upload if query fails
-    if ($file_path && file_exists($file_path)) {
-        unlink($file_path);
+if ($file_data !== null) {
+    $stmt = $conn->prepare("UPDATE submissions SET description = ?, file_data = ?, file_name = ?, file_size = ? WHERE id = ?");
+    if (!$stmt) {
+        file_put_contents('debug.log', "Prepare Error (File Update): " . $conn->error . "\n", FILE_APPEND);
+        echo json_encode(['success' => false, 'message' => 'SQL Prepare Error (File Update): ' . $conn->error]);
+        exit;
     }
-    echo json_encode(['success' => false, 'message' => 'Failed to update submission']);
+    $stmt->bind_param("sssis", $description, $file_data, $file_name, $file_size, $submission_id);
+} else {
+    $stmt = $conn->prepare("UPDATE submissions SET description = ? WHERE id = ?");
+    if (!$stmt) {
+        file_put_contents('debug.log', "Prepare Error (No File): " . $conn->error . "\n", FILE_APPEND);
+        echo json_encode(['success' => false, 'message' => 'SQL Prepare Error (No File): ' . $conn->error]);
+        exit;
+    }
+    $stmt->bind_param("si", $description, $submission_id);
 }
+
+if (!$stmt->execute()) {
+    file_put_contents('debug.log', "Execute Error: " . $stmt->error . "\n", FILE_APPEND);
+    echo json_encode(['success' => false, 'message' => 'SQL Execute Error: ' . $stmt->error]);
+    exit;
+}
+
+file_put_contents('debug.log', "Update Successful: submission_id=$submission_id\n", FILE_APPEND);
+echo json_encode(['success' => true, 'message' => 'Submission updated successfully']);
 
 $stmt->close();
 $conn->close();

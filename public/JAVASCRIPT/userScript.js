@@ -282,7 +282,169 @@ fetch('../controller/submit_form.php', {
 
 
 
+// Open and populate the edit submission modal
+function editSubmissionModal(submission) {
+    const modal = document.getElementById('editSubmissionModal');
+    const form = document.getElementById('editSubmissionForm');
+    const submissionIdInput = document.getElementById('edit_submission_id');
+    const descriptionInput = document.getElementById('edit_description');
+    const documentTypeDisplay = document.getElementById('edit_document_type_display');
+    const statusDisplay = document.getElementById('edit_status_display');
+    const submissionDateDisplay = document.getElementById('edit_submission_date');
+    const fileInput = document.getElementById('uploaded_file');
+    const fileInfo = document.getElementById('file_info');
+    const fileNameDisplay = document.getElementById('file_name');
+    const fileWarning = document.getElementById('edit_file_warning');
+    const descWarning = document.getElementById('edit_desc_warning');
+    const actionButtons = document.getElementById('edit_action_buttons');
 
+    // Populate modal fields
+    submissionIdInput.value = submission.id;
+    descriptionInput.value = submission.description || '';
+    documentTypeDisplay.textContent = submission.document_type || 'Unknown';
+    submissionDateDisplay.textContent = submission.submission_date || 'N/A';
+
+    // Set status display with appropriate styling
+    statusDisplay.textContent = submission.status || 'Unknown';
+    statusDisplay.className = `text-xs px-2 py-1 rounded-full ${
+        submission.status === 'rejected' ? 'bg-red-100 text-red-600' :
+            submission.status === 'pending' ? 'bg-yellow-100 text-yellow-600' :
+                submission.status === 'approved' ? 'bg-green-100 text-green-600' :
+                    'bg-gray-100 text-gray-600'
+    }`;
+
+    // Reset file input and info
+    fileInput.value = '';
+    fileInfo.classList.add('hidden');
+    fileNameDisplay.textContent = '';
+    fileWarning.classList.add('hidden');
+    descWarning.classList.add('hidden');
+
+    // If there's an existing file, show it
+    if (submission.file_name) {
+        fileInfo.classList.remove('hidden');
+        fileNameDisplay.textContent = submission.file_name;
+    }
+
+    // Add Resubmit button if status is rejected
+    actionButtons.innerHTML = '';
+    if (submission.status === 'rejected') {
+        const resubmitButton = document.createElement('button');
+        resubmitButton.type = 'button';
+        resubmitButton.className = 'py-2 px-4 bg-green-600 text-white rounded-md text-xs font-semibold hover:bg-green-700 transition-colors shadow-sm';
+        resubmitButton.textContent = 'Resubmit';
+        resubmitButton.onclick = () => resubmitSubmission(submission.id);
+        actionButtons.appendChild(resubmitButton);
+    }
+
+    // Show modal
+    modal.classList.remove('hidden');
+
+    // Client-side file validation
+    fileInput.addEventListener('change', () => {
+        const file = fileInput.files[0];
+        fileWarning.classList.add('hidden');
+        fileInfo.classList.add('hidden');
+
+        if (file) {
+            const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'image/jpeg', 'image/png'];
+            const maxSize = 5 * 1024 * 1024; // 5MB
+
+            if (!allowedTypes.includes(file.type)) {
+                fileWarning.textContent = 'Invalid file type. Allowed: PDF, DOC, DOCX, JPG, PNG';
+                fileWarning.classList.remove('hidden');
+                fileInput.value = '';
+                return;
+            }
+
+            if (file.size > maxSize) {
+                fileWarning.textContent = 'File too large. Max size: 5MB';
+                fileWarning.classList.remove('hidden');
+                fileInput.value = '';
+                return;
+            }
+
+            fileInfo.classList.remove('hidden');
+            fileNameDisplay.textContent = file.name;
+        }
+    });
+
+    // Client-side description validation
+    descriptionInput.addEventListener('input', () => {
+        descWarning.classList.add('hidden');
+        if (descriptionInput.value.length < 10) {
+            descWarning.classList.remove('hidden');
+        }
+    });
+}
+
+// Close the modal
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    modal.classList.add('hidden');
+    document.getElementById('editSubmissionForm').reset();
+    document.getElementById('edit_file_warning').classList.add('hidden');
+    document.getElementById('edit_desc_warning').classList.add('hidden');
+    document.getElementById('file_info').classList.add('hidden');
+}
+
+// Handle form submission
+document.getElementById('editSubmissionForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const formData = new FormData(form);
+    const descWarning = document.getElementById('edit_desc_warning');
+
+    // Client-side validation
+    const description = formData.get('description');
+    if (description.length < 10) {
+        descWarning.classList.remove('hidden');
+        return;
+    }
+
+    try {
+        const response = await fetch(form.action, {
+            method: 'POST',
+            body: formData
+        });
+        const result = await response.json();
+
+        if (result.success) {
+            alert('Submission updated successfully!');
+            // Optionally, refresh the submission list or close modal
+            closeModal('editSubmissionModal');
+            // Trigger a function to refresh the submission list if needed
+            // e.g., fetchSubmissions();
+        } else {
+            alert('Error: ' + result.message);
+        }
+    } catch (error) {
+        alert('An error occurred while updating the submission.');
+    }
+});
+
+// Resubmit submission
+async function resubmitSubmission(submissionId) {
+    try {
+        const response = await fetch('../controller/return_submission.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `id=${submissionId}`
+        });
+        const result = await response.json();
+
+        if (result.success) {
+            alert('Submission resubmitted successfully!');
+            closeModal('editSubmissionModal');
+            // Trigger a function to refresh the submission list if needed
+            // e.g., fetchSubmissions();
+        } else {
+            alert('Error: ' + result.message);
+        }
+    } catch (error) {
+        alert('An error occurred while resubmitting.');
+    }
+}
 
 
 
