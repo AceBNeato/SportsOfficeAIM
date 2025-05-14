@@ -907,15 +907,6 @@ function searchUsers($searchTerm) {
                     align-items: center;
                     justify-content: center;
                     padding: 0.5rem;
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-                    overflow: auto;
-=======
-
->>>>>>> Stashed changes
-=======
-
->>>>>>> Stashed changes
                 }
 
                 #documentModal.show {
