@@ -4,26 +4,9 @@ session_start();
 // Debug: Log session data
 file_put_contents('debug.log', 'Session: ' . print_r($_SESSION, true) . "\n", FILE_APPEND);
 
-// Validate admin session
-if (!isset($_SESSION['admin']['id']) || !is_numeric($_SESSION['admin']['id'])) {
-    header('Content-Type: application/json');
-    echo json_encode(['success' => false, 'message' => 'Unauthorized access']);
-    exit;
-}
 
-// Validate request method
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Content-Type: application/json');
-    echo json_encode(['success' => false, 'message' => 'Invalid request method']);
-    exit;
-}
 
-// CSRF token validation
-if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token'])) {
-    header('Content-Type: application/json');
-    echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
-    exit;
-}
+
 
 // Database connection
 $conn = new mysqli("localhost", "root", "", "SportOfficeDB");
@@ -38,12 +21,6 @@ $conn->set_charset("utf8mb4");
 $submission_id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
 $admin_id = (int)$_SESSION['admin']['id'];
 $comments = isset($_POST['comments']) ? trim($_POST['comments']) : '';
-
-if ($submission_id <= 0) {
-    header('Content-Type: application/json');
-    echo json_encode(['success' => false, 'message' => 'Invalid submission ID']);
-    exit;
-}
 
 if (strlen($comments) > 1000) {
     header('Content-Type: application/json');

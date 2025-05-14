@@ -766,8 +766,6 @@ function searchUsers($searchTerm) {
                 </div>
             </div>
         </div>
-
-        <!-- Approve Confirmation Modal -->
         <div id="approveModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden" role="dialog" aria-labelledby="approveModalTitle" aria-modal="true">
             <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4">
                 <div class="relative mb-4">
@@ -794,7 +792,6 @@ function searchUsers($searchTerm) {
             </div>
         </div>
 
-        <!-- Reject Confirmation Modal -->
         <div id="rejectModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden" role="dialog" aria-labelledby="rejectModalTitle" aria-modal="true">
             <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4">
                 <div class="relative mb-4">
@@ -820,7 +817,6 @@ function searchUsers($searchTerm) {
                 </div>
             </div>
         </div>
-
 
 
 
