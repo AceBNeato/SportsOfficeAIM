@@ -280,15 +280,7 @@ function searchUsers($searchTerm) {
                         <?php unset($_SESSION['achievement_message'], $_SESSION['achievement_status']); ?>
                     <?php endif; ?>
                     <div class="space-y-8">
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-                        <section class="border border-gray-200 rounded-lg p-6">
-=======
                         <section class="border border-gray-200 rounded-lg p-6" style="width: 75vw;">
->>>>>>> Stashed changes
-=======
-                        <section class="border border-gray-200 rounded-lg p-6" style="width: 75vw;">
->>>>>>> Stashed changes
                             <h2 class="text-xl font-semibold text-gray-800 mb-4" id="studentInfoHeading">Student Information</h2>
                             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                                 <div class="lg:col-span-2">
@@ -308,85 +300,6 @@ function searchUsers($searchTerm) {
                                 </div>
                             </div>
                         </section>
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-                        <section class="border border-gray-200 rounded-lg p-6">
-                            <h2 class="text-xl font-semibold text-gray-800 mb-4" id="awardDetailsHeading">Award Details</h2>
-                            <div class="grid grid-cols-1 xl:grid-cols-7 gap-8">
-                                <div class="xl:col-span-3 space-y-6">
-                                    <div>
-                                        <label for="awardType" class="block text-sm font-medium text-gray-700 mb-1">Award Type</label>
-                                        <div class="relative">
-                                            <select id="awardType" name="award_type" class="appearance-none w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent" required aria-required="true">
-                                                <option value="" disabled selected>Select Award Type</option>
-                                                <option value="championship">Championship</option>
-                                                <option value="medal">Medal</option>
-                                                <option value="certificate">Certificate of Achievement</option>
-                                                <option value="scholarship">Scholarship</option>
-                                                <option value="special_recognition">Special Recognition</option>
-                                            </select>
-                                            <svg class="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
-                                            </svg>
-                                        </div>
-                                    </div>
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div>
-                                            <label for="eventName" class="block text-sm font-medium text-gray-700 mb-1">Event Name</label>
-                                            <input type="text" id="eventName" name="event_name" placeholder="e.g. Regional Sports Competition"
-                                                   class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent" required aria-required="true"/>
-                                        </div>
-                                        <div>
-                                            <label for="eventDate" class="block text-sm font-medium text-gray-700 mb-1">Event Date</label>
-                                            <input type="date" id="eventDate" name="event_date"
-                                                   class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent" aria-required="true"/>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="xl:col-span-4">
-                                    <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Achievement Description</label>
-                                    <textarea id="description" name="description" placeholder="Describe the achievement in detail (e.g., competition details, significance, achievements, etc.)"
-                                              rows="6" class="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent" required aria-required="true"></textarea>
-                                </div>
-                            </div>
-                        </section>
-                        <section class="border border-gray-200 rounded-lg p-6">
-                            <div class="w-full">
-                                <label for="fileUpload" class="block text-sm font-medium text-gray-700 mb-1">Supporting Documents</label>
-                                <div class="flex items-center justify-center w-full">
-                                    <label for="fileUpload" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-white hover:bg-gray-50 hover:border-red-500" aria-describedby="fileUploadHint">
-                                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                            <svg class="w-8 h-8 mb-2 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                                            </svg>
-                                            <p class="text-sm text-gray-600">
-                                                <span class="font-semibold text-red-500">Click to upload</span> or drag and drop
-                                            </p>
-                                            <p id="fileUploadHint" class="text-xs text-gray-500">PDF, JPG, PNG, DOCX (Max. 10MB)</p>
-                                        </div>
-                                        <input id="fileUpload" name="achievement_file" type="file" class="hidden" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" aria-required="true" multiple />
-                                    </label>
-                                </div>
-                                <div id="fileNameDisplay" class="text-sm text-gray-600 mt-3" role="status"></div>
-                            </div>
-                        </section>
-                        <div class="flex justify-center space-x-6 mt-8">
-                            <button type="reset" class="px-10 py-3 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 font-medium text-sm transition-colors duration-200" aria-label="Clear form">
-                                Clear Form
-                            </button>
-                            <button type="submit" class="px-10 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 font-medium text-sm transition-colors duration-200" aria-label="Submit achievement">
-                                Submit Achievement
-                            </button>
-                        </div>
-                    </div>
-=======
-
-
->>>>>>> Stashed changes
-=======
-
-
->>>>>>> Stashed changes
                     <input type="hidden" name="page" value="Achievement">
                     <input type="hidden" name="_token" value="<?php echo bin2hex(random_bytes(32)); ?>">
                 </form>
@@ -1007,14 +920,7 @@ function searchUsers($searchTerm) {
 
                 #documentModal.show {
                     display: flex;
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
                     padding: 10vw;
->>>>>>> Stashed changes
-=======
-                    padding: 10vw;
->>>>>>> Stashed changes
                 }
 
                 .modal-content {
