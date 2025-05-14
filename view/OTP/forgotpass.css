@@ -9,11 +9,11 @@
 html, body {
     height: 100%;
     width: 100%;
-    background: url('../image/background.png') no-repeat center center/cover;
+    background: url('../../public/image/background.png') no-repeat center center/cover;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-top: 80px;
+    padding-top: 80px; /* Increased to accommodate top bar */
 }
 
 /* Top Bar */
@@ -82,14 +82,14 @@ html, body {
 
 /* Login Box */
 .login-box {
-    background: rgba(0, 0, 0, 0.75);
+    background: rgba(0, 0, 0, 0.75); /* Adjusted to match the semi-transparent black in the image */
     padding: 40px;
     border-radius: 16px;
     max-width: 450px;
     width: 100%;
     text-align: center;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Subtle border for definition */
 }
 
 .login-box h1 {
@@ -97,7 +97,7 @@ html, body {
     color: #fff;
     font-size: 32px;
     font-weight: 700;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); /* Improve legibility */
 }
 
 /* Input Group */
@@ -111,7 +111,7 @@ html, body {
     left: 15px;
     top: 50%;
     transform: translateY(-50%);
-    color: #ccc;
+    color: #ccc; /* Lighter for visibility */
     font-size: 18px;
 }
 
@@ -120,10 +120,10 @@ form input[type="text"],
 form input[type="password"] {
     width: 100%;
     padding: 14px 15px 14px 40px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Lighter border */
     border-radius: 8px;
     font-size: 15px;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.15); /* Slightly opaque for inputs */
     color: #fff;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
@@ -135,7 +135,7 @@ form input:focus {
 }
 
 form input::placeholder {
-    color: #ddd;
+    color: #ddd; /* Lighter placeholder for visibility */
 }
 
 /* Buttons */
@@ -198,7 +198,7 @@ button.loading {
 /* Signup Link */
 .signup-link {
     margin-top: 20px;
-    color: #ddd;
+    color: #ddd; /* Lighter for visibility */
     font-size: 14px;
 }
 
@@ -223,118 +223,55 @@ button.loading {
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: auto;
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 0.7);
     animation: fadeIn 0.3s ease;
 }
 
 .modal-content {
-    background: rgba(0, 0, 0, 0.75);
+    background: #fff;
     margin: 15% auto;
-    padding: 40px;
-    border-radius: 16px;
+    padding: 30px;
+    border-radius: 12px;
     width: 90%;
     max-width: 450px;
     text-align: center;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #fff;
-    animation: slideIn 0.3s ease;
-}
-
-@keyframes slideIn {
-    from { transform: translateY(-50px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+    position: relative;
 }
 
 .close-button {
     position: absolute;
     top: 15px;
     right: 15px;
-    font-size: 28px;
-    color: #ccc;
+    font-size: 24px;
+    color: #555;
     cursor: pointer;
-    transition: color 0.3s ease, transform 0.2s ease;
+    transition: color 0.3s ease;
 }
 
 .close-button:hover {
-    color: #ff5e5e;
-    transform: scale(1.1);
+    color: #000;
 }
 
 .modal-content h2 {
-    margin-bottom: 25px;
-    font-size: 28px;
-    font-weight: 700;
-    color: #fff;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-}
-
-.modal-content .input-group {
     margin-bottom: 20px;
-}
-
-.modal-content .input-group i {
-    color: #ccc;
-}
-
-.modal-content input[type="password"] {
-    background: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: #fff;
-    padding: 14px 15px 14px 40px;
-    border-radius: 8px;
-    font-size: 15px;
-    width: 100%;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.modal-content input[type="password"]::placeholder {
-    color: #ddd;
-}
-
-.modal-content input[type="password"]:focus {
-    border-color: #ff5e5e;
-    box-shadow: 0 0 8px rgba(255, 94, 94, 0.3);
+    font-size: 24px;
+    color: #333;
 }
 
 .modal-content .btn {
-    background: #ff5e5e;
-    padding: 14px;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 600;
-    width: 100%;
-    transition: background 0.3s ease, transform 0.2s ease;
+    background: #004aad;
+    margin-top: 15px;
 }
 
 .modal-content .btn:hover {
-    background: #e04b4b;
-    transform: translateY(-2px);
+    background: #003a8c;
 }
 
-.modal-content .btn:active {
-    transform: translateY(0);
-}
-
-/* Password Strength Indicator */
-.password-strength {
-    margin-top: 10px;
-    font-size: 13px;
-    color: #ddd;
-    display: none;
-}
-
-.password-strength.weak {
-    color: #ff5e5e;
-}
-
-.password-strength.medium {
-    color: #ffa500;
-}
-
-.password-strength.strong {
-    color: #4caf50;
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 /* Responsive Design */
@@ -350,10 +287,6 @@ button.loading {
 
     .title-container h1 {
         font-size: 24px;
-    }
-
-    .modal-content {
-        margin: 20% auto;
     }
 }
 
@@ -377,10 +310,138 @@ button.loading {
         padding: 12px;
         font-size: 15px;
     }
+}
 
+
+/* Reset Password Modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; /* Enable scroll if needed */
+    background: rgba(0, 0, 0, 0.85); /* Darker backdrop for focus */
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+    background: rgba(0, 0, 0, 0.75); /* Match login-box background */
+    margin: 10% auto; /* Adjusted for better vertical centering */
+    padding: 40px;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 450px;
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Consistent border */
+    color: #fff; /* Text color for dark theme */
+    position: relative;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.close-button {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 28px;
+    color: #ccc; /* Lighter for visibility */
+    cursor: pointer;
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.close-button:hover {
+    color: #ff5e5e; /* Red accent on hover */
+    transform: scale(1.1);
+}
+
+.modal-content h2 {
+    margin-bottom: 25px;
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff; /* White for consistency */
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); /* Match login-box h1 */
+}
+
+.modal-content .input-group {
+    margin-bottom: 20px;
+}
+
+.modal-content .input-group i {
+    color: #ccc; /* Consistent with login inputs */
+}
+
+.modal-content input[type="password"] {
+    background: rgba(255, 255, 255, 0.15); /* Match login input background */
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+    padding: 14px 15px 14px 40px;
+    border-radius: 8px;
+    font-size: 15px;
+    width: 100%;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.modal-content input[type="password"]::placeholder {
+    color: #ddd; /* Match login placeholder */
+}
+
+.modal-content input[type="password"]:focus {
+    border-color: #ff5e5e;
+    box-shadow: 0 0 8px rgba(255, 94, 94, 0.3);
+}
+
+.modal-content .btn {
+    background: #ff5e5e; /* Match login button */
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    width: 100%;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.modal-content .btn:hover {
+    background: #e04b4b; /* Match login button hover */
+    transform: translateY(-2px);
+}
+
+.modal-content .btn:active {
+    transform: translateY(0);
+}
+
+/* Password Strength Indicator */
+.password-strength {
+    display: none;
+    margin-top: 10px;
+    font-size: 13px;
+    color: #ddd;
+}
+
+.password-strength.weak {
+    color: #ff5e5e;
+}
+
+.password-strength.medium {
+    color: #ffa500;
+}
+
+.password-strength.strong {
+    color: #4caf50;
+}
+
+/* Responsive Design for Modal */
+@media (max-width: 480px) {
     .modal-content {
         padding: 30px;
-        margin: 25% auto;
+        margin: 20% auto; /* Adjust for smaller screens */
     }
 
     .modal-content h2 {
