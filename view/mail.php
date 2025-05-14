@@ -38,7 +38,15 @@ function sendApprovalEmail($recipientEmail, $fullName, $studentId) {
                 <li><strong>Email:</strong> $recipientEmail</li>
                 <li><strong>Password:</strong> $studentId (Please change your password after logging in for security purposes.)</li>
             </ul>
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
             <p><a href='SportsOfficeAIM/view/loginView.php'>Log in here</a></p>
+=======
+            <p><a href='http://localhost/SportsOfficeAIM/view/loginView.php'>Log in here</a></p>
+>>>>>>> Stashed changes
+=======
+            <p><a href='http://localhost/SportsOfficeAIM/view/loginView.php'>Log in here</a></p>
+>>>>>>> Stashed changes
             <p>Best regards,<br>SportOfficeDB Team</p>
         ";
 

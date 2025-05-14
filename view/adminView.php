@@ -280,7 +280,15 @@ function searchUsers($searchTerm) {
                         <?php unset($_SESSION['achievement_message'], $_SESSION['achievement_status']); ?>
                     <?php endif; ?>
                     <div class="space-y-8">
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
                         <section class="border border-gray-200 rounded-lg p-6">
+=======
+                        <section class="border border-gray-200 rounded-lg p-6" style="width: 75vw;">
+>>>>>>> Stashed changes
+=======
+                        <section class="border border-gray-200 rounded-lg p-6" style="width: 75vw;">
+>>>>>>> Stashed changes
                             <h2 class="text-xl font-semibold text-gray-800 mb-4" id="studentInfoHeading">Student Information</h2>
                             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                                 <div class="lg:col-span-2">
@@ -300,6 +308,8 @@ function searchUsers($searchTerm) {
                                 </div>
                             </div>
                         </section>
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
                         <section class="border border-gray-200 rounded-lg p-6">
                             <h2 class="text-xl font-semibold text-gray-800 mb-4" id="awardDetailsHeading">Award Details</h2>
                             <div class="grid grid-cols-1 xl:grid-cols-7 gap-8">
@@ -369,6 +379,14 @@ function searchUsers($searchTerm) {
                             </button>
                         </div>
                     </div>
+=======
+
+
+>>>>>>> Stashed changes
+=======
+
+
+>>>>>>> Stashed changes
                     <input type="hidden" name="page" value="Achievement">
                     <input type="hidden" name="_token" value="<?php echo bin2hex(random_bytes(32)); ?>">
                 </form>
@@ -976,11 +994,27 @@ function searchUsers($searchTerm) {
                     align-items: center;
                     justify-content: center;
                     padding: 0.5rem;
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
                     overflow: auto;
+=======
+
+>>>>>>> Stashed changes
+=======
+
+>>>>>>> Stashed changes
                 }
 
                 #documentModal.show {
                     display: flex;
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+                    padding: 10vw;
+>>>>>>> Stashed changes
+=======
+                    padding: 10vw;
+>>>>>>> Stashed changes
                 }
 
                 .modal-content {
