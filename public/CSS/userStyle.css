@@ -600,6 +600,12 @@ form select {
     fill: none;
 }
 
+
+.upload-icon-container{
+    display: flex;
+    justify-content: center;
+}
+
 .upload-instruction {
     font-size: 1rem;
     font-weight: 500;

@@ -1,36 +1,62 @@
 <?php
+session_start();
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    http_response_code(403);
+    exit;
+}
+
 $conn = new mysqli("localhost", "root", "", "SportOfficeDB");
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+    http_response_code(500);
+    exit;
 }
 
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $download = isset($_GET['download']) && $_GET['download'] === 'true';
-$convert = isset($_GET['convert']) && $_GET['convert'] === 'pdf';
 
-$stmt = $conn->prepare("SELECT file_name FROM submissions WHERE id = ?");
+$stmt = $conn->prepare("SELECT file_name, file_data FROM submissions WHERE id = ?");
 $stmt->bind_param("i", $id);
 $stmt->execute();
 $result = $stmt->get_result();
+
 if ($row = $result->fetch_assoc()) {
-    $filePath = "../uploads/" . $row['file_name'];
-    if (file_exists($filePath)) {
-        if ($download) {
-            header('Content-Type: application/octet-stream');
-            header('Content-Disposition: attachment; filename="' . basename($filePath) . '"');
-            readfile($filePath);
-        } else {
-            $mime = mime_content_type($filePath);
-            if ($convert && $mime !== 'application/pdf') {
-                // Placeholder: Add logic to convert to PDF if needed
-                $mime = 'application/pdf';
-            }
-            header('Content-Type: ' . $mime);
-            readfile($filePath);
-        }
-        exit;
+    $file_name = $row['file_name'];
+    $file_data = $row['file_data'];
+    $extension = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+
+    // Detect MIME type from BLOB data
+    $finfo = new finfo(FILEINFO_MIME_TYPE);
+    $mime_type = $finfo->buffer($file_data);
+
+    $content_type = match (true) {
+        str_contains($mime_type, 'pdf') || $extension === 'pdf' => 'application/pdf',
+        str_contains($mime_type, 'jpeg') || $extension === 'jpg' || $extension === 'jpeg' => 'image/jpeg',
+        str_contains($mime_type, 'png') || $extension === 'png' => 'image/png',
+        default => 'application/octet-stream',
+    };
+
+    // Fix filename for download if extension is malformed
+    if (!in_array($extension, ['pdf', 'jpg', 'jpeg', 'png'])) {
+        $extension = match (true) {
+            str_contains($mime_type, 'pdf') => 'pdf',
+            str_contains($mime_type, 'jpeg') => 'jpg',
+            str_contains($mime_type, 'png') => 'png',
+            default => 'bin',
+        };
+        $file_name = pathinfo($file_name, PATHINFO_FILENAME) . '.' . $extension;
     }
+
+    if ($download) {
+        header('Content-Type: application/octet-stream');
+        header('Content-Disposition: attachment; filename="' . basename($file_name) . '"');
+    } else {
+        header('Content-Type: ' . $content_type);
+    }
+    header('Content-Length: ' . strlen($file_data));
+    echo $file_data;
+    exit;
 }
+
 http_response_code(404);
 echo "File not found.";
 ?>

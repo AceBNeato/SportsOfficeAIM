@@ -1,9 +1,4 @@
 <?php
-
-
-
-
-
 class Database {
     private static $instance = null;
     private $conn;
@@ -28,18 +23,32 @@ class Database {
     }
 }
 
+// Secure session configuration
+ini_set('session.use_strict_mode', 1);
+ini_set('session.cookie_httponly', 1);
+if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
+    ini_set('session.cookie_secure', 1);
+}
+ini_set('session.cookie_samesite', 'Strict');
+ini_set('session.gc_maxlifetime', 3600); // 1 hour (overriding 30 min for consistency)
+session_set_cookie_params(0, '/'); // Ensure session cookie is available for all paths
+
 // Start session and validate
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
+// Debug: Log session state
+file_put_contents('debug.log', 'Admin View - Session: ' . print_r($_SESSION, true) . "\n", FILE_APPEND);
+file_put_contents('debug.log', 'Admin View - Session ID: ' . session_id() . "\n", FILE_APPEND);
 
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || !isset($_SESSION['user']['id'])) {
     header("Location: ../view/loginView.php?message=" . urlencode("Please log in."));
     exit;
 }
 
-// Session timeout (30 minutes)
-$session_timeout = 1800;
+// Session timeout (30 minutes - overridden to 1 hour for consistency)
+$session_timeout = 3600; // Changed to 1 hour to match other scripts
 if (isset($_SESSION['user']['last_activity']) && (time() - $_SESSION['user']['last_activity'] > $session_timeout)) {
     session_unset();
     session_destroy();
@@ -48,8 +57,13 @@ if (isset($_SESSION['user']['last_activity']) && (time() - $_SESSION['user']['la
 }
 $_SESSION['user']['last_activity'] = time();
 
-// PHPMailer-based email notification
+// Generate CSRF token if not already set (for the form)
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+$csrf_token = $_SESSION['csrf_token'];
 
+// PHPMailer-based email notification (assuming this is defined elsewhere)
 
 // Helper function for user search
 function searchUsers($searchTerm) {
@@ -67,6 +81,18 @@ function searchUsers($searchTerm) {
     $stmt->close();
     return $users;
 }
+
+// Fetch pending approvals for the table
+$conn = Database::getInstance();
+$stmt = $conn->prepare("SELECT id, full_name, status FROM account_approvals WHERE approval_status = 'pending'");
+$stmt->execute();
+$result = $stmt->get_result();
+$requests = $result->fetch_all(MYSQLI_ASSOC);
+$stmt->close();
+
+// Handle status messages from approveRequest.php
+$status = $_GET['status'] ?? '';
+$action = $_GET['action'] ?? '';
 ?>
 
 
@@ -81,7 +107,7 @@ function searchUsers($searchTerm) {
     <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
     <link rel="stylesheet" href="../public/CSS/adminStyle.css" />
     <script src="../public/JAVASCRIPT/adminScript.js" defer></script>
-    <script src="../public/JAVASCRIPT/docadminScripy.js" defer></script>
+    <script src="../public/JAVASCRIPT/evalScipt.js" defer ></script>
 
     <link rel="icon" href="../public/image/Usep.png" sizes="any" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
@@ -645,6 +671,10 @@ function searchUsers($searchTerm) {
             <?php endif; ?>
         </div>
 
+        <!-- Add CSRF token input here -->
+    <input type="hidden" id="csrf_token" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
+
+
         <!-- Evaluation Modal -->
         <div id="evaluationModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden" role="dialog" aria-labelledby="evaluationModalTitle" aria-modal="true">
             <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-3xl mx-4">
@@ -708,10 +738,6 @@ function searchUsers($searchTerm) {
                     </button>
                 </div>
                 <p class="text-sm text-gray-700 mb-4">Are you sure you want to approve this submission?</p>
-                <div class="mb-4">
-                    <label for="approveComments" class="text-sm text-gray-700">Comments (optional):</label>
-                    <textarea id="approveComments" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400" rows="4"></textarea>
-                </div>
                 <div class="flex justify-end space-x-2">
                     <button onclick="closeModal('approveModal')" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md text-sm hover:bg-gray-400 transition-colors">
                         Cancel
@@ -722,6 +748,7 @@ function searchUsers($searchTerm) {
                 </div>
             </div>
         </div>
+
 
         <div id="rejectModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden" role="dialog" aria-labelledby="rejectModalTitle" aria-modal="true">
             <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4">

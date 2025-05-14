@@ -118,13 +118,12 @@
 }
 }
 
-    // View submission
-    function viewSubmission(submissionId, fileName) {
+function viewSubmission(submissionId, fileName) {
     if (!submissionId || isNaN(submissionId)) {
-    console.error('Invalid submission ID:', submissionId);
-    alert('Invalid submission ID. Please try again.');
-    return;
-}
+        console.error('Invalid submission ID:', submissionId);
+        alert('Invalid submission ID. Please try again.');
+        return;
+    }
 
     const modal = document.getElementById('fileViewModal');
     const preview = document.getElementById('fileViewPreview');
@@ -134,44 +133,53 @@
     downloadLink.classList.remove('hidden');
 
     preview.innerHTML = `
-                <div class="flex items-center justify-center min-h-full py-6">
-                    <div class="text-center">
-                        <svg class="animate-spin h-6 w-6 text-blue-500 mx-auto" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        <p class="mt-2 text-gray-500 text-sm">Loading file...</p>
-                    </div>
-                </div>
-            `;
+        <div class="flex items-center justify-center min-h-full py-6">
+            <div class="text-center">
+                <svg class="animate-spin h-6 w-6 text-blue-500 mx-auto" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <p class="mt-2 text-gray-500 text-sm">Loading file...</p>
+            </div>
+        </div>
+    `;
     modal.classList.remove('hidden');
 
-    fetch(`../controller/download_submission.php?id=${encodeURIComponent(submissionId)}`)
-    .then(response => {
-    if (!response.ok) throw new Error(`Failed to load file: ${response.statusText}`);
-    return response.blob();
-})
-    .then(blob => {
-    const url = URL.createObjectURL(blob);
-    const contentType = blob.type;
+    const fileUrl = `../controller/download_submission.php?id=${encodeURIComponent(submissionId)}`;
+    const timeoutId = setTimeout(() => {
+        preview.innerHTML = `<div class="text-center py-6 text-red-500 text-sm">Timeout loading file. Please download the original file.</div>`;
+        downloadLink.classList.remove('hidden');
+    }, 10000); // 10-second timeout
 
-    if (contentType === 'application/pdf') {
-    preview.innerHTML = `<iframe src="${url}#zoom=auto" style="width:100%; height:100%; max-height:100%;" frameborder="0" title="File Preview" aria-label="PDF file preview"></iframe>`;
-} else if (contentType.startsWith('image/')) {
-    preview.innerHTML = `<img src="${url}" alt="Uploaded File" class="w-full h-full object-contain" aria-label="Image preview" />`;
-} else {
-    preview.innerHTML = `<div class="text-center py-6 text-red-500 text-sm">Preview not available for this file type. Please download the original file.</div>`;
-    downloadLink.classList.remove('hidden');
-}
-})
-    .catch(error => {
-    console.error('Fetch error:', error);
-    preview.innerHTML = `<div class="text-center py-6 text-red-500 text-sm">Error loading file: ${error.message}. Please download the original file.</div>`;
-    downloadLink.classList.remove('hidden');
-});
+    fetch(fileUrl)
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            return response.blob();
+        })
+        .then(blob => {
+            clearTimeout(timeoutId);
+            const url = URL.createObjectURL(blob);
+            const contentType = blob.type;
+            const ext = fileName.split('.').pop().toLowerCase();
+            console.log('File Details:', { submissionId, fileName, contentType, extension: ext });
+
+            if (contentType === 'application/pdf' || ext === 'pdf') {
+                preview.innerHTML = `<iframe src="${url}#zoom=auto" style="width:100%; height:100%; max-height:100%;" frameborder="0" title="File Preview" aria-label="PDF file preview"></iframe>`;
+            } else if (contentType.startsWith('image/') || ['jpg', 'jpeg', 'png'].includes(ext)) {
+                preview.innerHTML = `<img src="${url}" alt="Uploaded File" class="w-full h-full object-contain" aria-label="Image preview" />`;
+            } else {
+                preview.innerHTML = `<div class="text-center py-6 text-red-500 text-sm">Preview not available for this file type (${ext}). Please download the original file.</div>`;
+                downloadLink.classList.remove('hidden');
+            }
+        })
+        .catch(error => {
+            clearTimeout(timeoutId);
+            console.error('Fetch error:', error);
+            preview.innerHTML = `<div class="text-center py-6 text-red-500 text-sm">Error loading file: ${error.message}. Please download the original file.</div>`;
+            downloadLink.classList.remove('hidden');
+        });
 }
 
-    // Approve submission
 // Approve submission
 // Approve submission
 function showApproveModal(submissionId) {
@@ -183,28 +191,28 @@ function showApproveModal(submissionId) {
 
     const modal = document.getElementById('approveModal');
     const confirmButton = document.getElementById('confirmApprove');
-    const commentsField = document.getElementById('approveComments');
 
-    if (!modal || !confirmButton || !commentsField) {
+    if (!modal || !confirmButton) {
         console.error('Approve modal elements missing');
         alert('Error: Approve modal components are missing.');
         return;
     }
 
-    commentsField.value = '';
+    const csrfToken = document.getElementById('csrf_token')?.value || '';
+    console.log('CSRF Token Sent:', csrfToken); // Debug
+
+    if (!csrfToken) {
+        console.error('CSRF token missing');
+        alert('CSRF token not found. Please refresh the page.');
+        return;
+    }
 
     const newConfirmButton = confirmButton.cloneNode(true);
     confirmButton.parentNode.replaceChild(newConfirmButton, confirmButton);
 
     newConfirmButton.addEventListener('click', () => {
-        const comments = commentsField.value.trim();
-        if (comments.length > 1000) {
-            alert('Comments are too long. Please keep them under 1000 characters.');
-            return;
-        }
-
-        // Get CSRF token from hidden input
-        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
+        console.log('Submission ID:', submissionId);
+        console.log('Fetch URL:', '../controller/approve_submission.php');
 
         newConfirmButton.disabled = true;
         newConfirmButton.textContent = 'Processing...';
@@ -212,22 +220,36 @@ function showApproveModal(submissionId) {
         fetch('../controller/approve_submission.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `id=${encodeURIComponent(submissionId)}&comments=${encodeURIComponent(comments)}&csrf_token=${encodeURIComponent(csrfToken)}`,
-            credentials: 'same-origin' // Ensure session cookies are sent
+            body: `id=${encodeURIComponent(submissionId)}&csrf_token=${encodeURIComponent(csrfToken)}`,
+            credentials: 'same-origin'
         })
             .then(response => {
+                console.log('Response Status:', response.status);
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
-                return response.json();
+                return response.text().then(text => {
+                    console.log('Response Text:', text);
+                    try {
+                        return JSON.parse(text);
+                    } catch (e) {
+                        throw new Error('Invalid JSON response: ' + text);
+                    }
+                });
             })
             .then(data => {
+                console.log('Response Data:', data);
                 if (data.success) {
                     alert('Submission approved successfully!');
                     closeModal('approveModal');
                     location.reload();
                 } else {
-                    alert('Error approving submission: ' + (data.message || 'Unknown error'));
+                    if (data.message.includes('Admin not logged in') || data.message.includes('Invalid CSRF token')) {
+                        alert('Session expired or invalid request. Please log in again.');
+                        window.location.href = '../view/loginView.php';
+                    } else {
+                        alert('Error approving submission: ' + (data.message || 'Unknown error'));
+                    }
                 }
             })
             .catch(error => {
@@ -242,6 +264,36 @@ function showApproveModal(submissionId) {
 
     modal.classList.remove('hidden');
 }
+
+// Function to close the modal
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+}
+
+// Function for approveRequest.php form confirmation
+function showConfirmation(action, fullName, approvalId, form) {
+    if (confirm(`Are you sure you want to ${action} the request for ${fullName}?`)) {
+        // Ensure the form submits the CSRF token if required
+        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
+        if (csrfToken) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'csrf_token';
+            input.value = csrfToken;
+            form.appendChild(input);
+        }
+        return true;
+    }
+    return false;
+}
+
+
+
+
+
 
     // Reject submission
     function showRejectModal(submissionId) {

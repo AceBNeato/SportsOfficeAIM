@@ -834,8 +834,8 @@
                 </div>
 
                 <!-- File Preview Modal -->
-                <div id="filePreviewModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden" role="dialog" aria-labelledby="filePreviewModalTitle" aria-modal="true">
-                    <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-3xl border border-gray-200 mx-4 flex flex-col">
+                <div id="filePreviewModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70  hidden" role="dialog" aria-labelledby="filePreviewModalTitle" aria-modal="true">
+                    <div id="fileDownloadLink"  class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-3xl border border-gray-200 mx-4 flex flex-col" style="height: 45vw">
                         <div class="modal-header relative mb-4">
                             <h2 id="filePreviewModalTitle" class="text-lg font-semibold text-gray-800">Preview File</h2>
                             <button onclick="closeModal('filePreviewModal')" class="modal-close-btn absolute top-0 right-0 text-gray-400 hover:text-gray-600 transition-colors" aria-label="Close modal">
@@ -847,20 +847,7 @@
                         <div id="filePreviewContent" class="w-full flex-1 overflow-auto bg-gray-50">
                             <!-- Content will be injected here -->
                         </div>
-                        <div class="modal-footer mt-4 flex justify-center gap-3 bg-gray-100 p-4 rounded-b-2xl">
-                            <a id="fileDownloadLink" href="#" class="action-btn bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg flex items-center gap-2 transition-colors duration-200 focus:outline-none hidden">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                                </svg>
-                                Download
-                            </a>
-                            <button onclick="closeModal('filePreviewModal')" class="action-btn bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg flex items-center gap-2 transition-colors duration-200 focus:outline-none">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                </svg>
-                                Close
-                            </button>
-                        </div>
+
                     </div>
                 </div>
 
@@ -1357,11 +1344,11 @@
                         // Fetch submissions for the logged-in user
                         $user_id = $_SESSION['user']['id']; // Assuming user ID is stored in session
                         $stmt = $conn->prepare("
-            SELECT id, document_type, submission_date, status, description, file_name, other_type 
-            FROM submissions 
-            WHERE user_id = ? 
-            ORDER BY submission_date DESC
-        ");
+                        SELECT id, document_type, submission_date, status, description, file_name, other_type 
+                        FROM submissions 
+                        WHERE user_id = ? 
+                        ORDER BY submission_date DESC
+                    ");
                         $stmt->bind_param("i", $user_id);
                         $stmt->execute();
                         $result = $stmt->get_result();
@@ -1743,92 +1730,108 @@
                     }
 
                     function openDocumentModal(type, date, status, description, fileName, submissionId) {
-                        const existingModals = document.querySelectorAll('.fixed.inset-0');
-                        existingModals.forEach(modal => modal.remove());
+                        document.querySelectorAll('.fixed.inset-0').forEach(modal => modal.remove());
 
                         const modal = document.createElement('div');
-                        modal.className = 'fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50';
+                        modal.className = 'fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50 px-4';
                         modal.setAttribute('role', 'dialog');
                         modal.setAttribute('aria-labelledby', 'modal-title');
 
                         const escapedDescription = description.replace(/</g, '<').replace(/>/g, '>');
-                        let filePreview = '';
+                        let filePreview = fileName ? `
+        <div id="documentPreview" class="w-full h-96 mt-4 rounded-lg overflow-hidden bg-gray-50 relative">
+            <div class="absolute inset-0 flex items-center justify-center">
+                <svg class="animate-spin h-6 w-6 text-blue-500" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <p class="ml-2 text-sm text-gray-500">Loading...</p>
+            </div>
+        </div>
+    ` : '<p class="text-sm text-gray-600 mt-4">No file available.</p>';
 
                         if (fileName) {
-                            const fileExtension = fileName.split('.').pop().toLowerCase();
-                            const fileUrl = `../controller/download_submission.php?id=${encodeURIComponent(submissionId)}&convert=pdf`;
+                            const fileUrl = `../controller/download_submission.php?id=${encodeURIComponent(submissionId)}`;
+                            const timeoutId = setTimeout(() => {
+                                const preview = document.getElementById('documentPreview');
+                                preview.innerHTML = `<div class="text-center py-4 text-red-500 text-sm">Timeout loading file. <a href="${fileUrl}&download=true" class="text-blue-600 underline">Download</a></div>`;
+                            }, 10000);
 
-                            // Show loading state initially
-                            filePreview = `
-                <div class="flex items-center justify-center min-h-[200px] py-6">
-                    <div class="text-center">
-                        <svg class="animate-spin h-6 w-6 text-blue-500 mx-auto" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        <p class="mt-2 text-gray-500 text-sm">Loading file...</p>
-                    </div>
-                </div>
-                <div id="documentPreview" class="w-full h-64 mt-4"></div>
-            `;
-
-                            // Fetch the file and determine how to display it
-                            setTimeout(() => {
-                                fetch(fileUrl)
-                                    .then(response => {
-                                        if (!response.ok) throw new Error(`Failed to load file: ${response.statusText}`);
-                                        return response.blob();
-                                    })
-                                    .then(blob => {
-                                        const url = URL.createObjectURL(blob);
-                                        const contentType = blob.type || 'application/octet-stream';
-                                        const previewDiv = modal.querySelector('#documentPreview');
-
-                                        if (contentType === 'application/pdf' || fileExtension === 'pdf') {
-                                            previewDiv.innerHTML = `<iframe src="${url}#zoom=auto" class="w-full h-full" title="PDF Preview" aria-label="PDF document preview"></iframe>`;
-                                        } else if (contentType.startsWith('image/') || ['jpg', 'jpeg', 'png'].includes(fileExtension)) {
-                                            previewDiv.innerHTML = `<img src="${url}" alt="Uploaded File" class="w-full h-full object-contain" aria-label="Image preview">`;
-                                        } else {
-                                            previewDiv.innerHTML = `
-                                <div class="text-center py-6 text-red-500 text-sm">
-                                    Preview not available for this file type (.${fileExtension}). Please download the original file.
-                                    <a href="../controller/download_submission.php?id=${submissionId}" class="text-blue-600 hover:underline block mt-2" aria-label="Download file">Download</a>
-                                </div>
-                            `;
-                                        }
-                                    })
-                                    .catch(error => {
-                                        const previewDiv = modal.querySelector('#documentPreview');
-                                        previewDiv.innerHTML = `
-                            <div class="text-center py-6 text-red-500 text-sm">
-                                Error loading file preview: ${error.message}. Please download the original file.
-                                <a href="../controller/download_submission.php?id=${submissionId}" class="text-blue-600 hover:underline block mt-2" aria-label="Download file">Download</a>
-                            </div>
-                        `;
-                                    });
-                            }, 0);
-                        } else {
-                            filePreview = `<p class="text-sm text-gray-700 mt-4">No file available for preview.</p>`;
+                            fetch(fileUrl)
+                                .then(response => {
+                                    if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                                    return response.blob();
+                                })
+                                .then(blob => {
+                                    clearTimeout(timeoutId);
+                                    const url = URL.createObjectURL(blob);
+                                    const ext = fileName.split('.').pop().toLowerCase();
+                                    const preview = document.getElementById('documentPreview');
+                                    preview.innerHTML = (blob.type === 'application/pdf' || ext === 'pdf')
+                                        ? `<iframe src="${url}#zoom=auto" class="w-full h-full" title="PDF Preview"></iframe>`
+                                        : (blob.type.startsWith('image/') || ['jpg', 'jpeg', 'png'].includes(ext))
+                                            ? `<img src="${url}" alt="File" class="w-full h-full object-contain">`
+                                            : `<div class="text-center py-4 text-red-500 text-sm">Unsupported type (${ext}). <a href="${fileUrl}&download=true" class="text-blue-600 underline">Download</a></div>`;
+                                })
+                                .catch(error => {
+                                    clearTimeout(timeoutId);
+                                    document.getElementById('documentPreview').innerHTML = `<div class="text-center py-4 text-red-500 text-sm">${error.message}. <a href="${fileUrl}&download=true" class="text-blue-600 underline">Download</a></div>`;
+                                });
                         }
 
                         modal.innerHTML = `
-            <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg text-center">
-                <h2 id="modal-title" class="text-xl font-semibold mb-4 text-gray-900">Document Details</h2>
-                <p class="text-sm text-gray-700"><strong>Type:</strong> ${type}</p>
-                <p class="text-sm text-gray-700"><strong>Date:</strong> ${date}</p>
-                <p class="text-sm text-gray-700"><strong>Status:</strong> ${status}</p>
-                <p class="text-sm text-gray-700 break-words"><strong>Description:</strong> ${escapedDescription}</p>
-                ${filePreview}
-                <button onclick="this.parentElement.parentElement.remove()" class="mt-6 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors">Close</button>
+        <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-2xl">
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-4 border-b pb-3">
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                        <span class="text-gray-600 text-lg">👤</span>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-900">Gian</h2>
+                        <p class="text-sm text-gray-500">ID: 2023-00410</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <span class="px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full">${status}</span>
+                    <button onclick="this.closest('.fixed.inset-0').remove()" class="text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded p-1" aria-label="Close">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
             </div>
-        `;
 
-                        modal.addEventListener('click', (e) => {
-                            if (e.target === modal) {
-                                modal.remove();
-                            }
-                        });
+            <!-- Document Details -->
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div>
+                    <p class="text-sm font-medium text-gray-700">Document Type</p>
+                    <p class="text-sm text-gray-600">${type}</p>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-700">Submission Date</p>
+                    <p class="text-sm text-gray-600">${date}</p>
+                </div>
+                <div class="col-span-2">
+                    <p class="text-sm font-medium text-gray-700">Description</p>
+                    <p class="text-sm text-gray-600 break-words">${escapedDescription}</p>
+                </div>
+            </div>
 
+            <!-- File Preview -->
+            <div class="mt-6">
+                <h3 class="text-sm font-medium text-gray-700 mb-3">File Preview</h3>
+                ${filePreview}
+            </div>
+
+            <!-- Footer -->
+            <div class="mt-6 flex justify-end">
+                <button onclick="this.closest('.fixed.inset-0').remove()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">Close</button>
+            </div>
+        </div>
+    `;
+
+                        modal.addEventListener('click', e => e.target === modal && modal.remove());
                         document.body.appendChild(modal);
                     }
 

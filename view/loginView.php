@@ -6,9 +6,15 @@ if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
     ini_set('session.cookie_secure', 1);
 }
 ini_set('session.cookie_samesite', 'Strict');
+ini_set('session.gc_maxlifetime', 3600); // 1 hour (overriding 30 min from adminView.php for consistency)
+session_set_cookie_params(0, '/'); // Ensure session cookie is available for all paths
 
 // Start session
 session_start();
+
+// Debug: Log session state
+file_put_contents('debug.log', 'Login View - Session: ' . print_r($_SESSION, true) . "\n", FILE_APPEND);
+file_put_contents('debug.log', 'Login View - Session ID: ' . session_id() . "\n", FILE_APPEND);
 
 // Generate CSRF token if not already set
 if (!isset($_SESSION['csrf_token'])) {
