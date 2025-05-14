@@ -233,7 +233,9 @@ error_log("Login page loaded. Error message: " . ($errorMessage ?: 'none'));
 </head>
 <body>
 <div class="container">
-    <!-- Left Panel -->
+    <!-- Left Panel  nigga -->
+
+
     <div class="left-panel">
         <div class="content-wrapper">
             <div class="logo-container">
