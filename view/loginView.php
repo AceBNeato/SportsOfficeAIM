@@ -279,7 +279,7 @@ error_log("Login page loaded. Error message: " . ($errorMessage ?: 'none'));
 
             <p class="signup-link">
                 Don't have an account? <a href="../view/signupView.php">Sign Up</a>
-                <a href="../view/forgotPassView.php" style="font-size: 0.8em;">Forgot Password?</a>
+                <a href="OTP/forgotPassView.php" style="font-size: 0.8em;">Forgot Password?</a>
             </p>
         </div>
     </div>
