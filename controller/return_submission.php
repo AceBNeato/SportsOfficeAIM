@@ -1,7 +1,13 @@
 <?php
+header('Content-Type: application/json');
+
 session_start();
 
-// Database connection
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    echo json_encode(['success' => false, 'message' => 'Unauthorized access']);
+    exit;
+}
+
 $host = "localhost";
 $username = "root";
 $password = "";
@@ -13,36 +19,36 @@ if ($conn->connect_error) {
     exit;
 }
 
-if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || !isset($_POST['id'])) {
-    echo json_encode(['success' => false, 'message' => 'Unauthorized or missing ID']);
+$submission_id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+
+if ($submission_id <= 0) {
+    echo json_encode(['success' => false, 'message' => 'Invalid input']);
     exit;
 }
 
-$submission_id = (int)$_POST['id'];
+// Verify ownership
 $user_id = $_SESSION['user']['id'];
-
-$stmt = $conn->prepare("SELECT user_id FROM submissions WHERE id = ?");
+$stmt = $conn->prepare("SELECT user_id, status FROM submissions WHERE id = ?");
 $stmt->bind_param("i", $submission_id);
 $stmt->execute();
 $result = $stmt->get_result();
-if ($result->num_rows === 0 || $result->fetch_assoc()['user_id'] !== $user_id) {
-    echo json_encode(['success' => false, 'message' => 'Submission not found or access denied']);
-    $stmt->close();
-    $conn->close();
+
+if ($result->num_rows === 0 || $result->fetch_assoc()['user_id'] != $user_id) {
+    echo json_encode(['success' => false, 'message' => 'Unauthorized access to submission']);
     exit;
 }
 $stmt->close();
 
-$stmt = $conn->prepare("UPDATE submissions SET status = 'pending' WHERE id = ? AND user_id = ?");
-$stmt->bind_param("ii", $submission_id, $user_id);
+// Update status to pending
+$stmt = $conn->prepare("UPDATE submissions SET status = 'pending', submission_date = NOW() WHERE id = ?");
+$stmt->bind_param("i", $submission_id);
+
 if ($stmt->execute()) {
-    echo json_encode(['success' => true, 'message' => 'Submission returned for resubmission']);
+    echo json_encode(['success' => true, 'message' => 'Submission resubmitted successfully']);
 } else {
-    echo json_encode(['success' => false, 'message' => 'Failed to return submission']);
+    echo json_encode(['success' => false, 'message' => 'Failed to resubmit submission']);
 }
 
 $stmt->close();
 $conn->close();
 ?>
-
-<?php

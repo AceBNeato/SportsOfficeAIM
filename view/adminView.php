@@ -700,9 +700,10 @@ $action = $_GET['action'] ?? '';
         </div>
 
         <!-- File View Modal -->
+        <!-- File View Modal -->
         <div id="fileViewModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden" role="dialog" aria-labelledby="fileViewModalTitle" aria-modal="true">
-            <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-3xl border border-gray-200 mx-4 flex flex-col">
-                <div class="modal-header relative mb-4">
+            <div class="bg-white rounded-2xl shadow-2xl p-4 w-[95vw] max-w-[1440px] h-[95vh] max-h-[1080px] border border-gray-200 flex flex-col"  style="width: 50vw; height:40vw">
+                <div class="modal-header relative mb-2">
                     <h2 id="fileViewModalTitle" class="text-lg font-semibold text-gray-800">View File</h2>
                     <button onclick="closeModal('fileViewModal')" class="modal-close-btn absolute top-0 right-0 text-gray-400 hover:text-gray-600 transition-colors" aria-label="Close modal">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -710,15 +711,17 @@ $action = $_GET['action'] ?? '';
                         </svg>
                     </button>
                 </div>
-                <div id="fileViewPreview" class="w-full flex-1 overflow-auto bg-gray-50"></div>
-                <div class="modal-footer mt-4 flex justify-center gap-3 bg-gray-100 p-4 rounded-b-2xl">
-                    <a id="fileDownloadLink" href="#" class="action-btn bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg flex items-center gap-2 transition-colors duration-200 focus:outline-none hidden">
+                <div id="fileViewPreview" class="w-full h-full flex-1 bg-gray-50 rounded-lg overflow-hidden">
+
+                </div>
+                <div class="modal-footer mt-2 flex justify-center gap-2 bg-gray-100 p-2 rounded-b-2xl">
+                    <a id="fileDownloadLink" href="#" class="action-btn bg-red-600 hover:bg-red-700 text-white py-1 px-3 rounded-lg flex items-center gap-1 transition-colors duration-200 focus:outline-none hidden">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                         </svg>
                         Download
                     </a>
-                    <button onclick="closeModal('fileViewModal')" class="action-btn bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg flex items-center gap-2 transition-colors duration-200 focus:outline-none">
+                    <button onclick="closeModal('fileViewModal')" class="action-btn bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded-lg flex items-center gap-1 transition-colors duration-200 focus:outline-none">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                         </svg>

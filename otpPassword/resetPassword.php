@@ -1,10 +1,10 @@
 <?php
 session_start();
 
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "SportOfficeDB";
+$servername = getenv('DB_HOST') ?: 'localhost';
+$username = getenv('DB_USER') ?: 'root';
+$password = getenv('DB_PASS') ?: '';
+$dbname = getenv('DB_NAME') ?: 'SportOfficeDB';
 
 // Connect to database
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -17,10 +17,11 @@ if ($conn->connect_error) {
 // Ensure JSON response
 header('Content-Type: application/json');
 
-// Check if user is authorized to reset password (OTP verified)
-if (!isset($_SESSION['otp_verified']) || $_SESSION['otp_verified'] !== true) {
-    error_log("Unauthorized access: OTP not verified");
-    echo json_encode(['status' => 'error', 'message' => 'Unauthorized access']);
+// Check if user is authorized to reset password
+if (!isset($_SESSION['otp_verified']) || $_SESSION['otp_verified'] !== true ||
+    !isset($_SESSION['reset_otp_email']) || !isset($_SESSION['reset_user_role'])) {
+    error_log("Unauthorized access: Invalid session");
+    echo json_encode(['status' => 'error', 'message' => 'Unauthorized access or session expired']);
     exit();
 }
 
@@ -28,36 +29,32 @@ if (!isset($_SESSION['otp_verified']) || $_SESSION['otp_verified'] !== true) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $new_password = $_POST['new_password'] ?? '';
     $confirm_password = $_POST['confirm_password'] ?? '';
-    $email = $_SESSION['reset_otp_email'] ?? '';
-    $user_role = $_SESSION['reset_user_role'] ?? '';
+    $email = $_SESSION['reset_otp_email'];
+    $user_role = $_SESSION['reset_user_role'];
 
-    // Log input data for debugging (remove sensitive data in production)
+    // Log attempt (avoid logging passwords)
     error_log("Reset password attempt for email: $email, role: $user_role");
 
     // Validate inputs
     $errors = [];
 
     if (empty($new_password)) {
-        $errors[] = "New password is required";
+        $errors[] = "New password is required.";
     } elseif (strlen($new_password) < 8) {
-        $errors[] = "Password must be at least 8 characters";
+        $errors[] = "Password must be at least 8 characters.";
+    } elseif (!preg_match('/[A-Z]/', $new_password) ||
+        !preg_match('/[a-z]/', $new_password) ||
+        !preg_match('/[0-9]/', $new_password) ||
+        !preg_match('/[!@#$%^&*]/', $new_password)) {
+        $errors[] = "Password must include uppercase, lowercase, number, and special character.";
     }
 
     if ($new_password !== $confirm_password) {
-        $errors[] = "Passwords do not match";
-    }
-
-    if (empty($email)) {
-        $errors[] = "Email session expired";
-    }
-
-    if (empty($user_role)) {
-        $errors[] = "User role not found";
+        $errors[] = "Passwords do not match.";
     }
 
     // If no errors, update password
     if (empty($errors)) {
-        // Hash the new password
         $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
         if (!$hashed_password) {
             error_log("Password hashing failed");
@@ -65,10 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit();
         }
 
-        // Update password in the appropriate table
         $table = ($user_role === 'admin') ? 'admins' : 'users';
-
-        // Prepare and execute update query
         $update_stmt = $conn->prepare("UPDATE $table SET password = ? WHERE email = ?");
         if (!$update_stmt) {
             error_log("Prepare failed: " . $conn->error);
@@ -78,7 +72,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $update_stmt->bind_param("ss", $hashed_password, $email);
         if ($update_stmt->execute()) {
-            // Clear all session variables
+            // Clear session variables
             unset($_SESSION['reset_otp']);
             unset($_SESSION['reset_otp_email']);
             unset($_SESSION['reset_otp_time']);
@@ -90,12 +84,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo json_encode(['status' => 'success', 'message' => 'Password reset successfully']);
         } else {
             error_log("Update failed: " . $update_stmt->error);
-            echo json_encode(['status' => 'error', 'message' => 'Database update failed: ' . $update_stmt->error]);
+            echo json_encode(['status' => 'error', 'message' => 'Failed to update password']);
         }
         $update_stmt->close();
     } else {
-        error_log("Validation errors: " . implode(', ', $errors));
-        echo json_encode(['status' => 'error', 'message' => implode(', ', $errors)]);
+        error_log("Validation errors: " . implode(' ', $errors));
+        echo json_encode(['status' => 'error', 'message' => $errors[0]]); // Show first error for simplicity
     }
 } else {
     error_log("Invalid request method: " . $_SERVER["REQUEST_METHOD"]);
