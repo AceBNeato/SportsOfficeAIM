@@ -236,3 +236,7 @@ form select {
 
 
 
+#documentModal.show,
+#confirmationModal.show {
+    display: flex !important;
+}

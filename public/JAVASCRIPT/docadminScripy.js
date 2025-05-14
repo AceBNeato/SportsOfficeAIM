@@ -1,4 +1,7 @@
 
+
+
+// File: public/JAVASCRIPT/docadminScripy.js
     // Helper function to escape HTML
     function htmlEscape(str) {
     return str
@@ -169,36 +172,74 @@
 }
 
     // Approve submission
-    function showApproveModal(submissionId) {
+// Approve submission
+// Approve submission
+function showApproveModal(submissionId) {
+    if (!submissionId || isNaN(submissionId)) {
+        console.error('Invalid submission ID:', submissionId);
+        alert('Invalid submission ID. Please try again.');
+        return;
+    }
+
     const modal = document.getElementById('approveModal');
     const confirmButton = document.getElementById('confirmApprove');
     const commentsField = document.getElementById('approveComments');
+
+    if (!modal || !confirmButton || !commentsField) {
+        console.error('Approve modal elements missing');
+        alert('Error: Approve modal components are missing.');
+        return;
+    }
+
     commentsField.value = '';
 
     const newConfirmButton = confirmButton.cloneNode(true);
     confirmButton.parentNode.replaceChild(newConfirmButton, confirmButton);
+
     newConfirmButton.addEventListener('click', () => {
-    const comments = commentsField.value.trim();
-    fetch('../controller/approve_submission.php', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: `id=${encodeURIComponent(submissionId)}&comments=${encodeURIComponent(comments)}`
-})
-    .then(response => response.json())
-    .then(data => {
-    if (data.success) {
-    alert('Submission approved successfully!');
-    location.reload();
-} else {
-    alert('Error approving submission: ' + (data.message || 'Unknown error'));
-}
-})
-    .catch(error => {
-    console.error('Error:', error);
-    alert('An error occurred while approving the submission.');
-});
-    closeModal('approveModal');
-});
+        const comments = commentsField.value.trim();
+        if (comments.length > 1000) {
+            alert('Comments are too long. Please keep them under 1000 characters.');
+            return;
+        }
+
+        // Get CSRF token from hidden input
+        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
+
+        newConfirmButton.disabled = true;
+        newConfirmButton.textContent = 'Processing...';
+
+        fetch('../controller/approve_submission.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `id=${encodeURIComponent(submissionId)}&comments=${encodeURIComponent(comments)}&csrf_token=${encodeURIComponent(csrfToken)}`,
+            credentials: 'same-origin' // Ensure session cookies are sent
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    alert('Submission approved successfully!');
+                    closeModal('approveModal');
+                    location.reload();
+                } else {
+                    alert('Error approving submission: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error approving submission:', error);
+                alert('An error occurred while approving the submission: ' + error.message);
+            })
+            .finally(() => {
+                newConfirmButton.disabled = false;
+                newConfirmButton.textContent = 'Confirm';
+            });
+    });
+
     modal.classList.remove('hidden');
 }
 

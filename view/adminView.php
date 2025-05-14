@@ -879,6 +879,8 @@ function searchUsers($searchTerm) {
             <meta http-equiv="X-UA-Compatible" content="IE=edge">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Approval Requests</title>
+
+            <script src="../public/JAVASCRIPT/accappro.js" defer></script>
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
             <style>
                 :root {
@@ -1120,15 +1122,14 @@ function searchUsers($searchTerm) {
                 <?php if ($result && $result->num_rows > 0): ?>
                     <?php while ($row = $result->fetch_assoc()): ?>
                         <div class="card">
-
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div class="mt-2 space-y-1 text-gray-600 text-sm">
                                     <h3 class="text-lg font-semibold text-gray-800"><?php echo htmlspecialchars($row['full_name'], ENT_QUOTES, 'UTF-8'); ?></h3>
-                                        <p><span class="font-medium">Student ID:</span> <?php echo htmlspecialchars($row['student_id'], ENT_QUOTES, 'UTF-8'); ?></p>
-                                        <p><span class="font-medium">Email:</span> <?php echo htmlspecialchars($row['email'], ENT_QUOTES, 'UTF-8'); ?></p>
-                                        <p><span class="font-medium">Status:</span> <?php echo htmlspecialchars($row['status'], ENT_QUOTES, 'UTF-8'); ?></p>
-                                        <p><span class="font-medium">Request Date:</span> <?php echo htmlspecialchars($row['request_date'], ENT_QUOTES, 'UTF-8'); ?></p>
-                                    </div>
+                                    <p><span class="font-medium">Student ID:</span> <?php echo htmlspecialchars($row['student_id'], ENT_QUOTES, 'UTF-8'); ?></p>
+                                    <p><span class="font-medium">Email:</span> <?php echo htmlspecialchars($row['email'], ENT_QUOTES, 'UTF-8'); ?></p>
+                                    <p><span class="font-medium">Status:</span> <?php echo htmlspecialchars($row['status'], ENT_QUOTES, 'UTF-8'); ?></p>
+                                    <p><span class="font-medium">Request Date:</span> <?php echo htmlspecialchars($row['request_date'], ENT_QUOTES, 'UTF-8'); ?></p>
+                                </div>
 
                                 <div class="flex items-center justify-between md:justify-end space-x-2">
                                     <button class="action-btn view-btn" onclick="showDocument(<?php echo (int)$row['id']; ?>, '<?php echo htmlspecialchars(json_encode($row['file_name']), ENT_QUOTES, 'UTF-8'); ?>', '<?php echo htmlspecialchars($row['file_type'], ENT_QUOTES, 'UTF-8'); ?>')">
@@ -1151,7 +1152,7 @@ function searchUsers($searchTerm) {
                                         </button>
                                     </form>
                                 </div>
-
+                            </div>
                         </div>
                     <?php endwhile; ?>
                 <?php else: ?>
@@ -1164,7 +1165,7 @@ function searchUsers($searchTerm) {
 
         <!-- Document Modal -->
         <div id="documentModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden" role="dialog" aria-labelledby="documentModalTitle" aria-modal="true">
-            <div class="modal-content flex flex-col bg-white rounded-lg w-full mx-auto my-2 overflow-hidden">
+            <div class="modal-content flex flex-col bg-white rounded-lg w-full max-w-[95vw] my-2 overflow-hidden">
                 <div class="modal-header flex justify-between items-center p-4 border-b border-gray-200">
                     <h3 class="text-lg font-semibold text-gray-800" id="documentModalTitle">Document Preview</h3>
                     <button onclick="closeModal()" class="modal-close-btn text-gray-500 hover:text-gray-700 focus:outline-none" aria-label="Close modal">
@@ -1192,10 +1193,9 @@ function searchUsers($searchTerm) {
         </div>
 
         <!-- Confirmation Modal -->
-        <div id="confirmationModal" class="confirmation-modal">
+        <div id="confirmationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden" role="dialog" aria-labelledby="confirmationTitle" aria-modal="true">
             <div class="bg-white rounded-lg shadow-lg p-4 w-full max-w-xs">
                 <h3 class="text-base font-semibold text-gray-800 mb-3" id="confirmationTitle"></h3>
-                <p class="text-gray-600 mb-4 text-sm" id="confirmationMessage"></p>
                 <div class="flex justify-end space-x-3">
                     <button onclick="cancelConfirmation()" class="action-btn bg-gray-500 hover:bg-gray-600 text-white">
                         Cancel
@@ -1207,120 +1207,7 @@ function searchUsers($searchTerm) {
             </div>
         </div>
 
-        <script>
-            let currentForm = null;
 
-            function showDocument(id, fileName, fileType) {
-                const modal = document.getElementById('documentModal');
-                const preview = document.getElementById('documentPreview');
-                const downloadLink = document.getElementById('downloadLink');
-                const modalTitle = document.getElementById('documentModalTitle');
-
-                document.body.style.overflow = 'hidden';
-                modalTitle.textContent = `Document: ${JSON.parse(fileName)}`;
-                downloadLink.href = `../controller/downloadDocument.php?id=${encodeURIComponent(id)}&download=true`;
-                preview.innerHTML = `
-            <div class="flex items-center justify-center min-h-full py-6">
-                <div class="text-center">
-                    <svg class="animate-spin h-6 w-6 text-red-500 mx-auto" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <p class="mt-2 text-gray-500 text-sm">Loading document...</p>
-                </div>
-            </div>`;
-                modal.classList.add('show');
-
-                fetch(`../controller/downloadDocument.php?id=${encodeURIComponent(id)}`)
-                    .then(response => {
-                        if (!response.ok) throw new Error(`Failed to load document: ${response.statusText}`);
-                        return response.blob();
-                    })
-                    .then(blob => {
-                        const url = URL.createObjectURL(blob);
-                        if (fileType === 'application/pdf') {
-                            preview.innerHTML = `<iframe src="${url}#zoom=auto" style="width:100%; height:100%; max-height:100%;" frameborder="0" title="Document Preview"></iframe>`;
-                        } else if (fileType.startsWith('image/')) {
-                            preview.innerHTML = `<img src="${url}" alt="Document" class="w-full h-full object-contain" />`;
-                        } else {
-                            preview.innerHTML = `<div class="text-center py-6 text-red-500 text-sm">Preview not available for this file type. Please download to view.</div>`;
-                        }
-                    })
-                    .catch(error => {
-                        preview.innerHTML = `<div class="text-center py-6 text-red-500 text-sm">Error loading document: ${error.message}</div>`;
-                    });
-            }
-
-            function closeModal() {
-                const modal = document.getElementById('documentModal');
-                const preview = document.getElementById('documentPreview');
-
-                document.body.style.overflow = '';
-                modal.classList.remove('show');
-                const iframes = preview.getElementsByTagName('iframe');
-                const images = preview.getElementsByTagName('img');
-                for (let iframe of iframes) {
-                    URL.revokeObjectURL(iframe.src);
-                }
-                for (let img of images) {
-                    URL.revokeObjectURL(img.src);
-                }
-                preview.innerHTML = '';
-            }
-
-            let currentForm = null;
-
-            function showConfirmation(action, fullName, approvalId, form) {
-                const modal = document.getElementById('confirmationModal');
-                const title = document.getElementById('confirmationTitle');
-                const message = document.getElementById('confirmationMessage');
-                const confirmBtn = document.getElementById('confirmActionBtn');
-
-                title.textContent = `${action.charAt(0).toUpperCase() + action.slice(1)} Request`;
-                message.textContent = `Are you sure you want to ${action} the account request for ${fullName}?`;
-
-                if (action === 'reject') {
-                    message.textContent += ' This will notify the user that their request has been rejected.';
-                    confirmBtn.className = 'action-btn reject-btn';
-                } else {
-                    confirmBtn.className = 'action-btn approve-btn';
-                }
-
-                currentForm = form; // Store the passed form directly
-                modal.classList.add('show');
-                return false; // Prevent default form submission
-            }
-
-            function confirmAction() {
-                if (currentForm) {
-                    currentForm.submit(); // Submit the stored form
-                }
-            }
-
-            function cancelConfirmation() {
-                document.getElementById('confirmationModal').classList.remove('show');
-                currentForm = null;
-            }
-            document.getElementById('documentModal').addEventListener('click', function(event) {
-                if (event.target === this) {
-                    closeModal();
-                }
-            });
-
-            document.getElementById('confirmationModal').addEventListener('click', function(event) {
-                if (event.target === this) {
-                    cancelConfirmation();
-                }
-            });
-
-            // Auto-dismiss success/error alerts after 5 seconds
-            const alertMessage = document.getElementById('alertMessage');
-            if (alertMessage) {
-                setTimeout(() => {
-                    alertMessage.style.display = 'none';
-                }, 5000);
-            }
-        </script>
         </body>
         </html>
 
