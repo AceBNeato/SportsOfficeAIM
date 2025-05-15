@@ -27,7 +27,7 @@
         </div>
     </nav>
 
-    <div class="center-panel">
+    <div class="">
         <div class="login-box">
             <h1>Forgot Password</h1>
             <form id="forgotPasswordForm" onsubmit="return false;">
@@ -71,39 +71,9 @@
     </div>
 </div>
 
-<script>
-    // Display any error messages from querystring
-    document.addEventListener('DOMContentLoaded', function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const error = urlParams.get('error');
-        const success = urlParams.get('success');
 
-        if (error === 'unauthorized') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Unauthorized access. Please complete the verification process.',
-                confirmButtonColor: '#800000'
-            });
-        } else if (error === 'reset_failed') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Password Reset Failed',
-                text: 'There was an error resetting your password. Please try again.',
-                confirmButtonColor: '#800000'
-            });
-        }
 
-        if (success === 'email_sent') {
-            Swal.fire({
-                icon: 'success',
-                title: 'Success',
-                text: 'Email sent successfully. Please check your inbox.',
-                confirmButtonColor: '#800000'
-            });
-        }
-    });
-</script>
+
 
 </body>
 </html>

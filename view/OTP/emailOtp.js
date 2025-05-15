@@ -10,8 +10,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Send OTP button click handler
     sendOtpBtn.addEventListener('click', async function() {
         const email = emailInput.value.trim();
+        this.classList.add('loading'); // Add loading state
 
         if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            this.classList.remove('loading'); // Remove loading state
             Swal.fire({
                 icon: 'error',
                 title: 'Invalid Email',
@@ -55,14 +57,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 text: 'Failed to send OTP. Please try again.',
                 confirmButtonColor: '#800000'
             });
+        } finally {
+            this.classList.remove('loading'); // Remove loading state
         }
     });
 
     // Verify OTP button click handler
     verifyBtn.addEventListener('click', async function() {
         const otp = otpInput.value.trim();
+        this.classList.add('loading'); // Add loading state
 
         if (!otp || otp.length !== 6 || !/^\d{6}$/.test(otp)) {
+            this.classList.remove('loading'); // Remove loading state
             Swal.fire({
                 icon: 'error',
                 title: 'Invalid OTP',
@@ -73,7 +79,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         try {
-            // Fix: Use the same path as for sending OTP
             const response = await fetch('emailOtp.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -89,7 +94,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     text: result.message,
                     confirmButtonColor: '#800000'
                 }).then(() => {
-                    // Show reset password modal
                     resetPasswordModal.style.display = 'block';
                     forgotPasswordForm.style.display = 'none';
                 });
@@ -108,13 +112,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 text: 'Failed to verify OTP. Please try again.',
                 confirmButtonColor: '#800000'
             });
+        } finally {
+            this.classList.remove('loading'); // Remove loading state
         }
     });
 
     // Close reset password modal
     window.closeResetModal = function() {
         resetPasswordModal.style.display = 'none';
-        // Reset form and show OTP section again
         forgotPasswordForm.style.display = 'block';
         otpSection.style.display = 'none';
         sendOtpBtn.style.display = 'block';
@@ -184,28 +189,36 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     });
-});
 
-// Example for Send OTP button
-document.getElementById('send-otp-btn').addEventListener('click', async function() {
-    this.classList.add('loading');
-    try {
-        // Simulate async operation (replace with your actual API call)
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        // Your OTP sending logic here
-    } finally {
-        this.classList.remove('loading');
+    // Display any error messages from querystring
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get('error');
+    const success = urlParams.get('success');
+
+    if (error === 'unauthorized') {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Unauthorized access. Please complete the verification process.',
+            confirmButtonColor: '#800000'
+        });
+    } else if (error === 'reset_failed') {
+        Swal.fire({
+            icon: 'error',
+            title: 'Password Reset Failed',
+            text: 'There was an error resetting your password. Please try again.',
+            confirmButtonColor: '#800000'
+        });
+    }
+
+    if (success === 'email_sent') {
+        Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: 'Email sent successfully. Please check your inbox.',
+            confirmButtonColor: '#800000'
+        });
     }
 });
 
-// Example for Verify OTP button
-document.getElementById('verify-btn').addEventListener('click', async function() {
-    this.classList.add('loading');
-    try {
-        // Simulate async operation (replace with your actual API call)
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        // Your OTP verification logic here
-    } finally {
-        this.classList.remove('loading');
-    }
-});
+
