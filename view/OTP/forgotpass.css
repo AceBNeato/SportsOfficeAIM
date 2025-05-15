@@ -10,7 +10,10 @@ html, body {
     height: 100%;
     width: 100%;
     background: url('../../public/image/background.png') no-repeat center center/cover;
-    overflow: hidden; /* Prevent scrollbar */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 80px; /* Increased to accommodate top bar */
 }
 
 /* Top Bar */
@@ -18,10 +21,11 @@ html, body {
     position: fixed;
     top: 0;
     left: 0;
-    right: 0;
-    height: 80px;
-    z-index: 1000;
-    background: transparent; /* Match design */
+    width: 100%;
+    background: linear-gradient(90deg, #1c1c1c, #2a2a2a);
+    padding: 15px 0;
+    z-index: 999;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .top-bar-content {
@@ -29,7 +33,7 @@ html, body {
     align-items: center;
     justify-content: center;
     gap: 15px;
-    max-width: 1300px; /* Increased from 1200px to accommodate wider login box */
+    max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
 }
@@ -60,38 +64,32 @@ html, body {
 /* Container */
 .container {
     width: 100%;
-    max-width: 1300px; /* Increased from 1200px to support wider login box */
-    height: 100vh; /* Full viewport height */
+    max-width: 1200px;
+    padding: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start; /* Align content at the top */
 }
 
 /* Center Panel */
 .center-panel {
-    width: 100%;
-    height: calc(100vh - 80px); /* Account for top-bar */
-    margin-top: 80px; /* Offset for fixed top-bar */
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* Align login-box at the top */
-    overflow: hidden; /* Prevent internal scrolling */
+    align-items: center;
+    width: 100%;
+    min-height: calc(100vh - 80px);
 }
 
 /* Login Box */
 .login-box {
-    background: rgba(0, 0, 0, 0.75); /* Kept semi-transparent black as in your CSS */
+    background: rgba(0, 0, 0, 0.75); /* Adjusted to match the semi-transparent black in the image */
     padding: 40px;
     border-radius: 16px;
-    max-width: 1100px; /* Increased from 999px for wider form */
+    max-width: 450px;
     width: 100%;
     text-align: center;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    max-height: calc(100vh - 120px); /* Ensure it fits within viewport */
-    overflow: hidden; /* Prevent scrollbar in login box */
-    margin-top: 20px; /* Small margin for spacing from top */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Subtle border for definition */
 }
 
 .login-box h1 {
@@ -99,7 +97,7 @@ html, body {
     color: #fff;
     font-size: 32px;
     font-weight: 700;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); /* Improve legibility */
 }
 
 /* Input Group */
@@ -113,19 +111,19 @@ html, body {
     left: 15px;
     top: 50%;
     transform: translateY(-50%);
-    color: #ccc;
+    color: #ccc; /* Lighter for visibility */
     font-size: 18px;
 }
 
 form input[type="email"],
 form input[type="text"],
 form input[type="password"] {
-    width: 100%; /* Scales with wider login box */
+    width: 100%;
     padding: 14px 15px 14px 40px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Lighter border */
     border-radius: 8px;
     font-size: 15px;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.15); /* Slightly opaque for inputs */
     color: #fff;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
@@ -137,13 +135,13 @@ form input:focus {
 }
 
 form input::placeholder {
-    color: #ddd;
+    color: #ddd; /* Lighter placeholder for visibility */
 }
 
 /* Buttons */
 button {
     position: relative;
-    width: 100%; /* Scales with wider login box */
+    width: 100%;
     padding: 14px;
     background: #ff5e5e;
     border: none;
@@ -200,7 +198,7 @@ button.loading {
 /* Signup Link */
 .signup-link {
     margin-top: 20px;
-    color: #ddd;
+    color: #ddd; /* Lighter for visibility */
     font-size: 14px;
 }
 
@@ -218,43 +216,135 @@ button.loading {
 
 /* Modal */
 .modal {
+    display: none;
     position: fixed;
     z-index: 1000;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 0.7);
     animation: fadeIn 0.3s ease;
-    overflow: hidden; /* Prevent modal scrollbar */
 }
 
 .modal-content {
-    background: rgba(0, 0, 0, 0.75);
-    margin: 10% auto;
-    padding: 40px;
-    border-radius: 16px;
+    background: #fff;
+    margin: 15% auto;
+    padding: 30px;
+    border-radius: 12px;
     width: 90%;
-    max-width: 1100px; /* Increased to match login-box width */
+    max-width: 450px;
     text-align: center;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #fff;
     position: relative;
-    animation: slideIn 0.3s ease;
-    max-height: 80vh; /* Limit modal height */
-    overflow: hidden; /* Prevent internal scrollbar */
 }
 
-/* Rest of the modal styles remain unchanged */
-@keyframes slideIn {
-    from { transform: translateY(-50px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+.close-button {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 24px;
+    color: #555;
+    cursor: pointer;
+    transition: color 0.3s ease;
 }
 
+.close-button:hover {
+    color: #000;
+}
+
+.modal-content h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+}
+
+.modal-content .btn {
+    background: #004aad;
+    margin-top: 15px;
+}
+
+.modal-content .btn:hover {
+    background: #003a8c;
+}
+
+/* Animations */
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .login-box {
+        padding: 30px;
+    }
+
+    .top-bar-content {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .title-container h1 {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-box {
+        padding: 25px;
+    }
+
+    .login-box h1 {
+        font-size: 28px;
+    }
+
+    form input[type="email"],
+    form input[type="text"],
+    form input[type="password"] {
+        padding: 12px 12px 12px 35px;
+        font-size: 14px;
+    }
+
+    button {
+        padding: 12px;
+        font-size: 15px;
+    }
+}
+
+
+/* Reset Password Modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; /* Enable scroll if needed */
+    background: rgba(0, 0, 0, 0.85); /* Darker backdrop for focus */
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+    background: rgba(0, 0, 0, 0.75); /* Match login-box background */
+    margin: 10% auto; /* Adjusted for better vertical centering */
+    padding: 40px;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 450px;
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Consistent border */
+    color: #fff; /* Text color for dark theme */
+    position: relative;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
 }
 
 .close-button {
@@ -262,13 +352,13 @@ button.loading {
     top: 15px;
     right: 15px;
     font-size: 28px;
-    color: #ccc;
+    color: #ccc; /* Lighter for visibility */
     cursor: pointer;
     transition: color 0.3s ease, transform 0.2s ease;
 }
 
 .close-button:hover {
-    color: #ff5e5e;
+    color: #ff5e5e; /* Red accent on hover */
     transform: scale(1.1);
 }
 
@@ -276,8 +366,8 @@ button.loading {
     margin-bottom: 25px;
     font-size: 28px;
     font-weight: 700;
-    color: #fff;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    color: #fff; /* White for consistency */
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); /* Match login-box h1 */
 }
 
 .modal-content .input-group {
@@ -285,11 +375,11 @@ button.loading {
 }
 
 .modal-content .input-group i {
-    color: #ccc;
+    color: #ccc; /* Consistent with login inputs */
 }
 
 .modal-content input[type="password"] {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.15); /* Match login input background */
     border: 1px solid rgba(255, 255, 255, 0.3);
     color: #fff;
     padding: 14px 15px 14px 40px;
@@ -300,7 +390,7 @@ button.loading {
 }
 
 .modal-content input[type="password"]::placeholder {
-    color: #ddd;
+    color: #ddd; /* Match login placeholder */
 }
 
 .modal-content input[type="password"]:focus {
@@ -309,7 +399,7 @@ button.loading {
 }
 
 .modal-content .btn {
-    background: #ff5e5e;
+    background: #ff5e5e; /* Match login button */
     padding: 14px;
     border-radius: 8px;
     font-size: 16px;
@@ -319,7 +409,7 @@ button.loading {
 }
 
 .modal-content .btn:hover {
-    background: #e04b4b;
+    background: #e04b4b; /* Match login button hover */
     transform: translateY(-2px);
 }
 
@@ -347,54 +437,11 @@ button.loading {
     color: #4caf50;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .login-box {
-        padding: 30px;
-        max-width: 90%; /* Adjust for smaller screens */
-    }
-
-    .top-bar-content {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .title-container h1 {
-        font-size: 24px;
-    }
-
-    .modal-content {
-        padding: 30px;
-        max-width: 90%; /* Adjust for smaller screens */
-    }
-}
-
+/* Responsive Design for Modal */
 @media (max-width: 480px) {
-    .login-box {
-        padding: 25px;
-        max-width: 95%; /* Further adjust for very small screens */
-    }
-
-    .login-box h1 {
-        font-size: 28px;
-    }
-
-    form input[type="email"],
-    form input[type="text"],
-    form input[type="password"] {
-        padding: 12px 12px 12px 35px;
-        font-size: 14px;
-    }
-
-    button {
-        padding: 12px;
-        font-size: 15px;
-    }
-
     .modal-content {
         padding: 30px;
-        margin: 20% auto;
-        max-width: 95%; /* Adjust for very small screens */
+        margin: 20% auto; /* Adjust for smaller screens */
     }
 
     .modal-content h2 {
@@ -410,31 +457,4 @@ button.loading {
         padding: 12px;
         font-size: 15px;
     }
-}
-
-
-
-.loading {
-    position: relative;
-    opacity: 0.7;
-    cursor: not-allowed;
-    pointer-events: none;
-}
-
-.loading::after {
-    content: '';
-    position: absolute;
-    width: 16px;
-    height: 16px;
-    border: 2px solid #fff;
-    border-radius: 50%;
-    border-top-color: transparent;
-    animation: spin 1s linear infinite;
-    top: 50%;
-    right: 10px;
-    transform: translateY(-50%);
-}
-
-@keyframes spin {
-    to { transform: translateY(-50%) rotate(360deg); }
 }
