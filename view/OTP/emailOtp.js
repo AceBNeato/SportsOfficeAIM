@@ -165,7 +165,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     text: 'Password reset successfully! Redirecting to login...',
                     confirmButtonColor: '#800000'
                 }).then(() => {
-                    window.location.href = 'loginView.php?success=password_reset';
+                    window.location.href = '../loginView.php?success=password_reset';
                 });
             } else {
                 Swal.fire({
