@@ -68,9 +68,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $address = 'Unknown'; // Update if address is collected
             $stmt->bind_param("ssssss", $request['student_id'], $request['full_name'], $address, $request['email'], $hashedPassword, $request['status']);
             $userInserted = $stmt->execute();
+            $newUserId = $conn->insert_id; // Get the ID of the newly inserted user
             $stmt->close();
 
             if ($userInserted) {
+                // Insert default profile image
+                $defaultImagePath = '../public/image/user.png';
+                if (file_exists($defaultImagePath)) {
+                    $imageData = file_get_contents($defaultImagePath);
+                    $imageType = mime_content_type($defaultImagePath);
+
+                    $stmt = $conn->prepare("INSERT INTO user_images (user_id, image, image_type, uploaded_at) VALUES (?, ?, ?, NOW())");
+                    $stmt->bind_param("iss", $newUserId, $imageData, $imageType);
+                    $imageInserted = $stmt->execute();
+                    $stmt->close();
+
+                    if (!$imageInserted) {
+                        error_log("Failed to insert default profile image for user ID: $newUserId");
+                        // Optionally, handle this error (e.g., proceed anyway or rollback)
+                    }
+                } else {
+                    error_log("Default profile image not found at: $defaultImagePath");
+                }
+
                 // Update account_approvals
                 $stmt = $conn->prepare("UPDATE account_approvals SET approval_status = 'approved', approved_by = ?, approval_date = NOW() WHERE id = ?");
                 $stmt->bind_param("ii", $adminId, $approvalId);
@@ -104,4 +124,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $conn->close();
 exit;
-?>
+?>  
