@@ -198,3 +198,59 @@ BEGIN
         email = user_email;
 END$$
 DELIMITER ;
+
+
+
+
+
+
+
+
+
+
+
+trigger
+
+
+
+DELIMITER $$
+
+CREATE TRIGGER after_account_approval_update
+AFTER UPDATE ON account_approvals
+FOR EACH ROW
+BEGIN
+    IF NEW.approval_status = 'approved' AND OLD.approval_status != 'approved' THEN
+        INSERT INTO notifications (user_id, message, timestamp)
+        SELECT u.id,
+               CONCAT('Your account request for ', NEW.full_name, ' has been approved.'),
+               CURRENT_TIMESTAMP
+        FROM users u
+        WHERE u.email = NEW.email AND u.student_id = NEW.student_id;
+    END IF;
+END$$
+
+DELIMITER ;
+
+
+
+
+
+DELIMITER $$
+
+CREATE TRIGGER after_submission_update
+AFTER UPDATE ON submissions
+FOR EACH ROW
+BEGIN
+    IF NEW.status != OLD.status THEN
+        SET @message = CASE NEW.status
+            WHEN 'pending' THEN CONCAT('Your submission "', NEW.document_type, '" is now pending.')
+            WHEN 'approved' THEN CONCAT('Your submission "', NEW.document_type, '" has been approved.')
+            WHEN 'rejected' THEN CONCAT('Your submission "', NEW.document_type, '" has been rejected. Reason: ', IFNULL(NEW.comments, 'No comments provided.'))
+        END;
+
+        INSERT INTO notifications (user_id, message, timestamp)
+        VALUES (NEW.user_id, @message, CURRENT_TIMESTAMP);
+    END IF;
+END$$
+
+DELIMITER ;

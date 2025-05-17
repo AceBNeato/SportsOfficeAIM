@@ -8,6 +8,8 @@
     <link rel="icon" href="../public/image/Usep.png" sizes="any">
     <script src="../public/JAVASCRIPT/validateStudentAthlete.js" defer></script>
     <link href="https://cdn.jsdelivr.net/npm/boxicons/css/boxicons.min.css" rel="stylesheet" />
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         .drop-zone {
             border: 2px dashed #007bff;
@@ -38,41 +40,6 @@
         }
         .drop-zone:hover {
             border-color: #0056b3;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        .modal-content {
-            background-color: white;
-            padding: 20px;
-            border-radius: 5px;
-            text-align: center;
-            max-width: 400px;
-            width: 90%;
-        }
-        .modal-content p {
-            margin: 0 0 20px 0;
-            font-size: 16px;
-        }
-        .close-btn {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .close-btn:hover {
-            background-color: #0056b3;
         }
     </style>
 </head>
@@ -120,22 +87,6 @@
     </div>
 </div>
 
-<!-- Success Modal -->
-<div id="successModal" class="modal">
-    <div class="modal-content">
-        <p>Your account has been submitted successfully! Please wait for admin approval.</p>
-        <button class="close-btn" onclick="closeModal('successModal')">OK</button>
-    </div>
-</div>
-
-<!-- Error Modal -->
-<div id="errorModal" class="modal">
-    <div class="modal-content">
-        <p id="errorMessage"></p>
-        <button class="close-btn" onclick="closeModal('errorModal')">OK</button>
-    </div>
-</div>
-
 <script>
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('document');
@@ -170,23 +121,34 @@
         }
     });
 
-    function closeModal(modalId) {
-        document.getElementById(modalId).style.display = 'none';
-        // Clear query parameters from URL
-        window.history.replaceState({}, document.title, window.location.pathname);
-    }
-
-    // Handle modal display based on query parameters
+    // Handle SweetAlert2 display based on query parameters
     window.onload = function() {
         const urlParams = new URLSearchParams(window.location.search);
         const status = urlParams.get('status');
         const message = urlParams.get('message');
 
         if (status === 'success') {
-            document.getElementById('successModal').style.display = 'flex';
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: 'Your account has been submitted successfully! Please wait for admin approval.',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#007bff'
+            }).then(() => {
+                // Clear query parameters from URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            });
         } else if (status === 'error' && message) {
-            document.getElementById('errorMessage').textContent = message;
-            document.getElementById('errorModal').style.display = 'flex';
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: message,
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#007bff'
+            }).then(() => {
+                // Clear query parameters from URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            });
         }
     };
 </script>

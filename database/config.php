@@ -1,5 +1,4 @@
 <?php
-
 $host = "localhost";
 $username = "root";
 $password = "";
@@ -104,7 +103,20 @@ if (!$conn->query($sql)) {
     die("Error creating account_approvals table: " . $conn->error);
 }
 
-// 9. Add admin using stored procedure
+// 9. Create notifications table
+$sql = "CREATE TABLE IF NOT EXISTS notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    message TEXT NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_read BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+)";
+if (!$conn->query($sql)) {
+    die("Error creating notifications table: " . $conn->error);
+}
+
+// 10. Add admin using stored procedure
 $fullName = "Gian Glen Vincent Garcia";
 $address = "Tagum City";
 $sampleEmail = "admin@usep.edu.ph";
@@ -112,7 +124,6 @@ $samplePassword = "admin123";
 $hashedPassword = password_hash($samplePassword, PASSWORD_DEFAULT);
 $status = "alumni";
 
-// Ensure procedure exists before this or add CREATE PROCEDURE code separately
 $stmt = $conn->prepare("CALL AddAdminIfAllowed(?, ?, ?, ?, ?)");
 if ($stmt) {
     $stmt->bind_param("sssss", $fullName, $address, $sampleEmail, $hashedPassword, $status);
@@ -127,7 +138,7 @@ if ($stmt) {
     echo "AddAdminIfAllowed procedure not found or prepare() failed: " . $conn->error;
 }
 
-// 10. Call stored procedure to count students
+// 11. Call stored procedure to count students
 $result = $conn->query("CALL GetTotalStudents()");
 if ($result) {
     $row = $result->fetch_assoc();
@@ -137,5 +148,4 @@ if ($result) {
 }
 
 $conn->close();
-
 ?>

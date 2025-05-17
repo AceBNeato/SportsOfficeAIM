@@ -308,7 +308,7 @@ error_log("Login page loaded. Error message: " . ($errorMessage ?: 'none'));
                 <img src="../public/image/dataPrivacy.png" alt="Student privacy illustration" />
             </div>
             <h3>By continuing to use the Student Portal, you agree to the
-                <span class="privacy-link">University of Southeastern Philippines' Data Privacy Statement</span>.
+                <span class="privacy-link">University of Southeastern Philippines' Data Privacy Statement</span>
             </h3>
             <button class="privacy-button" id="continueButton">CONTINUE</button>
         </div>

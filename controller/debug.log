@@ -347,3 +347,175 @@ Approve Request - POST Data: Array
 )
 
 Approve Request - Session ID: 091k2g1i51b3uup4vaesueppl8
+Approve Submission - Debug: Array
+(
+    [session_id] => iij0fsm62nno8k61uvh0m3f0n2
+    [session_data] => Array
+        (
+            [csrf_token] => 737ebdf6191c6fe081cbd34112f7c8a92ab16b71a18fec320627bab21f807539
+            [logged_in] => 1
+            [user] => Array
+                (
+                    [id] => 1
+                    [student_id] => 
+                    [email] => admin@usep.edu.ph
+                    [password] => admin123
+                    [address] => Tagum City
+                    [role] => admin
+                    [full_name] => Gian Glen Vincent Garcia
+                    [year_section] => 
+                    [last_activity] => 1747438236
+                    [ip_address] => ::1
+                    [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+                    [has_profile_image] => 
+                )
+
+            [submissions] => Array
+                (
+                    [year_section] => 
+                )
+
+        )
+
+    [post_data] => Array
+        (
+            [id] => 13
+            [csrf_token] => 737ebdf6191c6fe081cbd34112f7c8a92ab16b71a18fec320627bab21f807539
+        )
+
+    [session_check] => Array
+        (
+            [logged_in] => 1
+            [user_exists] => 1
+            [user_id] => 1
+            [user_role] => admin
+        )
+
+    [csrf_check] => Array
+        (
+            [session_csrf] => 737ebdf6191c6fe081cbd34112f7c8a92ab16b71a18fec320627bab21f807539
+            [post_csrf] => 737ebdf6191c6fe081cbd34112f7c8a92ab16b71a18fec320627bab21f807539
+        )
+
+)
+
+Approve Submission - Debug: Array
+(
+    [session_id] => bd6mmv8j2e4f1a0nfur3olare1
+    [session_data] => Array
+        (
+            [csrf_token] => 89453a5e956992b7f2ee9847f2b13fe0d770a748827318cbe2b52638ef26b463
+            [logged_in] => 1
+            [user] => Array
+                (
+                    [id] => 1
+                    [student_id] => 
+                    [email] => admin@usep.edu.ph
+                    [password] => admin123
+                    [address] => Tagum City
+                    [role] => admin
+                    [full_name] => Gian Glen Vincent Garcia
+                    [year_section] => 
+                    [last_activity] => 1747443353
+                    [ip_address] => ::1
+                    [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+                    [has_profile_image] => 
+                )
+
+            [submissions] => Array
+                (
+                    [year_section] => 
+                )
+
+        )
+
+    [post_data] => Array
+        (
+            [id] => 14
+            [csrf_token] => 89453a5e956992b7f2ee9847f2b13fe0d770a748827318cbe2b52638ef26b463
+        )
+
+    [session_check] => Array
+        (
+            [logged_in] => 1
+            [user_exists] => 1
+            [user_id] => 1
+            [user_role] => admin
+        )
+
+    [csrf_check] => Array
+        (
+            [session_csrf] => 89453a5e956992b7f2ee9847f2b13fe0d770a748827318cbe2b52638ef26b463
+            [post_csrf] => 89453a5e956992b7f2ee9847f2b13fe0d770a748827318cbe2b52638ef26b463
+        )
+
+)
+
+Approve Request - Session: Array
+(
+    [csrf_token] => 93cbf0208acbf7d1744c7320f9b8309d304abe545003bae466903d56d4fb8bdf
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [last_activity] => 1747443782
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Approve Request - POST Data: Array
+(
+    [approval_id] => 26
+    [action] => approve
+)
+
+Approve Request - Session ID: kkml73skskdp5qdqeil4520cqa
+Approve Request - Session: Array
+(
+    [csrf_token] => 8108465812b0252cb0112b53e58e97c9ed9d490a9bb977b7ee6c95a9b0092363
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [last_activity] => 1747445138
+            [ip_address] => 192.168.0.101
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Approve Request - POST Data: Array
+(
+    [approval_id] => 28
+    [action] => approve
+)
+
+Approve Request - Session ID: 6drtt7kks056qmvri8ss6ais3v

@@ -34,13 +34,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($request) {
         if ($action === 'reject') {
-            // Rejection logic
-            $stmt = $conn->prepare("UPDATE account_approvals SET approval_status = 'rejected', approved_by = ?, approval_date = NOW() WHERE id = ?");
-            $stmt->bind_param("ii", $adminId, $approvalId);
-            $updated = $stmt->execute();
+            // Optional: Insert notification into notifications table
+            $notification_message = "Your account approval request has been rejected.";
+            $stmt = $conn->prepare("INSERT INTO notifications (user_id, message) SELECT id, ? FROM users WHERE email = ? LIMIT 1");
+            $stmt->bind_param("ss", $notification_message, $request['email']);
+            $stmt->execute();
             $stmt->close();
 
-            if ($updated) {
+            // Delete the record from account_approvals
+            $stmt = $conn->prepare("DELETE FROM account_approvals WHERE id = ?");
+            $stmt->bind_param("i", $approvalId);
+            $deleted = $stmt->execute();
+            $stmt->close();
+
+            if ($deleted) {
                 // Send rejection email
                 if (sendRejectionEmail($request['email'], $request['full_name'])) {
                     header("Location: ../view/adminView.php?status=success&action=reject");
@@ -49,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     header("Location: ../view/adminView.php?status=error&action=reject");
                 }
             } else {
-                error_log("Failed to update account_approvals for rejection ID: $approvalId");
+                error_log("Failed to delete account_approvals record for ID: $approvalId");
                 header("Location: ../view/adminView.php?status=error&action=reject");
             }
         }
