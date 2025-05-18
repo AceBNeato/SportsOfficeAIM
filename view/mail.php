@@ -280,4 +280,111 @@ function sendRejectionEmail($recipientEmail, $fullName) {
         return false;
     }
 }
-?>
+
+
+// Function to send notification email
+function sendNotificationEmail($recipientEmail, $fullName, $notifications) {
+    if (!filter_var($recipientEmail, FILTER_VALIDATE_EMAIL)) {
+        error_log("Invalid email address for notifications: $recipientEmail");
+        return false;
+    }
+
+    $unread_count = 0;
+    $notification_list = '';
+    foreach ($notifications as $notification) {
+        if (!$notification['is_read']) {
+            $unread_count++;
+            $formatted_date = date('M d, Y h:i A', strtotime($notification['timestamp']));
+            $notification_list .= "<li style='font-size: 14px; line-height: 1.6; margin-bottom: 10px;'><strong>" . htmlspecialchars($notification['message'], ENT_QUOTES, 'UTF-8') . "</strong> at $formatted_date</li>";
+        }
+    }
+
+    if ($unread_count === 0) {
+        error_log("No unread notifications to email for: $recipientEmail");
+        return false;
+    }
+
+    try {
+        $mail = new PHPMailer(true);
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = 'tagummabinisportoffice@gmail.com';
+        $mail->Password = 'wecx ezju zcin ymmn';
+        $mail->SMTPSecure = 'ssl';
+        $mail->Port = 465;
+
+        $mail->setFrom('tagummabinisportoffice@gmail.com', 'SportOfficeDB Admin');
+        $mail->addAddress($recipientEmail, $fullName);
+        $mail->addReplyTo('tagummabinisportoffice@gmail.com', 'SportOfficeDB Admin');
+
+        $mail->isHTML(true);
+        $mail->Subject = 'New Notifications from Sports Office';
+        $mail->Body = "
+            <!DOCTYPE html>
+            <html lang='en'>
+            <head>
+                <meta charset='UTF-8'>
+                <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                <title>New Notifications</title>
+            </head>
+            <body style='margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; background-color: #f4f4f4; color: #333333;'>
+                <table role='presentation' width='100%' cellspacing='0' cellpadding='0' style='max-width: 600px; margin: 20px auto;'>
+                    <tr>
+                        <td style='background-color: #ffffff; border-radius: 8px; overflow: hidden;'>
+                            <!-- Header -->
+                            <table role='presentation' width='100%' cellspacing='0' cellpadding='0'>
+                                <tr>
+                                    <td style='background-color: #1a3c6d; padding: 20px; text-align: center;'>
+                                        <h1 style='margin: 0; font-size: 24px; font-weight: bold; color: #ffffff;'>New Notifications</h1>
+                                    </td>
+                                </tr>
+                            </table>
+                            <!-- Content -->
+                            <table role='presentation' width='100%' cellspacing='0' cellpadding='0'>
+                                <tr>
+                                    <td style='padding: 30px;'>
+                                        <p style='font-size: 16px; line-height: 1.5; margin: 0 0 15px;'>Dear $fullName,</p>
+                                        <p style='font-size: 16px; line-height: 1.5; margin: 0 0 15px;'>You have $unread_count new notification(s) from the Sports Office:</p>
+                                        <table role='presentation' width='100%' cellspacing='0' cellpadding='0' style='background-color: #f8fafc; padding: 20px; border-radius: 6px; margin: 20px 0;'>
+                                            <tr>
+                                                <td>
+                                                    <ul style='margin: 0; padding-left: 20px;'>
+                                                        $notification_list
+                                                    </ul>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <p style='text-align: center; margin: 20px 0;'>
+                                            <a href='http://192.168.199.137/SportsOfficeAIM/view/loginView.php' style='display: inline-block; padding: 12px 24px; background-color: #2563eb; color: #ffffff; text-decoration: none; border-radius: 6px; font-size: 16px; font-weight: bold;' role='button' aria-label='View Notifications'>View Notifications</a>
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                            <!-- Footer -->
+                            <table role='presentation' width='100%' cellspacing='0' cellpadding='0'>
+                                <tr>
+                                    <td style='background-color: #e5e7eb; padding: 15px; text-align: center; font-size: 12px; color: #4b5563;'>
+                                        <p style='margin: 0;'>Best regards,<br>SportOfficeDB Team</p>
+                                        <p style='margin: 10px 0 0;'><a href='mailto:tagummabinisportoffice@gmail.com' style='color: #2563eb; text-decoration: none;'>Contact Us</a></p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </body>
+            </html>
+        ";
+
+        $mail->AltBody = strip_tags(str_replace('</li>', "\n", $notification_list));
+
+        $mail->send();
+        error_log("Notification email sent to: $recipientEmail with $unread_count unread notifications");
+        return true;
+    } catch (Exception $e) {
+        error_log("PHPMailer Error in sendNotificationEmail: {$mail->ErrorInfo}");
+        return false;
+    }
+}
+
