@@ -135,7 +135,7 @@ function sendApprovalEmail($recipientEmail, $fullName, $studentId) {
                             <a href='http://localhost/SportsOfficeAIM/view/loginView.php' class='button'>Log In Now</a>
                         </p>
                     </div>
-                    <div class='footer'>
+                    <div class='footer'>    
                         <p>Best regards,<br>SportOfficeDB Team</p>
                     </div>
                 </div>
