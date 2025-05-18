@@ -132,7 +132,7 @@ function sendApprovalEmail($recipientEmail, $fullName, $studentId) {
                             </ul>
                         </div>
                         <p style='text-align: center;'>
-                            <a href='http://192.168.199.137/SportsOfficeAIM/view/loginView.php' class='button'>Log In Now</a>
+                            <a href='http://localhost/SportsOfficeAIM/view/loginView.php' class='button'>Log In Now</a>
                         </p>
                     </div>
                     <div class='footer'>
