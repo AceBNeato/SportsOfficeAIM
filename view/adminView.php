@@ -231,7 +231,7 @@ $action = $_GET['action'] ?? '';
     <?php elseif ($currentPage === 'Achievement'): ?>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" style="padding-top: 1rem;">
             <div class="bg-white shadow-md rounded-lg overflow-hidden">
-                <header class="bg-gradient-to-r from-red-600 to-orange-500 shadow-md rounded-lg p-8 mb-8">
+                <header class="bg-gradient-to-r from-red-600 to-orange-500 shadow-md rounded-lg p-8 mb-8" style="margin: 0;">
                     <div class="flex items-center justify-between">
                         <div>
                             <h1 class="text-3xl font-bold text-white">Award Recognition</h1>
@@ -253,7 +253,7 @@ $action = $_GET['action'] ?? '';
                         <?php unset($_SESSION['achievement_message'], $_SESSION['achievement_status']); ?>
                     <?php endif; ?>
                     <div class="space-y-8">
-                        <section class="border border-gray-200 rounded-lg p-6" style="width: 75vw;">
+                        <section class="border border-gray-200 rounded-lg p-6">
                             <h2 class="text-xl font-semibold text-gray-800 mb-4" id="studentInfoHeading">Student Information</h2>
                             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                                 <div class="lg:col-span-2">

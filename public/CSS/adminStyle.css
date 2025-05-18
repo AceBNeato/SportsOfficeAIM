@@ -145,12 +145,6 @@
 
 
 
-<<<<<<< Updated upstream:public/CSS/adminStyle.css
-=======
-<<<<<<< Updated upstream:sportsofficedb/admin/CSS/Style.css
-=======
->>>>>>> Stashed changes:sportsofficedb/admin/CSS/Style.css
-/* Center Panel */
 .center-panel {
     display: flex;
     justify-content: center;
@@ -178,12 +172,6 @@
 }
 
 /* Form */
-form {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    justify-content: center;
-}
 
 form input,
 form select {
@@ -244,14 +232,5 @@ form select {
 #documentModal.show,
 #confirmationModal.show {
     display: flex !important;
-<<<<<<< Updated upstream:public/CSS/adminStyle.css
-}
-=======
     padding: 10vw;
-<<<<<<< Updated upstream:sportsofficedb/admin/CSS/Style.css
 }
->>>>>>> Stashed changes:public/CSS/adminStyle.css
-=======
-}
->>>>>>> Stashed changes:public/CSS/adminStyle.css
->>>>>>> Stashed changes:sportsofficedb/admin/CSS/Style.css
