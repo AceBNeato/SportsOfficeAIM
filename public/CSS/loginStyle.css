@@ -166,38 +166,7 @@ body, html {
     color: #666;
 }
 
-@media screen and (max-width: 768px) {
-    .container {
-        flex-direction: column;
-    }
-    .left-panel, .right-panel {
-        width: 100%;
-    }
-    .logo-container {
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
 
-    .left-panel footer{
-        display: none;
-    }
-
-
-}
-
-/* Mobile-specific styles */
-@media screen and (max-width: 600px) {
-    .signup-link {
-        margin-top: 12px;
-        padding: 0 10px;
-        text-align: center;
-        display: block;
-    }
-    .left-panel footer{
-        display: none;
-    }
-}
 
 
 /* Desktop-specific styles */

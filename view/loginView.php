@@ -229,6 +229,89 @@ error_log("Login page loaded. Error message: " . ($errorMessage ?: 'none'));
         .toggle-password:hover {
             color: #007bff;
         }
+
+        .footer-container{
+            display: none;
+        }
+
+
+        @media screen and (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .left-panel footer{
+                display: none;
+            }
+            .footer-container {
+                width: 100%;
+                display: flex;
+                justify-content: center;
+                background-color: #1c1c1c;
+                color: white;
+                text-align: center;
+            }
+            .logo-container {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .footer-container h2 {
+                margin-top: 20px;
+                font-size: 1.9rem;
+            }
+
+            .content-wrapper {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                flex-grow: 1;
+            }
+
+
+            .left-panel .highlight {
+                color: #e63946;
+                font-weight: bold;
+            }
+
+            .footer-container p {
+                margin-top: 10px;
+                font-size: 1.0rem;
+            }
+
+            .footer-container footer {
+                margin: 0 0 10px;
+                font-size: 0.8rem;
+            }
+
+            .footer-container footer a {
+                color: #ccc;
+                text-decoration: underline;
+                margin: 0 5px;
+            }
+
+        }
+
+
+        /* Mobile-specific styles */
+        @media screen and (max-width: 600px) {
+            .signup-link {
+                margin-top: 12px;
+                padding: 0 10px;
+                text-align: center;
+                display: block;
+            }
+            .left-panel footer{
+                display: none;
+            }
+        }
+
+
+
+
+
     </style>
 </head>
 <body>
@@ -313,6 +396,15 @@ error_log("Login page loaded. Error message: " . ($errorMessage ?: 'none'));
             <button class="privacy-button" id="continueButton">CONTINUE</button>
         </div>
     </div>
+</div>
+
+
+
+<div class="footer-container">
+    <footer>
+        <p>© 2025. All Rights Reserved.</p>
+        <a href="#" id="termsLink">Terms of Use</a> | <a href="https://www.usep.edu.ph/usep-data-privacy-statement/">Privacy Policy</a>
+    </footer>
 </div>
 
 <!-- Scripts -->
