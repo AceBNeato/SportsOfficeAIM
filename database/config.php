@@ -116,19 +116,7 @@ if (!$conn->query($sql)) {
     die("Error creating notifications table: " . $conn->error);
 }
 
-// 9.1 Create pending_email_notifications table
-$sql = "CREATE TABLE IF NOT EXISTS pending_email_notifications (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    notification_id INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    processed BOOLEAN DEFAULT FALSE,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (notification_id) REFERENCES notifications(id) ON DELETE CASCADE
-)";
-if (!$conn->query($sql)) {
-    die("Error creating pending_email_notifications table: " . $conn->error);
-}
+
 
 // 10. Add admin using stored procedure
 $fullName = "Gian Glen Vincent Garcia";
