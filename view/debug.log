@@ -6033,3 +6033,76 @@ Admin View - Session: Array
 )
 
 Admin View - Session ID: n55cttkinmips6j9c1p44u6a0a
+Admin View - Session: Array
+(
+    [csrf_token] => 6b53a09788c43228da7bd8a1c7b73ddfbcef334690fafd63cbe284e504ff32b4
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [last_activity] => 1747550512
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Admin View - Session ID: n55cttkinmips6j9c1p44u6a0a
+Admin View - Session: Array
+(
+)
+
+Admin View - Session ID: 0034qubj85qtvbf8vp8t705fme
+Admin View - Session: Array
+(
+    [csrf_token] => f5cf35fce81064d2354369ed85ec0ccc8de92e84db126ac0006a210276289360
+)
+
+Admin View - Session ID: 0034qubj85qtvbf8vp8t705fme
+Admin View - Session: Array
+(
+    [csrf_token] => f5cf35fce81064d2354369ed85ec0ccc8de92e84db126ac0006a210276289360
+)
+
+Admin View - Session ID: 0034qubj85qtvbf8vp8t705fme
+Admin View - Session: Array
+(
+    [csrf_token] => 6b53a09788c43228da7bd8a1c7b73ddfbcef334690fafd63cbe284e504ff32b4
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [last_activity] => 1747550583
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Admin View - Session ID: n55cttkinmips6j9c1p44u6a0a

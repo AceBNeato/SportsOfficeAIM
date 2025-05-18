@@ -178,6 +178,12 @@ body, html {
         flex-wrap: wrap;
         justify-content: center;
     }
+
+    .left-panel footer{
+        display: none;
+    }
+
+
 }
 
 /* Mobile-specific styles */
@@ -187,6 +193,9 @@ body, html {
         padding: 0 10px;
         text-align: center;
         display: block;
+    }
+    .left-panel footer{
+        display: none;
     }
 }
 
