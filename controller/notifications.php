@@ -12,16 +12,25 @@ if ($conn->connect_error) {
     die(json_encode(['error' => 'Connection failed: ' . $conn->connect_error]));
 }
 
-$user_id = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 0; // Assume user_id is stored in session
+$user_id = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 0;
+
+if ($user_id === 0) {
+    echo json_encode(['error' => 'User not authenticated']);
+    exit;
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $stmt = $conn->prepare("SELECT message, timestamp FROM notifications WHERE user_id = ? AND is_read = FALSE ORDER BY timestamp DESC");
+    $stmt = $conn->prepare("SELECT id, message, timestamp FROM notifications WHERE user_id = ? AND is_read = FALSE ORDER BY timestamp DESC");
     $stmt->bind_param("i", $user_id);
     $stmt->execute();
     $result = $stmt->get_result();
     $notifications = [];
     while ($row = $result->fetch_assoc()) {
-        $notifications[] = $row;
+        $notifications[] = [
+            'id' => $row['id'],
+            'message' => $row['message'],
+            'timestamp' => $row['timestamp']
+        ];
     }
     $stmt->close();
     echo json_encode(['notifications' => $notifications]);

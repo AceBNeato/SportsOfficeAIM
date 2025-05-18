@@ -400,16 +400,13 @@
 
                     <script>
                         document.addEventListener('DOMContentLoaded', function() {
-                            // Notification system elements
                             const notificationsContainer = document.getElementById('notificationsContainer');
                             const refreshBtn = document.getElementById('refreshNotifications');
                             const clearBtn = document.getElementById('clearNotifications');
 
-                            // Load notifications from localStorage or initialize
                             let notifications = JSON.parse(localStorage.getItem('notifications')) || [];
-                            let timestampUpdaters = {}; // Store interval IDs for timestamp updates
+                            let timestampUpdaters = {};
 
-                            // Fetch notifications from server
                             function fetchNotifications() {
                                 fetch('../controller/notifications.php')
                                     .then(response => {
@@ -421,33 +418,32 @@
                                     .then(data => {
                                         if (data.notifications && data.notifications.length > 0) {
                                             data.notifications.forEach(notification => {
-                                                // Avoid duplicates by checking if notification already exists
-                                                if (!notifications.some(n => n.message === notification.message && n.timestamp === notification.timestamp)) {
-                                                    addNotification(notification.message, notification.timestamp, false);
+                                                if (!notifications.some(n => n.id === notification.id)) {
+                                                    notifications.unshift(notification);
+                                                    if (notifications.length > 50) {
+                                                        const removed = notifications.pop();
+                                                        if (timestampUpdaters[removed.timestamp]) {
+                                                            clearInterval(timestampUpdaters[removed.timestamp]);
+                                                            delete timestampUpdaters[removed.timestamp];
+                                                        }
+                                                    }
                                                 }
                                             });
-                                            // Mark notifications as read on the server
+                                            localStorage.setItem('notifications', JSON.stringify(notifications));
+                                            displayNotifications();
                                             markNotificationsAsRead();
                                         }
                                     })
-                                    .catch(error => {
-                                        console.error('Error fetching notifications:', error);
-                                    });
+                                    .catch(error => console.error('Error fetching notifications:', error));
                             }
 
-                            // Mark notifications as read
                             function markNotificationsAsRead() {
                                 fetch('../controller/notifications.php', {
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json' },
                                     body: JSON.stringify({ action: 'mark_read' })
                                 })
-                                    .then(response => {
-                                        if (!response.ok) {
-                                            throw new Error('Failed to mark notifications as read');
-                                        }
-                                        return response.json();
-                                    })
+                                    .then(response => response.json())
                                     .then(data => {
                                         if (!data.success) {
                                             console.warn('Failed to mark notifications as read:', data.error);
@@ -456,155 +452,112 @@
                                     .catch(error => console.error('Error marking notifications as read:', error));
                             }
 
-                            // Format time with real-time updates
                             function formatTime(timestamp, element) {
                                 const updateTime = () => {
                                     const now = new Date();
                                     const notificationTime = new Date(timestamp);
-                                    const diffInSeconds = Math.floor((now - notification sy) {
-                                        if (diffInSeconds < 60) {
-                                            element.textContent = 'Just now';
-                                        } else if (diffInSeconds < 3600) {
-                                            const minutes = Math.floor(diffInSeconds / 60);
-                                            element.textContent = `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
-                                        } else if (diffInSeconds < 86400) {
-                                            const hours = Math.floor(diffInSeconds / 3600);
-                                            element.textContent = `${hours} hour${hours !== 1 ? 's' : ''} ago`;
-                                        } else {
-                                            element.textContent = notificationTime.toLocaleDateString();
+                                    const diffInSeconds = Math.floor((now - notificationTime) / 1000);
+
+                                    if (diffInSeconds < 60) {
+                                        element.textContent = 'Just now';
+                                    } else if (diffInSeconds < 3600) {
+                                        const minutes = Math.floor(diffInSeconds / 60);
+                                        element.textContent = `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
+                                    } else if (diffInSeconds < 86400) {
+                                        const hours = Math.floor(diffInSeconds / 3600);
+                                        element.textContent = `${hours} hour${hours !== 1 ? 's' : ''} ago`;
+                                    } else {
+                                        element.textContent = notificationTime.toLocaleDateString();
+                                        clearInterval(timestampUpdaters[timestamp]);
+                                        delete timestampUpdaters[timestamp];
+                                    }
+                                };
+
+                                updateTime();
+                                if (!timestampUpdaters[timestamp]) {
+                                    timestampUpdaters[timestamp] = setInterval(updateTime, 60000);
+                                }
+                            }
+
+                            function displayNotifications() {
+                                notificationsContainer.innerHTML = '';
+
+                                if (notifications.length === 0) {
+                                    notificationsContainer.innerHTML = '<p class="text-gray-500 text-center py-4">No notifications</p>';
+                                    return;
+                                }
+
+                                notifications.forEach((notification, index) => {
+                                    const notificationElement = document.createElement('div');
+                                    notificationElement.className = 'p-3 bg-gray-50 rounded border-l-4 border-blue-500 flex justify-between items-start';
+                                    notificationElement.innerHTML = `
+                <div>
+                    <p class="text-sm">${notification.message}</p>
+                    <p class="text-xs text-gray-500 mt-1 timestamp" data-timestamp="${notification.timestamp}"></p>
+                </div>
+                <button class="text-gray-400 hover:text-gray-600 delete-notification" data-index="${index}">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+                                    notificationsContainer.appendChild(notificationElement);
+
+                                    const timestampElement = notificationElement.querySelector('.timestamp');
+                                    formatTime(notification.timestamp, timestampElement);
+                                });
+
+                                document.querySelectorAll('.delete-notification').forEach(btn => {
+                                    btn.addEventListener('click', function() {
+                                        const index = parseInt(this.getAttribute('data-index'));
+                                        const timestamp = notifications[index].timestamp;
+                                        if (timestampUpdaters[timestamp]) {
                                             clearInterval(timestampUpdaters[timestamp]);
                                             delete timestampUpdaters[timestamp];
                                         }
-                                    };
-
-                                    updateTime();
-                                    if (!timestampUpdaters[timestamp]) {
-                                        timestampUpdaters[timestamp] = setInterval(updateTime, 60000);
-                                    }
-                                }
-
-                                // Display notifications in the UI
-                                function displayNotifications() {
-                                    notificationsContainer.innerHTML = '';
-
-                                    if (notifications.length === 0) {
-                                        notificationsContainer.innerHTML = '<p class="text-gray-500 text-center py-4">No notifications</p>';
-                                        return;
-                                    }
-
-                                    notifications.forEach((notification, index) => {
-                                        const notificationElement = document.createElement('div');
-                                        notificationElement.className = 'p-3 bg-gray-50 rounded border-l-4 border-blue-500 flex justify-between items-start';
-                                        notificationElement.innerHTML = `
-                    <div>
-                        <p class="text-sm">${notification.message}</p>
-                        <p class="text-xs text-gray-500 mt-1 timestamp" data-timestamp="${notification.timestamp}"></p>
-                    </div>
-                    <button class="text-gray-400 hover:text-gray-600 delete-notification" data-index="${index}">
-                        <i class="fas fa-times"></i>
-                    </button>
-                `;
-                                        notificationsContainer.appendChild(notificationElement);
-
-                                        const timestampElement = notificationElement.querySelector('.timestamp');
-                                        formatTime(notification.timestamp, timestampElement);
-                                    });
-
-                                    document.querySelectorAll('.delete-notification').forEach(btn => {
-                                        btn.addEventListener('click', function() {
-                                            const index = parseInt(this.getAttribute('data-index'));
-                                            const timestamp = notifications[index].timestamp;
-                                            if (timestampUpdaters[timestamp]) {
-                                                clearInterval(timestampUpdaters[timestamp]);
-                                                delete timestampUpdaters[timestamp];
-                                            }
-                                            notifications.splice(index, 1);
-                                            localStorage.setItem('notifications', JSON.stringify(notifications));
-                                            displayNotifications();
-                                        });
-                                    });
-                                }
-
-                                // Add a new notification
-                                function addNotification(message, timestamp = null, saveToStorage = true) {
-                                    const newTimestamp = timestamp || new Date().toISOString();
-                                    notifications.unshift({ message, timestamp: newTimestamp });
-
-                                    if (notifications.length > 50) {
-                                        const removed = notifications.pop();
-                                        if (timestampUpdaters[removed.timestamp]) {
-                                            clearInterval(timestampUpdaters[removed.timestamp]);
-                                            delete timestampUpdaters[removed.timestamp];
-                                        }
-                                    }
-
-                                    if (saveToStorage) {
+                                        notifications.splice(index, 1);
                                         localStorage.setItem('notifications', JSON.stringify(notifications));
-                                    }
-                                    displayNotifications();
-                                }
-
-                                // Clear all notifications
-                                clearBtn.addEventListener('click', function() {
-                                    if (confirm('Are you sure you want to clear all notifications?')) {
-                                        Object.values(timestampUpdaters).forEach(interval => clearInterval(interval));
-                                        timestampUpdaters = {};
-                                        notifications = [];
-                                        localStorage.setItem('notifications', JSON.stringify(notifications));
-                                        fetch('../controller/notifications.php', {
-                                            method: 'POST',
-                                            headers: { 'Content-Type': 'application/json' },
-                                            body: JSON.stringify({ action: 'clear_all' })
-                                        })
-                                            .then(response => {
-                                                if (!response.ok) {
-                                                    throw new Error('Failed to clear notifications');
-                                                }
-                                                return response.json();
-                                            })
-                                            .then(data => {
-                                                if (!data.success) {
-                                                    console.warn('Failed to clear notifications:', data.error);
-                                                }
-                                                displayNotifications();
-                                            })
-                                            .catch(error => console.error('Error clearing notifications:', error));
-                                    }
+                                        displayNotifications();
+                                    });
                                 });
+                            }
 
-                                // Refresh notifications
-                                refreshBtn.addEventListener('click', function() {
-                                    refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Refreshing';
-                                    fetchNotifications();
-                                    refreshBtn.innerHTML = '<i class="fas fa-sync-alt mr-1"></i>Refresh';
-                                });
-
-                                // Initial setup
-                                fetchNotifications();
-                                displayNotifications();
-
-                                // Listen for custom events
-                                document.addEventListener('profileUpdated', function(e) {
-                                    const changes = e.detail.changes;
-                                    let message = 'Profile updated: ';
-                                    const changesList = [];
-                                    if (changes.name) changesList.push('name');
-                                    if (changes.email) changesList.push('email');
-                                    if (changes.photo) changesList.push('profile photo');
-                                    if (changes.address) changesList.push('address');
-                                    if (changes.password) changesList.push('password');
-                                    if (changesList.length > 0) {
-                                        message += changesList.join(', ');
-                                        addNotification(message);
-                                    }
-                                });
-
-                                window.addNotification = addNotification;
-
-                                window.addEventListener('beforeunload', function() {
+                            clearBtn.addEventListener('click', function() {
+                                if (confirm('Are you sure you want to clear all notifications?')) {
                                     Object.values(timestampUpdaters).forEach(interval => clearInterval(interval));
-                                });
+                                    timestampUpdaters = {};
+                                    notifications = [];
+                                    localStorage.setItem('notifications', JSON.stringify(notifications));
+                                    fetch('../controller/notifications.php', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ action: 'clear_all' })
+                                    })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            if (data.success) {
+                                                displayNotifications();
+                                            } else {
+                                                console.warn('Failed to clear notifications:', data.error);
+                                            }
+                                        })
+                                        .catch(error => console.error('Error clearing notifications:', error));
+                                }
                             });
+
+                            refreshBtn.addEventListener('click', function() {
+                                refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Refreshing';
+                                fetchNotifications();
+                                setTimeout(() => {
+                                    refreshBtn.innerHTML = '<i class="fas fa-sync-alt mr-1"></i>Refresh';
+                                }, 1000);
+                            });
+
+                            fetchNotifications();
+                            displayNotifications();
+
+                            window.addEventListener('beforeunload', function() {
+                                Object.values(timestampUpdaters).forEach(interval => clearInterval(interval));
+                            });
+                        });
                     </script>
     
 
