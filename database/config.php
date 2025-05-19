@@ -116,6 +116,37 @@ if (!$conn->query($sql)) {
     die("Error creating notifications table: " . $conn->error);
 }
 
+
+
+
+$sql = "CREATE TABLE IF NOT EXISTS achievements (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    athlete_name VARCHAR(255) NOT NULL,
+    level_of_competition VARCHAR(50) NOT NULL,
+    performance VARCHAR(50) NOT NULL,
+    number_of_events VARCHAR(50),
+    leadership_role VARCHAR(50),
+    sportsmanship VARCHAR(50),
+    community_impact VARCHAR(50),
+    completeness_of_documents VARCHAR(50),
+    total_points INT NOT NULL,
+    submission_date DATETIME NOT NULL,
+    status ENUM('Pending', 'Approved', 'Rejected') DEFAULT 'Pending',
+    rejection_reason TEXT,
+    documents TEXT, -- To store JSON array of file paths
+    FOREIGN KEY (user_id) REFERENCES users(id)
+)";
+
+if (!$conn->query($sql)) {
+    error_log("Error creating achievements table: " . $conn->error);
+    die("Error creating achievements table: " . $conn->error);
+} else {
+    error_log("Achievements table created or already exists");
+}
+
+
+
 // 10. Add admin using stored procedure
 $fullName = "Gian Glen Vincent Garcia";
 $address = "Tagum City";
