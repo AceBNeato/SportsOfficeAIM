@@ -116,13 +116,6 @@ if (!$conn->query($sql)) {
     die("Error creating notifications table: " . $conn->error);
 }
 
-<<<<<<< HEAD
-
-
-<<<<<<< HEAD
-=======
->>>>>>> parent of d613f21 (achievement merge with notification)
-=======
 
 $sql = "CREATE TABLE IF NOT EXISTS achievements (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -152,7 +145,6 @@ if (!$conn->query($sql)) {
 
 
 
->>>>>>> 59aec3e9f9389d334d59671d188fca365e087b6d
 // 10. Add admin using stored procedure
 $fullName = "Gian Glen Vincent Garcia";
 $address = "Tagum City";
