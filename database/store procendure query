@@ -205,6 +205,14 @@ DELIMITER ;
 
 
 
+<<<<<<< HEAD
+=======
+
+
+
+
+trigger
+>>>>>>> parent of d613f21 (achievement merge with notification)
 
 DROP TRIGGER IF EXISTS after_submission_insert;
 DROP TRIGGER IF EXISTS after_submission_update;

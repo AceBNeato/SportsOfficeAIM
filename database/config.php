@@ -116,8 +116,11 @@ if (!$conn->query($sql)) {
     die("Error creating notifications table: " . $conn->error);
 }
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> parent of d613f21 (achievement merge with notification)
 // 10. Add admin using stored procedure
 $fullName = "Gian Glen Vincent Garcia";
 $address = "Tagum City";

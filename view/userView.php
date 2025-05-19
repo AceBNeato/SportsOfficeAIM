@@ -453,6 +453,7 @@
                                 });
                         }
 
+<<<<<<< HEAD
                         // Function to clear all notifications
                         function clearNotifications() {
                             fetch('../controller/notifications.php', {
@@ -510,6 +511,50 @@
                         setInterval(fetchNotifications, 30000);
                     });
                 </script>
+=======
+                            clearBtn.addEventListener('click', function() {
+                                if (confirm('Are you sure you want to clear all notifications?')) {
+                                    Object.values(timestampUpdaters).forEach(interval => clearInterval(interval));
+                                    timestampUpdaters = {};
+                                    notifications = [];
+                                    localStorage.setItem('notifications', JSON.stringify(notifications));
+                                    fetch('../controller/notifications.php', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ action: 'clear_all' })
+                                    })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            if (data.success) {
+                                                displayNotifications();
+                                            } else {
+                                                console.warn('Failed to clear notifications:', data.error);
+                                            }
+                                        })
+                                        .catch(error => console.error('Error clearing notifications:', error));
+                                }
+                            });
+
+                            refreshBtn.addEventListener('click', function() {
+                                refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Refreshing';
+                                fetchNotifications();
+                                setTimeout(() => {
+                                    refreshBtn.innerHTML = '<i class="fas fa-sync-alt mr-1"></i>Refresh';
+                                }, 1000);
+                            });
+
+                            fetchNotifications();
+                            displayNotifications();
+
+                            window.addEventListener('beforeunload', function() {
+                                Object.values(timestampUpdaters).forEach(interval => clearInterval(interval));
+                            });
+                        });
+                    </script>
+    
+
+
+>>>>>>> parent of d613f21 (achievement merge with notification)
 
 
 
