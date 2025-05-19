@@ -164,12 +164,10 @@ $action = $_GET['action'] ?? '';
 
 <!-- Main Content -->
 <div id="mainContent" class="main-content px-1 sm:px-4 lg:px-0">
-    <div class="sticky top-0 z-30 bg-gray-100 w-full px-1 sm:px-4 lg:px-3">
-        <div class="border-b-4 border-red-500 px-5 pt-2 pb-1 flex justify-between items-center">
+    <div class="sticky top-0 z-30 bg-gray-100 w-full px-1 sm:px-4 lg:px-3"><div class="border-b-4 border-red-500 px-5 pt-2 pb-1 flex justify-between items-center">
             <h1 class="text-2xl sm:text-3xl font-semibold text-gray-900 tracking-tight">
                 <?php echo htmlspecialchars($currentPage); ?>
             </h1>
-
         </div>
 
 
@@ -187,7 +185,38 @@ $action = $_GET['action'] ?? '';
 
 
 
-    `<?php
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <?php
         if ($currentPage === 'Student Athletes'):
         // Database configuration
         try {
@@ -209,9 +238,10 @@ $action = $_GET['action'] ?? '';
             if (empty($searchTerm)) {
                 // Fetch all users when no search term
                 $stmt = $conn->prepare("
-                SELECT id, student_id, full_name, address
-                FROM users
-                ORDER BY full_name ASC
+                SELECT u.id, u.student_id, u.full_name, u.address, ui.image, ui.image_type
+                FROM users u
+                LEFT JOIN user_images ui ON u.id = ui.user_id
+                ORDER BY u.full_name ASC
                 LIMIT ? OFFSET ?
             ");
                 if (!$stmt) {
@@ -223,10 +253,11 @@ $action = $_GET['action'] ?? '';
                 // Search query
                 $searchTerm = '%' . $conn->real_escape_string($searchTerm) . '%';
                 $stmt = $conn->prepare("
-                SELECT id, student_id, full_name, address
-                FROM users
-                WHERE student_id LIKE ? OR full_name LIKE ?
-                ORDER BY full_name ASC
+                SELECT u.id, u.student_id, u.full_name, u.address, ui.image, ui.image_type
+                FROM users u
+                LEFT JOIN user_images ui ON u.id = ui.user_id
+                WHERE u.student_id LIKE ? OR u.full_name LIKE ?
+                ORDER BY u.full_name ASC
                 LIMIT ? OFFSET ?
             ");
                 if (!$stmt) {
@@ -274,7 +305,7 @@ $action = $_GET['action'] ?? '';
 
         <div class="w-full max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 mt-4">
             <!-- Search Form -->
-            <form method="GET" action="?page=Student Athletes" class="mb-4 flex flex-col sm:flex-row gap-2">
+            <form method="GET" class="mb-4 flex flex-col sm:flex-row gap-2">
                 <input type="hidden" name="page" value="Student Athletes"/>
                 <div class="relative flex-1">
                     <input
@@ -282,11 +313,8 @@ $action = $_GET['action'] ?? '';
                             name="search"
                             placeholder="Search by Student ID or Name..."
                             value="<?php echo htmlspecialchars($searchTerm); ?>"
-                            class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-sm"
+                            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-sm"
                     >
-                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
                 </div>
                 <button
                         type="submit"
@@ -301,9 +329,10 @@ $action = $_GET['action'] ?? '';
 
             <!-- Results Header -->
             <div class="hidden sm:grid grid-cols-12 gap-2 bg-gray-100 text-gray-700 font-semibold py-3 px-4 rounded-t-lg text-sm">
+                <div class="col-span-2">Profile Picture</div>
                 <div class="col-span-3">Student ID</div>
-                <div class="col-span-4">Student Name</div>
-                <div class="col-span-5">Address</div>
+                <div class="col-span-3">Student Name</div>
+                <div class="col-span-4">Address</div>
             </div>
 
             <!-- Results -->
@@ -311,20 +340,32 @@ $action = $_GET['action'] ?? '';
                 <?php if (count($users) > 0): ?>
                     <?php foreach ($users as $row): ?>
                         <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 p-3 sm:p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors text-sm">
+                            <div class="col-span-1 sm:col-span-2 flex items-center">
+                                <span class="block sm:hidden font-medium text-gray-600 text-xs">Profile Picture:</span>
+                                <?php if (!empty($row['image']) && !empty($row['image_type'])): ?>
+                                    <img
+                                            src="data:<?php echo htmlspecialchars($row['image_type']); ?>;base64,<?php echo base64_encode($row['image']); ?>"
+                                            alt="Profile picture of <?php echo htmlspecialchars($row['full_name']); ?>"
+                                            class="w-10 h-10 rounded-full object-cover"
+                                            onerror="this.src='/images/default-profile.png'"
+                                    >
+                                <?php else: ?>
+                                    <img
+                                            src="/images/default-profile.png"
+                                            alt="Default profile picture"
+                                            class="w-10 h-10 rounded-full object-cover"
+                                    >
+                                <?php endif; ?>
+                            </div>
                             <div class="col-span-1 sm:col-span-3">
                                 <span class="block sm:hidden font-medium text-gray-600 text-xs">Student ID:</span>
                                 <?php echo htmlspecialchars($row['student_id']); ?>
                             </div>
-                            <div class="col-span-1 sm:col-span-4 flex items-center gap-2">
+                            <div class="col-span-1 sm:col-span-3 flex items-center gap-2">
                                 <span class="block sm:hidden font-medium text-gray-600 text-xs">Name:</span>
-                                <a href="?page=StudentProfile&id=<?php echo urlencode($row['id']); ?>" class="text-blue-600 hover:underline flex items-center gap-1">
-                                    <?php echo htmlspecialchars($row['full_name']); ?>
-                                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                    </svg>
-                                </a>
+                                <?php echo htmlspecialchars($row['full_name']); ?>
                             </div>
-                            <div class="col-span-1 sm:col-span-5">
+                            <div class="col-span-1 sm:col-span-4">
                                 <span class="block sm:hidden font-medium text-gray-600 text-xs">Address:</span>
                                 <?php echo htmlspecialchars($row['address'] ?? 'N/A'); ?>
                             </div>
@@ -390,11 +431,23 @@ $action = $_GET['action'] ?? '';
                 .rounded-lg {
                     border-radius: 0.375rem;
                 }
+
+                .w-10 {
+                    width: 2.5rem;
+                }
+
+                .h-10 {
+                    height: 2.5rem;
+                }
             }
 
             @media (min-width: 640px) and (max-width: 1024px) {
                 .grid-cols-12 {
                     grid-template-columns: repeat(12, minmax(0, 1fr));
+                }
+
+                .col-span-2 {
+                    grid-column: span 2 / span 2;
                 }
 
                 .col-span-3 {
@@ -404,25 +457,17 @@ $action = $_GET['action'] ?? '';
                 .col-span-4 {
                     grid-column: span 4 / span 4;
                 }
+            }
 
-                .col-span-5 {
-                    grid-column: span 5 / span 5;
-                }
+            /* Profile picture styles */
+            .rounded-full {
+                border-radius: 50%;
+            }
+
+            .object-cover {
+                object-fit: cover;
             }
         </style>
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

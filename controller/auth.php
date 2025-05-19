@@ -157,8 +157,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id = $user_details['id'];
         $student_id = null;
         $year_section = null;
+        $sport = null;
+        $campus = null;
     } else {
-        $query = "SELECT id, student_id, full_name, address, email, password FROM users WHERE email = ?";
+        $query = "SELECT id, student_id, full_name, address, email, password, sport, campus FROM users WHERE email = ?";
         $stmt = $conn->prepare($query);
         if (!$stmt) {
             error_log("Database error: " . $conn->error);
@@ -183,6 +185,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $address = $user_details['address'];
         $id = $user_details['id'];
         $student_id = $user_details['student_id'];
+        $sport = $user_details['sport'];
+        $campus = $user_details['campus'];
         $password = $user_details['password'];
 
         // Get year_section from submissions table
@@ -190,7 +194,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $submission_query = "SELECT year_section FROM submissions WHERE user_id = ? LIMIT 1";
         $submission_stmt = $conn->prepare($submission_query);
         if ($submission_stmt) {
-            $submission_stmt->bind_param("i", $id); // Changed to 'i' for integer
+            $submission_stmt->bind_param("i", $id);
             $submission_stmt->execute();
             $submission_result = $submission_stmt->get_result();
             if ($submission_result->num_rows > 0) {
@@ -226,6 +230,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'role' => $role,
         'full_name' => $full_name,
         'year_section' => $year_section,
+        'sport' => $sport,
+        'campus' => $campus,
         'last_activity' => time(),
         'ip_address' => $_SERVER['REMOTE_ADDR'],
         'user_agent' => $_SERVER['HTTP_USER_AGENT'],
@@ -241,6 +247,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Debug log
     error_log("User logged in - Email: $email, Role: $role, Has Image: " . ($has_profile_image ? 'Yes' : 'No') .
         ", Year/Section: " . ($year_section ?? 'Not set') .
+        ", Sport: " . ($sport ?? 'Not set') .
+        ", Campus: " . ($campus ?? 'Not set') .
         ", Redirecting to: " . ($role === 'admin' ? 'adminView.php' : 'userView.php'));
 
     // Redirect based on role
