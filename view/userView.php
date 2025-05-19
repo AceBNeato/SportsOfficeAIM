@@ -362,8 +362,16 @@
 
 
 
+
+
+
+
+
+                <!-- Right Column - Notifications -->
+                <!-- Right Column - Notifications -->
                 <div class="w-full md:w-1/2 h-[calc(100vh-150px)]">
                     <div class="bg-white rounded-lg shadow h-full flex flex-col">
+                        <!-- Header with buttons (fixed height) -->
                         <div class="flex justify-between items-center p-4 border-b">
                             <div class="flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
@@ -375,84 +383,144 @@
                                 <button id="refreshNotifications" class="text-blue-500 hover:text-blue-700 text-sm mr-3">
                                     <i class="fas fa-sync-alt mr-1"></i>Refresh
                                 </button>
-                                <button id="markAllRead" class="text-blue-500 hover:text-blue-700 text-sm mr-3">
-                                    <i class="fas fa-check-circle mr-1"></i>Mark All Read
-                                </button>
                                 <button id="clearNotifications" class="text-blue-500 hover:text-blue-700 text-sm">
                                     <i class="fas fa-trash-alt mr-1"></i>Clear All
                                 </button>
                             </div>
                         </div>
+
+                        <!-- Scrollable notifications container -->
                         <div class="flex-1 overflow-y-auto" style="max-height: calc(100vh - 200px);">
                             <div id="notificationsContainer" class="space-y-3 p-4">
-                                <p class="text-gray-500">Loading notifications...</p>
+                                <!-- Notifications will be dynamically inserted here -->
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <script>
-                    document.addEventListener('DOMContentLoaded', function () {
-                        const notificationsContainer = document.getElementById('notificationsContainer');
-                        const refreshButton = document.getElementById('refreshNotifications');
-                        const clearButton = document.getElementById('clearNotifications');
-                        const markAllReadButton = document.getElementById('markAllRead');
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const notificationsContainer = document.getElementById('notificationsContainer');
+                            const refreshBtn = document.getElementById('refreshNotifications');
+                            const clearBtn = document.getElementById('clearNotifications');
 
-                        // Function to fetch notifications
-                        function fetchNotifications() {
-                            // Adjust path based on your directory structure
-                            fetch('../controller/notifications.php', {
-                                method: 'GET',
-                                headers: { 'Content-Type': 'application/json' },
-                                credentials: 'same-origin'
-                            })
-                                .then(response => {
-                                    if (!response.ok) {
-                                        throw new Error(`HTTP error ${response.status}: ${response.statusText}`);
-                                    }
-                                    return response.json();
+                            let notifications = JSON.parse(localStorage.getItem('notifications')) || [];
+                            let timestampUpdaters = {};
+
+                            function fetchNotifications() {
+                                fetch('../controller/notifications.php')
+                                    .then(response => {
+                                        if (!response.ok) {
+                                            throw new Error('Network response was not ok');
+                                        }
+                                        return response.json();
+                                    })
+                                    .then(data => {
+                                        if (data.notifications && data.notifications.length > 0) {
+                                            data.notifications.forEach(notification => {
+                                                if (!notifications.some(n => n.id === notification.id)) {
+                                                    notifications.unshift(notification);
+                                                    if (notifications.length > 50) {
+                                                        const removed = notifications.pop();
+                                                        if (timestampUpdaters[removed.timestamp]) {
+                                                            clearInterval(timestampUpdaters[removed.timestamp]);
+                                                            delete timestampUpdaters[removed.timestamp];
+                                                        }
+                                                    }
+                                                }
+                                            });
+                                            localStorage.setItem('notifications', JSON.stringify(notifications));
+                                            displayNotifications();
+                                            markNotificationsAsRead();
+                                        }
+                                    })
+                                    .catch(error => console.error('Error fetching notifications:', error));
+                            }
+
+                            function markNotificationsAsRead() {
+                                fetch('../controller/notifications.php', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ action: 'mark_read' })
                                 })
-                                .then(data => {
-                                    notificationsContainer.innerHTML = '';
-                                    if (data.error) {
-                                        notificationsContainer.innerHTML = `<p class="text-red-500">Error: ${data.error}</p>`;
-                                        console.error('Server error:', data.error);
-                                        return;
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (!data.success) {
+                                            console.warn('Failed to mark notifications as read:', data.error);
+                                        }
+                                    })
+                                    .catch(error => console.error('Error marking notifications as read:', error));
+                            }
+
+                            function formatTime(timestamp, element) {
+                                const updateTime = () => {
+                                    const now = new Date();
+                                    const notificationTime = new Date(timestamp);
+                                    const diffInSeconds = Math.floor((now - notificationTime) / 1000);
+
+                                    if (diffInSeconds < 60) {
+                                        element.textContent = 'Just now';
+                                    } else if (diffInSeconds < 3600) {
+                                        const minutes = Math.floor(diffInSeconds / 60);
+                                        element.textContent = `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
+                                    } else if (diffInSeconds < 86400) {
+                                        const hours = Math.floor(diffInSeconds / 3600);
+                                        element.textContent = `${hours} hour${hours !== 1 ? 's' : ''} ago`;
+                                    } else {
+                                        element.textContent = notificationTime.toLocaleDateString();
+                                        clearInterval(timestampUpdaters[timestamp]);
+                                        delete timestampUpdaters[timestamp];
                                     }
+                                };
 
-                                    if (data.notifications.length === 0) {
-                                        notificationsContainer.innerHTML = '<p class="text-gray-500">No notifications found.</p>';
-                                        return;
-                                    }
+                                updateTime();
+                                if (!timestampUpdaters[timestamp]) {
+                                    timestampUpdaters[timestamp] = setInterval(updateTime, 60000);
+                                }
+                            }
 
-                                    data.notifications.forEach(notification => {
-                                        const date = new Date(notification.timestamp);
-                                        const formattedDate = date.toLocaleString('en-US', {
-                                            month: 'short',
-                                            day: 'numeric',
-                                            year: 'numeric',
-                                            hour: 'numeric',
-                                            minute: 'numeric',
-                                            hour12: true
-                                        });
+                            function displayNotifications() {
+                                notificationsContainer.innerHTML = '';
 
-                                        const notificationElement = document.createElement('div');
-                                        notificationElement.className = `p-3 rounded-lg border border-gray-200 ${
-                                            notification.is_read ? 'bg-gray-50' : 'bg-blue-50 font-semibold'
-                                        }`;
-                                        notificationElement.innerHTML = `
-                    <p class="text-sm text-gray-800">${notification.message}</p>
-                    <p class="text-xs text-gray-500 mt-1">${formattedDate}</p>
-                `;
-                                        notificationsContainer.appendChild(notificationElement);
-                                    });
-                                })
-                                .catch(error => {
-                                    notificationsContainer.innerHTML = '<p class="text-red-500">Failed to load notifications: ' + error.message + '</p>';
-                                    console.error('Error fetching notifications:', error);
+                                if (notifications.length === 0) {
+                                    notificationsContainer.innerHTML = '<p class="text-gray-500 text-center py-4">No notifications</p>';
+                                    return;
+                                }
+
+                                notifications.forEach((notification, index) => {
+                                    const notificationElement = document.createElement('div');
+                                    notificationElement.className = 'p-3 bg-gray-50 rounded border-l-4 border-blue-500 flex justify-between items-start';
+                                    notificationElement.innerHTML = `
+                <div>
+                    <p class="text-sm">${notification.message}</p>
+                    <p class="text-xs text-gray-500 mt-1 timestamp" data-timestamp="${notification.timestamp}"></p>
+                </div>
+                <button class="text-gray-400 hover:text-gray-600 delete-notification" data-index="${index}">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+                                    notificationsContainer.appendChild(notificationElement);
+
+                                    const timestampElement = notificationElement.querySelector('.timestamp');
+                                    formatTime(notification.timestamp, timestampElement);
                                 });
-                        }
 
+                                document.querySelectorAll('.delete-notification').forEach(btn => {
+                                    btn.addEventListener('click', function() {
+                                        const index = parseInt(this.getAttribute('data-index'));
+                                        const timestamp = notifications[index].timestamp;
+                                        if (timestampUpdaters[timestamp]) {
+                                            clearInterval(timestampUpdaters[timestamp]);
+                                            delete timestampUpdaters[timestamp];
+                                        }
+                                        notifications.splice(index, 1);
+                                        localStorage.setItem('notifications', JSON.stringify(notifications));
+                                        displayNotifications();
+                                    });
+                                });
+                            }
+
+<<<<<<< HEAD
 <<<<<<< HEAD
                         // Function to clear all notifications
                         function clearNotifications() {
@@ -467,31 +535,271 @@
                                     if (data.success) {
                                         notificationsContainer.innerHTML = '<p class="text-gray-500">No notifications found.</p>';
                                         fetchNotifications();
-                                    } else {
-                                        notificationsContainer.innerHTML = `<p class="text-red-500">Error: ${data.error || 'Failed to clear notifications'}</p>`;
-                                    }
-                                })
-                                .catch(error => {
-                                    notificationsContainer.innerHTML = '<p class="text-red-500">Failed to clear notifications: ${error.message}</p>';
-                                    console.error('Error clearing notifications:', error);
-                                });
-                        }
+=======
+                            clearBtn.addEventListener('click', function() {
+                                if (confirm('Are you sure you want to clear all notifications?')) {
+                                    Object.values(timestampUpdaters).forEach(interval => clearInterval(interval));
+                                    timestampUpdaters = {};
+                                    notifications = [];
+                                    localStorage.setItem('notifications', JSON.stringify(notifications));
+                                    fetch('../controller/notifications.php', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ action: 'clear_all' })
+                                    })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            if (data.success) {
+                                                displayNotifications();
+                                            } else {
+                                                console.warn('Failed to clear notifications:', data.error);
+                                            }
+                                        })
+                                        .catch(error => console.error('Error clearing notifications:', error));
+                                }
+                            });
 
-                        // Function to mark all notifications as read
-                        function markAllAsRead() {
-                            fetch('../controller/notifications.php', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                credentials: 'same-origin',
-                                body: JSON.stringify({ action: 'mark_read' })
-                            })
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.success) {
-                                        fetchNotifications();
+                            refreshBtn.addEventListener('click', function() {
+                                refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Refreshing';
+                                fetchNotifications();
+                                setTimeout(() => {
+                                    refreshBtn.innerHTML = '<i class="fas fa-sync-alt mr-1"></i>Refresh';
+                                }, 1000);
+                            });
+
+                            fetchNotifications();
+                            displayNotifications();
+
+                            window.addEventListener('beforeunload', function() {
+                                Object.values(timestampUpdaters).forEach(interval => clearInterval(interval));
+                            });
+                        });
+                    </script>
+
+
+
+
+
+
+
+                <?php
+
+                // Generate CSRF token
+                if (!isset($_SESSION['csrf_token'])) {
+                    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+                }
+                ?>
+
+                <?php elseif ($currentPage === 'Achievement'): ?>
+                    <!-- Achievement Section -->
+                    <div class="p-6 bg-gray-100 min-h-screen">
+                        <!-- Button to Open Achievement Form Modal -->
+                        <div class="mb-6">
+                            <button id="openAchievementModal" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Submit New Achievement</button>
+                        </div>
+
+                        <!-- Achievement Form Modal -->
+                        <div id="achievementModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center <?php echo isset($_SESSION['achievement_message']) ? '' : 'hidden'; ?>">
+                            <div class="bg-white rounded-lg shadow p-6 w-full max-w-2xl">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h2 class="text-xl font-bold">Athlete Achievement Form</h2>
+                                    <button id="closeAchievementModal" class="text-gray-500 hover:text-gray-700">×</button>
+                                </div>
+                                <form method="POST" enctype="multipart/form-data" action="../controller/handleAchievement.php" id="achievementForm" class="space-y-4">
+                                    <input type="hidden" name="submit_achievement" value="1">
+                                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label for="athlete_name" class="block text-sm font-medium text-gray-700">Athlete Name</label>
+                                            <input type="text" id="athlete_name" name="athlete_name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                        </div>
+                                        <div>
+                                            <label for="level_of_competition" class="block text-sm font-medium text-gray-700">Level of Competition</label>
+                                            <select id="level_of_competition" name="level_of_competition" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                                <option value="">Select</option>
+                                                <option value="Local">Local (5 pts)</option>
+                                                <option value="Regional">Regional (10 pts)</option>
+                                                <option value="National">National (15 pts)</option>
+                                                <option value="International">International (20 pts)</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label for="performance" class="block text-sm font-medium text-gray-700">Performance</label>
+                                            <select id="performance" name="performance" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                                <option value="">Select</option>
+                                                <option value="Winner (Gold)">Winner (Gold - 15 pts)</option>
+                                                <option value="Silver">Silver (10 pts)</option>
+                                                <option value="Bronze">Bronze (5 pts)</option>
+                                                <option value="Participant">Participant (2 pts)</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label for="number_of_events" class="block text-sm font-medium text-gray-700">Number of Events</label>
+                                            <select id="number_of_events" name="number_of_events" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                                <option value="">Select</option>
+                                                <option value="1-2">1-2 (5 pts)</option>
+                                                <option value="3-4">3-4 (10 pts)</option>
+                                                <option value="5+">5+ (15 pts)</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label for="leadership_role" class="block text-sm font-medium text-gray-700">Leadership Role</label>
+                                            <select id="leadership_role" name="leadership_role" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                                <option value="">Select</option>
+                                                <option value="Team Captain">Team Captain (10 pts)</option>
+                                                <option value="Active Member">Active Member (5 pts)</option>
+                                                <option value="Reserve">Reserve (2 pts)</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label for="sportsmanship" class="block text-sm font-medium text-gray-700">Sportsmanship</label>
+                                            <select id="sportsmanship" name="sportsmanship" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                                <option value="">Select</option>
+                                                <option value="No violation">No violation (10 pts)</option>
+                                                <option value="Minor warnings">Minor warnings (5 pts)</option>
+                                                <option value="Major offense">Major offense (0 pts)</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label for="community_impact" class="block text-sm font-medium text-gray-700">Community Impact</label>
+                                            <select id="community_impact" name="community_impact" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                                <option value="">Select</option>
+                                                <option value="Yes">Yes (10 pts)</option>
+                                                <option value="No">No (0 pts)</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label for="completeness_of_documents" class="block text-sm font-medium text-gray-700">Completeness of Documents</label>
+                                            <select id="completeness_of_documents" name="completeness_of_documents" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                                <option value="">Select</option>
+                                                <option value="Complete and verified">Complete and verified (15 pts)</option>
+                                                <option value="Incomplete or unclear">Incomplete or unclear (5 pts)</option>
+                                                <option value="Not submitted">Not submitted (0 pts)</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label for="documents" class="block text-sm font-medium text-gray-700">Upload Documents</label>
+                                            <input type="file" id="documents" name="documents[]" multiple accept=".pdf,.jpg,.jpeg,.png" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Submit Achievement</button>
+                                </form>
+                                <?php
+                                if (isset($_SESSION['achievement_message'])) {
+                                    echo '<div id="achievementMessage" class="mt-4 p-4 rounded-lg ' . $_SESSION['message_class'] . '">';
+                                    echo htmlspecialchars($_SESSION['achievement_message']);
+                                    echo '</div>';
+                                    unset($_SESSION['achievement_message']);
+                                    unset($_SESSION['message_class']);
+                                }
+                                ?>
+                            </div>
+                        </div>
+
+                        <!-- Past Achievements Section -->
+                        <div class="bg-white rounded-lg shadow p-6 mb-6">
+                            <h2 class="text-xl font-bold mb-4">Past Achievements</h2>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Athlete Name</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Level</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Performance</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Points</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Submission Date</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reason</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                                    <?php
+                                    // Database connection for past achievements
+                                    $host = "localhost";
+                                    $username = "root";
+                                    $password = "";
+                                    $dbname = "SportOfficeDB";
+
+                                    $conn = new mysqli($host, $username, $password, $dbname);
+                                    if ($conn->connect_error) {
+                                        echo '<tr><td colspan="7" class="px-6 py-4 text-sm text-gray-500 text-center">Database connection failed</td></tr>';
+>>>>>>> 59aec3e9f9389d334d59671d188fca365e087b6d
                                     } else {
-                                        notificationsContainer.innerHTML = `<p class="text-red-500">Error: ${data.error || 'Failed to mark notifications as read'}</p>`;
+                                        if (isset($_SESSION['user']['id'])) {
+                                            $user_id = $_SESSION['user']['id'];
+                                            $stmt = $conn->prepare("CALL GetUserAchievements(?)");
+                                            $stmt->bind_param("i", $user_id);
+                                            $stmt->execute();
+                                            $result = $stmt->get_result();
+                                            if ($result->num_rows > 0) {
+                                                while ($row = $result->fetch_assoc()) {
+                                                    echo '<tr>';
+                                                    echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">' . htmlspecialchars($row['athlete_name'] ?? 'N/A') . '</td>';
+                                                    echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">' . htmlspecialchars($row['level_of_competition'] ?? 'N/A') . '</td>';
+                                                    echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">' . htmlspecialchars($row['performance'] ?? 'N/A') . '</td>';
+                                                    echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">' . htmlspecialchars($row['total_points'] ?? '0') . '</td>';
+                                                    echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">' . htmlspecialchars($row['submission_date'] ?? 'N/A') . '</td>';
+                                                    echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">' . htmlspecialchars($row['status'] ?? 'Pending') . '</td>';
+                                                    echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">' . htmlspecialchars($row['rejection_reason'] ?? 'N/A') . '</td>';
+                                                    echo '</tr>';
+                                                }
+                                            } else {
+                                                echo '<tr><td colspan="7" class="px-6 py-4 text-sm text-gray-500 text-center">No achievements found</td></tr>';
+                                            }
+                                            $stmt->close();
+                                        } else {
+                                            echo '<tr><td colspan="7" class="px-6 py-4 text-sm text-gray-500 text-center">User not logged in</td></tr>';
+                                        }
+                                        $conn->close();
                                     }
+                                    ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Leaderboard Section -->
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h2 class="text-xl font-bold mb-4">Campus Leaderboard</h2>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Athlete Name</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Points</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rank</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                                    <?php
+                                    // Database connection for leaderboard
+                                    $conn = new mysqli($host, $username, $password, $dbname);
+                                    if ($conn->connect_error) {
+                                        echo '<tr><td colspan="3" class="px-6 py-4 text-sm text-gray-500 text-center">Database connection failed</td></tr>';
+                                    } else {
+                                        $result = $conn->query("CALL GetLeaderboard()");
+                                        if ($result) {
+                                            $leaderboard = [];
+                                            while ($row = $result->fetch_assoc()) {
+                                                $leaderboard[] = $row;
+                                            }
+                                            if (count($leaderboard) > 0) {
+                                                foreach ($leaderboard as $index => $athlete) {
+                                                    echo '<tr>';
+                                                    echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">' . htmlspecialchars($athlete['athlete_name'] ?? 'N/A') . '</td>';
+                                                    echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">' . htmlspecialchars($athlete['total_points'] ?? '0') . '</td>';
+                                                    echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">' . ($index + 1) . '</td>';
+                                                    echo '</tr>';
+                                                }
+                                            } else {
+                                                echo '<tr><td colspan="3" class="px-6 py-4 text-sm text-gray-500 text-center">No leaderboard data available</td></tr>';
+                                            }
+                                        } else {
+                                            echo '<tr><td colspan="3" class="px-6 py-4 text-sm text-gray-500 text-center">Failed to load leaderboard</td></tr>';
+                                        }
+                                        $conn->close();
+                                    }
+<<<<<<< HEAD
                                 })
                                 .catch(error => {
                                     notificationsContainer.innerHTML = '<p class="text-red-500">Failed to mark notifications as read: ${error.message}</p>';
@@ -555,9 +863,36 @@
 
 
 >>>>>>> parent of d613f21 (achievement merge with notification)
+=======
+                                    ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+>>>>>>> 59aec3e9f9389d334d59671d188fca365e087b6d
 
+                    <script>
+                        // Open/Close Modal
+                        document.getElementById('openAchievementModal').addEventListener('click', function() {
+                            document.getElementById('achievementModal').classList.remove('hidden');
+                        });
 
+                        document.getElementById('closeAchievementModal').addEventListener('click', function() {
+                            document.getElementById('achievementModal').classList.add('hidden');
+                            document.getElementById('achievementForm').reset();
+                            document.getElementById('achievementMessage')?.classList.add('hidden');
+                        });
 
+                        // Automatically close the modal after a successful submission
+                        <?php if (isset($_SESSION['achievement_message']) && $_SESSION['message_class'] === 'bg-green-100'): ?>
+                        setTimeout(function() {
+                            document.getElementById('achievementModal').classList.add('hidden');
+                            document.getElementById('achievementForm').reset();
+                            document.getElementById('achievementMessage').classList.add('hidden');
+                        }, 2000);
+                        <?php endif; ?>
+                    </script>
 
 
 

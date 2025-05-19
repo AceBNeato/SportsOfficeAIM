@@ -206,6 +206,7 @@ DELIMITER ;
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 
@@ -213,53 +214,81 @@ DELIMITER ;
 
 trigger
 >>>>>>> parent of d613f21 (achievement merge with notification)
+=======
+//ACHIEVEMENT
+DELIMITER //
+CREATE PROCEDURE AddAchievement(
+        IN p_user_id INT,
+        IN p_athlete_name VARCHAR(255),
+        IN p_level_of_competition VARCHAR(50),
+        IN p_performance VARCHAR(50),
+        IN p_number_of_events VARCHAR(50),
+        IN p_leadership_role VARCHAR(50),
+        IN p_sportsmanship VARCHAR(50),
+        IN p_community_impact VARCHAR(50),
+        IN p_completeness_of_documents VARCHAR(50),
+        IN p_total_points INT,
+        IN p_documents TEXT,
+        IN p_status ENUM('Pending', 'Approved', 'Rejected'),
+        IN p_rejection_reason TEXT
+    )
+    BEGIN
+        INSERT INTO achievements (
+            user_id, athlete_name, level_of_competition, performance, number_of_events,
+            leadership_role, sportsmanship, community_impact, completeness_of_documents,
+            total_points, documents, status, rejection_reason, submission_date
+        ) VALUES (
+            p_user_id, p_athlete_name, p_level_of_competition, p_performance, p_number_of_events,
+            p_leadership_role, p_sportsmanship, p_community_impact, p_completeness_of_documents,
+            p_total_points, p_documents, p_status, p_rejection_reason, NOW()
+        );
+    END //
+>>>>>>> 59aec3e9f9389d334d59671d188fca365e087b6d
 
-DROP TRIGGER IF EXISTS after_submission_insert;
-DROP TRIGGER IF EXISTS after_submission_update;
-DROP TRIGGER IF EXISTS after_submission_edit;
+    DELIMITER ;
 
-DELIMITER $$
-CREATE TRIGGER after_submission_insert
-AFTER INSERT ON submissions
-FOR EACH ROW
+-- Stored Procedure to Get User Achievements
+DELIMITER //
+
+CREATE PROCEDURE GetUserAchievements(IN p_user_id INT)
 BEGIN
-    INSERT INTO notifications (user_id, message, timestamp)
-    VALUES (NEW.user_id, CONCAT('You have submitted a new document: "', NEW.document_type, '".'), CURRENT_TIMESTAMP);
-END$$
+    SELECT
+        id,
+        athlete_name,
+        level_of_competition,
+        performance,
+        number_of_events,
+        leadership_role,
+        sportsmanship,
+        community_impact,
+        completeness_of_documents,
+        total_points,
+        documents,
+        DATE_FORMAT(submission_date, '%m-%d-%Y') AS submission_date,
+        status,
+        rejection_reason
+    FROM achievements
+    WHERE user_id = p_user_id
+    ORDER BY submission_date DESC;
+END //
 
-CREATE TRIGGER after_submission_update
-AFTER UPDATE ON submissions
-FOR EACH ROW
-BEGIN
-    DECLARE notification_message TEXT;
-    IF NEW.status != OLD.status THEN
-        SET notification_message = CASE NEW.status
-            WHEN 'pending' THEN CONCAT('Your submission "', NEW.document_type, '" is now pending.')
-            WHEN 'approved' THEN CONCAT('Your submission "', NEW.document_type, '" has been approved.')
-            WHEN 'rejected' THEN CONCAT('Your submission "', NEW.document_type, '" has been rejected. Reason: ', IFNULL(NEW.comments, 'No comments provided.'))
-        END;
-        IF notification_message IS NOT NULL THEN
-            INSERT INTO notifications (user_id, message, timestamp)
-            VALUES (NEW.user_id, notification_message, CURRENT_TIMESTAMP);
-        END IF;
-    END IF;
-END$$
+DELIMITER ;
 
-CREATE TRIGGER after_submission_edit
-AFTER UPDATE ON submissions
-FOR EACH ROW
+
+
+DELIMITER //
+
+CREATE PROCEDURE GetLeaderboard()
 BEGIN
-    DECLARE notification_message TEXT;
-    IF NEW.status = OLD.status AND (
-        NEW.document_type != OLD.document_type OR
-        NEW.description != OLD.description OR
-        NEW.file_name != OLD.file_name
-    ) THEN
-        SET notification_message = CONCAT('Your submission "', NEW.document_type, '" has been updated.');
-        INSERT INTO notifications (user_id, message, timestamp)
-        VALUES (NEW.user_id, notification_message, CURRENT_TIMESTAMP);
-    END IF;
-END$$
+    SELECT
+        athlete_name,
+        SUM(total_points) AS total_points
+    FROM achievements
+    WHERE status = 'Approved'
+    GROUP BY athlete_name
+    ORDER BY total_points DESC;
+END //
+
 DELIMITER ;
 
 
@@ -269,3 +298,64 @@ DELIMITER ;
 
 
 
+
+
+
+
+trigger
+
+
+DELIMITER $$
+
+-- Trigger for account_approvals status changes
+CREATE TRIGGER after_account_approval_update
+AFTER UPDATE ON account_approvals
+FOR EACH ROW
+BEGIN
+    DECLARE notification_message TEXT;
+
+    IF NEW.approval_status != OLD.approval_status THEN
+        SET notification_message = CASE NEW.approval_status
+            WHEN 'approved' THEN CONCAT('Your account is approved. Welcome, ', NEW.full_name, '!')
+            WHEN 'rejected' THEN CONCAT('Your account request for ', NEW.full_name, ' has been rejected.')
+            ELSE NULL
+        END;
+
+        IF notification_message IS NOT NULL THEN
+            INSERT INTO notifications (user_id, message, timestamp)
+            SELECT u.id, notification_message, CURRENT_TIMESTAMP
+            FROM users u
+            WHERE u.email = NEW.email AND u.student_id = NEW.student_id;
+        END IF;
+    END IF;
+END$$
+
+-- Trigger for new document submissions
+CREATE TRIGGER after_submission_insert
+AFTER INSERT ON submissions
+FOR EACH ROW
+BEGIN
+    INSERT INTO notifications (user_id, message, timestamp)
+    VALUES (NEW.user_id, CONCAT('You have submitted a new document: "', NEW.document_type, '".'), CURRENT_TIMESTAMP);
+END$$
+
+-- Updated trigger for submission status changes
+CREATE TRIGGER after_submission_update
+AFTER UPDATE ON submissions
+FOR EACH ROW
+BEGIN
+    DECLARE notification_message TEXT;
+
+    IF NEW.status != OLD.status THEN
+        SET notification_message = CASE NEW.status
+            WHEN 'pending' THEN CONCAT('Your submission "', NEW.document_type, '" is now pending.')
+            WHEN 'approved' THEN CONCAT('Your submission "', NEW.document_type, '" has been approved.')
+            WHEN 'rejected' THEN CONCAT('Your submission "', NEW.document_type, '" has been rejected. Reason: ', IFNULL(NEW.comments, 'No comments provided.'))
+        END;
+
+        INSERT INTO notifications (user_id, message, timestamp)
+        VALUES (NEW.user_id, notification_message, CURRENT_TIMESTAMP);
+    END IF;
+END$$
+
+DELIMITER ;
