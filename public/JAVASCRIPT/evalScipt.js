@@ -290,42 +290,69 @@ function showConfirmation(action, fullName, approvalId, form) {
     return false;
 }
 
+function showRejectModal(submissionId) {
+    if (!submissionId || isNaN(submissionId)) {
+        console.error('Invalid submission ID:', submissionId);
+        alert('Invalid submission ID. Please try again.');
+        return;
+    }
 
-
-
-
-
-    // Reject submission
-    function showRejectModal(submissionId) {
     const modal = document.getElementById('rejectModal');
     const confirmButton = document.getElementById('confirmReject');
     const commentsField = document.getElementById('rejectComments');
-    commentsField.value = '';
+
+    if (!modal || !confirmButton || !commentsField) {
+        console.error('Reject modal elements missing');
+        alert('Error: Reject modal components are missing.');
+        return;
+    }
+
+    commentsField.value = ''; // Clear previous comments
 
     const newConfirmButton = confirmButton.cloneNode(true);
     confirmButton.parentNode.replaceChild(newConfirmButton, confirmButton);
+
     newConfirmButton.addEventListener('click', () => {
-    const comments = commentsField.value.trim();
-    fetch('../controller/reject_submission.php', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: `id=${encodeURIComponent(submissionId)}&comments=${encodeURIComponent(comments)}`
-})
-    .then(response => response.json())
-    .then(data => {
-    if (data.success) {
-    alert('Submission rejected successfully!');
-    location.reload();
-} else {
-    alert('Error rejecting submission: ' + (data.message || 'Unknown error'));
-}
-})
-    .catch(error => {
-    console.error('Error:', error);
-    alert('An error occurred while rejecting the submission.');
-});
-    closeModal('rejectModal');
-});
+        const comments = commentsField.value.trim();
+        newConfirmButton.disabled = true;
+        newConfirmButton.textContent = 'Processing...';
+
+        fetch('../controller/reject_submission.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `id=${encodeURIComponent(submissionId)}&comments=${encodeURIComponent(comments)}`,
+            credentials: 'same-origin'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.text().then(text => {
+                    try {
+                        return JSON.parse(text);
+                    } catch (e) {
+                        throw new Error('Invalid JSON response: ' + text);
+                    }
+                });
+            })
+            .then(data => {
+                if (data.success) {
+                    alert('Submission rejected successfully!');
+                    closeModal('rejectModal');
+                    location.reload();
+                } else {
+                    alert('Error rejecting submission: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error rejecting submission:', error);
+                alert('An error occurred while rejecting the submission: ' + error.message);
+            })
+            .finally(() => {
+                newConfirmButton.disabled = false;
+                newConfirmButton.textContent = 'Confirm';
+            });
+    });
+
     modal.classList.remove('hidden');
 }
-
