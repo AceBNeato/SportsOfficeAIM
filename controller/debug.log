@@ -998,3 +998,159 @@ Approve Submission - Debug: Array
 
 )
 
+Approve Submission - Debug: Array
+(
+    [session_id] => 0q00snb38nrev6oamc5s8kvnhk
+    [session_data] => Array
+        (
+            [csrf_token] => 44fe9474ede669600945ca612cd56b3e00d49be588a41687ee1dece72255a7a1
+            [logged_in] => 1
+            [user] => Array
+                (
+                    [id] => 1
+                    [student_id] => 
+                    [email] => admin@usep.edu.ph
+                    [password] => admin123
+                    [address] => Tagum City
+                    [role] => admin
+                    [full_name] => Gian Glen Vincent Garcia
+                    [year_section] => 
+                    [last_activity] => 1747634221
+                    [ip_address] => ::1
+                    [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+                    [has_profile_image] => 
+                )
+
+            [submissions] => Array
+                (
+                    [year_section] => 
+                )
+
+        )
+
+    [post_data] => Array
+        (
+            [id] => 12
+            [csrf_token] => 44fe9474ede669600945ca612cd56b3e00d49be588a41687ee1dece72255a7a1
+        )
+
+    [session_check] => Array
+        (
+            [logged_in] => 1
+            [user_exists] => 1
+            [user_id] => 1
+            [user_role] => admin
+        )
+
+    [csrf_check] => Array
+        (
+            [session_csrf] => 44fe9474ede669600945ca612cd56b3e00d49be588a41687ee1dece72255a7a1
+            [post_csrf] => 44fe9474ede669600945ca612cd56b3e00d49be588a41687ee1dece72255a7a1
+        )
+
+)
+
+Approve Submission - Debug: Array
+(
+    [session_id] => vidbfrer5nh5cf4ccc7g4onu3p
+    [session_data] => Array
+        (
+            [csrf_token] => 053a6ac5e8b69322c55626ae8372dd0efa77a2a875ac9c048ad259e42c556545
+            [logged_in] => 1
+            [user] => Array
+                (
+                    [id] => 1
+                    [student_id] => 
+                    [email] => admin@usep.edu.ph
+                    [password] => admin123
+                    [address] => Tagum City
+                    [role] => admin
+                    [full_name] => Gian Glen Vincent Garcia
+                    [year_section] => 
+                    [last_activity] => 1747634488
+                    [ip_address] => ::1
+                    [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+                    [has_profile_image] => 
+                )
+
+            [submissions] => Array
+                (
+                    [year_section] => 
+                )
+
+        )
+
+    [post_data] => Array
+        (
+            [id] => 12
+            [csrf_token] => 053a6ac5e8b69322c55626ae8372dd0efa77a2a875ac9c048ad259e42c556545
+        )
+
+    [session_check] => Array
+        (
+            [logged_in] => 1
+            [user_exists] => 1
+            [user_id] => 1
+            [user_role] => admin
+        )
+
+    [csrf_check] => Array
+        (
+            [session_csrf] => 053a6ac5e8b69322c55626ae8372dd0efa77a2a875ac9c048ad259e42c556545
+            [post_csrf] => 053a6ac5e8b69322c55626ae8372dd0efa77a2a875ac9c048ad259e42c556545
+        )
+
+)
+
+Approve Submission - Debug: Array
+(
+    [session_id] => kvamt5q5bhcdjco8satefvjr0m
+    [session_data] => Array
+        (
+            [csrf_token] => ecc0b5c4cc5474004b936f6d46dec633f9440e6838807b56850a9e5ffa342b86
+            [logged_in] => 1
+            [user] => Array
+                (
+                    [id] => 1
+                    [student_id] => 
+                    [email] => admin@usep.edu.ph
+                    [password] => admin123
+                    [address] => Tagum City
+                    [role] => admin
+                    [full_name] => Gian Glen Vincent Garcia
+                    [year_section] => 
+                    [last_activity] => 1747635233
+                    [ip_address] => ::1
+                    [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+                    [has_profile_image] => 
+                )
+
+            [submissions] => Array
+                (
+                    [year_section] => 
+                )
+
+        )
+
+    [post_data] => Array
+        (
+            [id] => 12
+            [csrf_token] => ecc0b5c4cc5474004b936f6d46dec633f9440e6838807b56850a9e5ffa342b86
+        )
+
+    [session_check] => Array
+        (
+            [logged_in] => 1
+            [user_exists] => 1
+            [user_id] => 1
+            [user_role] => admin
+        )
+
+    [csrf_check] => Array
+        (
+            [session_csrf] => ecc0b5c4cc5474004b936f6d46dec633f9440e6838807b56850a9e5ffa342b86
+            [post_csrf] => ecc0b5c4cc5474004b936f6d46dec633f9440e6838807b56850a9e5ffa342b86
+        )
+
+)
+
