@@ -7906,3 +7906,258 @@ Admin View - Session: Array
 
 Admin View - Session ID: 67mul5tdof1rcapk8h1fhfnorp
 >>>>>>> parent of d71ba2e (ok na jud ang comment sa rejection all goods)
+Admin View - Session: Array
+(
+    [csrf_token] => ed9b565f663d2fee44dd533b399b65bb8a8775d91df235ac6c8e3fe7f39ab402
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [last_activity] => 1747654874
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Admin View - Session ID: b9nfvdp6j7d8sjtps59eh7edlt
+Admin View - Session: Array
+(
+    [csrf_token] => ed9b565f663d2fee44dd533b399b65bb8a8775d91df235ac6c8e3fe7f39ab402
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [last_activity] => 1747655212
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Admin View - Session ID: b9nfvdp6j7d8sjtps59eh7edlt
+Admin View - Session: Array
+(
+    [csrf_token] => ed9b565f663d2fee44dd533b399b65bb8a8775d91df235ac6c8e3fe7f39ab402
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [last_activity] => 1747655214
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Admin View - Session ID: b9nfvdp6j7d8sjtps59eh7edlt
+Admin View - Session: Array
+(
+    [csrf_token] => ed9b565f663d2fee44dd533b399b65bb8a8775d91df235ac6c8e3fe7f39ab402
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [last_activity] => 1747655216
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Admin View - Session ID: b9nfvdp6j7d8sjtps59eh7edlt
+Admin View - Session: Array
+(
+    [csrf_token] => ed9b565f663d2fee44dd533b399b65bb8a8775d91df235ac6c8e3fe7f39ab402
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [last_activity] => 1747655216
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Admin View - Session ID: b9nfvdp6j7d8sjtps59eh7edlt
+Admin View - Session: Array
+(
+    [csrf_token] => ed9b565f663d2fee44dd533b399b65bb8a8775d91df235ac6c8e3fe7f39ab402
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [last_activity] => 1747655218
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Admin View - Session ID: b9nfvdp6j7d8sjtps59eh7edlt
+Admin View - Session: Array
+(
+    [csrf_token] => cbaaac1e860deb9e9debf17ea70bc0ffdb257882344674149ba439e29eef7c8d
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 3
+            [student_id] => 2023-00066
+            [email] => aumicaroz00066@usep.edu.ph
+            [password] => $2y$10$2ruDYbymfe4XYMzL5ZKjEO3WH50zCStsbFuXSEPkxk2SBgPTpni8y
+            [address] => Unknown
+            [role] => user
+            [full_name] => Arthur Dale Enrique U. Micaroz
+            [year_section] => 2IT-BSIT
+            [last_activity] => 1747655266
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 3
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 2IT-BSIT
+        )
+
+)
+
+Admin View - Session ID: 79vt9kbple4iu1a0e6sbgfigc4
+Admin View - Session: Array
+(
+    [csrf_token] => cbaaac1e860deb9e9debf17ea70bc0ffdb257882344674149ba439e29eef7c8d
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 3
+            [student_id] => 2023-00066
+            [email] => aumicaroz00066@usep.edu.ph
+            [password] => $2y$10$2ruDYbymfe4XYMzL5ZKjEO3WH50zCStsbFuXSEPkxk2SBgPTpni8y
+            [address] => Unknown
+            [role] => user
+            [full_name] => Arthur Dale Enrique U. Micaroz
+            [year_section] => 2IT-BSIT
+            [last_activity] => 1747655275
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 3
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 2IT-BSIT
+        )
+
+)
+
+Admin View - Session ID: 79vt9kbple4iu1a0e6sbgfigc4
+Admin View - Session: Array
+(
+    [csrf_token] => cbaaac1e860deb9e9debf17ea70bc0ffdb257882344674149ba439e29eef7c8d
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 3
+            [student_id] => 2023-00066
+            [email] => aumicaroz00066@usep.edu.ph
+            [password] => $2y$10$2ruDYbymfe4XYMzL5ZKjEO3WH50zCStsbFuXSEPkxk2SBgPTpni8y
+            [address] => Unknown
+            [role] => user
+            [full_name] => Arthur Dale Enrique U. Micaroz
+            [year_section] => 2IT-BSIT
+            [last_activity] => 1747655300
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 3
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 2IT-BSIT
+        )
+
+)
+
+Admin View - Session ID: 79vt9kbple4iu1a0e6sbgfigc4
