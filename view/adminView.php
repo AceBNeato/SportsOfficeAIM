@@ -129,13 +129,13 @@ $action = $_GET['action'] ?? '';
         <nav class="space-y-2 w-full px-2 mt-4">
             <?php
             $currentPage = isset($_GET['page']) ? $_GET['page'] : 'Achievement';
-            $menu = ['Achievement', 'Student Athletes', 'Evaluation', 'Reports', 'Users', 'Account Approvals', 'Log-out'];
+            $menu = ['Achievement', 'Approve Docs', 'Evaluation', 'Reports', 'Student Athletes', 'Account Approvals', 'Log-out'];
             $icon = [
                 'Achievement' => "<box-icon name='trophy' type='solid' color='white'></box-icon>",
-                'Student Athletes' => "<box-icon name='file-doc' type='solid' color='white'></box-icon>",
+                'Approve Docs' => "<box-icon name='file-doc' type='solid' color='white'></box-icon>",
                 'Evaluation' => "<box-icon name='line-chart' color='white'></box-icon>",
                 'Reports' => "<box-icon name='report' type='solid' color='white'></box-icon>",
-                'Users' => "<box-icon name='user-circle' color='white'></box-icon>",
+                'Student Athletes' => "<box-icon name='user-circle' color='white'></box-icon>",
                 'Account Approvals' => "<box-icon name='user-check' color='white'></box-icon>",
                 'Log-out' => "<box-icon name='log-out' color='white'></box-icon>"
             ];
