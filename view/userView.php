@@ -398,184 +398,167 @@
                     </div>
                 </div>
 
-                    <script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            const notificationsContainer = document.getElementById('notificationsContainer');
-                            const refreshBtn = document.getElementById('refreshNotifications');
-                            const clearBtn = document.getElementById('clearNotifications');
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const notificationsContainer = document.getElementById('notificationsContainer');
+                        const refreshBtn = document.getElementById('refreshNotifications');
+                        const clearBtn = document.getElementById('clearNotifications');
 
-                            let notifications = JSON.parse(localStorage.getItem('notifications')) || [];
-                            let timestampUpdaters = {};
+                        let notifications = JSON.parse(localStorage.getItem('notifications')) || [];
+                        let timestampUpdaters = {};
 
-                            function fetchNotifications() {
-                                fetch('../controller/notifications.php')
-                                    .then(response => {
-                                        if (!response.ok) {
-                                            throw new Error('Network response was not ok');
-                                        }
-                                        return response.json();
-                                    })
-                                    .then(data => {
-                                        if (data.notifications && data.notifications.length > 0) {
-                                            data.notifications.forEach(notification => {
-                                                if (!notifications.some(n => n.id === notification.id)) {
-                                                    notifications.unshift(notification);
-                                                    if (notifications.length > 50) {
-                                                        const removed = notifications.pop();
-                                                        if (timestampUpdaters[removed.timestamp]) {
-                                                            clearInterval(timestampUpdaters[removed.timestamp]);
-                                                            delete timestampUpdaters[removed.timestamp];
-                                                        }
+                        function fetchNotifications() {
+                            fetch('../controller/notifications.php')
+                                .then(response => {
+                                    if (!response.ok) {
+                                        throw new Error('Network response was not ok');
+                                    }
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    if (data.notifications && data.notifications.length > 0) {
+                                        data.notifications.forEach(notification => {
+                                            if (!notifications.some(n => n.id === notification.id)) {
+                                                notifications.unshift(notification);
+                                                if (notifications.length > 50) {
+                                                    const removed = notifications.pop();
+                                                    if (timestampUpdaters[removed.timestamp]) {
+                                                        clearInterval(timestampUpdaters[removed.timestamp]);
+                                                        delete timestampUpdaters[removed.timestamp];
                                                     }
                                                 }
-                                            });
-                                            localStorage.setItem('notifications', JSON.stringify(notifications));
-                                            displayNotifications();
-                                            markNotificationsAsRead();
-                                        }
-                                    })
-                                    .catch(error => console.error('Error fetching notifications:', error));
-                            }
-
-                            function markNotificationsAsRead() {
-                                fetch('../controller/notifications.php', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ action: 'mark_read' })
-                                })
-                                    .then(response => response.json())
-                                    .then(data => {
-                                        if (!data.success) {
-                                            console.warn('Failed to mark notifications as read:', data.error);
-                                        }
-                                    })
-                                    .catch(error => console.error('Error marking notifications as read:', error));
-                            }
-
-                            function formatTime(timestamp, element) {
-                                const updateTime = () => {
-                                    const now = new Date();
-                                    const notificationTime = new Date(timestamp);
-                                    const diffInSeconds = Math.floor((now - notificationTime) / 1000);
-
-                                    if (diffInSeconds < 60) {
-                                        element.textContent = 'Just now';
-                                    } else if (diffInSeconds < 3600) {
-                                        const minutes = Math.floor(diffInSeconds / 60);
-                                        element.textContent = `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
-                                    } else if (diffInSeconds < 86400) {
-                                        const hours = Math.floor(diffInSeconds / 3600);
-                                        element.textContent = `${hours} hour${hours !== 1 ? 's' : ''} ago`;
-                                    } else {
-                                        element.textContent = notificationTime.toLocaleDateString();
-                                        clearInterval(timestampUpdaters[timestamp]);
-                                        delete timestampUpdaters[timestamp];
-                                    }
-                                };
-
-                                updateTime();
-                                if (!timestampUpdaters[timestamp]) {
-                                    timestampUpdaters[timestamp] = setInterval(updateTime, 60000);
-                                }
-                            }
-
-                            function displayNotifications() {
-                                notificationsContainer.innerHTML = '';
-
-                                if (notifications.length === 0) {
-                                    notificationsContainer.innerHTML = '<p class="text-gray-500 text-center py-4">No notifications</p>';
-                                    return;
-                                }
-
-                                notifications.forEach((notification, index) => {
-                                    const notificationElement = document.createElement('div');
-                                    notificationElement.className = 'p-3 bg-gray-50 rounded border-l-4 border-blue-500 flex justify-between items-start';
-                                    notificationElement.innerHTML = `
-                <div>
-                    <p class="text-sm">${notification.message}</p>
-                    <p class="text-xs text-gray-500 mt-1 timestamp" data-timestamp="${notification.timestamp}"></p>
-                </div>
-                <button class="text-gray-400 hover:text-gray-600 delete-notification" data-index="${index}">
-                    <i class="fas fa-times"></i>
-                </button>
-            `;
-                                    notificationsContainer.appendChild(notificationElement);
-
-                                    const timestampElement = notificationElement.querySelector('.timestamp');
-                                    formatTime(notification.timestamp, timestampElement);
-                                });
-
-                                document.querySelectorAll('.delete-notification').forEach(btn => {
-                                    btn.addEventListener('click', function() {
-                                        const index = parseInt(this.getAttribute('data-index'));
-                                        const timestamp = notifications[index].timestamp;
-                                        if (timestampUpdaters[timestamp]) {
-                                            clearInterval(timestampUpdaters[timestamp]);
-                                            delete timestampUpdaters[timestamp];
-                                        }
-                                        notifications.splice(index, 1);
+                                            }
+                                        });
                                         localStorage.setItem('notifications', JSON.stringify(notifications));
                                         displayNotifications();
-                                    });
-                                });
-                            }
+                                        markNotificationsAsRead();
+                                    }
+                                })
+                                .catch(error => console.error('Error fetching notifications:', error));
+                        }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-                        // Function to clear all notifications
-                        function clearNotifications() {
+                        function markNotificationsAsRead() {
                             fetch('../controller/notifications.php', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
-                                credentials: 'same-origin',
-                                body: JSON.stringify({ action: 'clear_all' })
+                                body: JSON.stringify({ action: 'mark_read' })
                             })
                                 .then(response => response.json())
                                 .then(data => {
-                                    if (data.success) {
-                                        notificationsContainer.innerHTML = '<p class="text-gray-500">No notifications found.</p>';
-                                        fetchNotifications();
-=======
-                            clearBtn.addEventListener('click', function() {
-                                if (confirm('Are you sure you want to clear all notifications?')) {
-                                    Object.values(timestampUpdaters).forEach(interval => clearInterval(interval));
-                                    timestampUpdaters = {};
-                                    notifications = [];
-                                    localStorage.setItem('notifications', JSON.stringify(notifications));
-                                    fetch('../controller/notifications.php', {
-                                        method: 'POST',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify({ action: 'clear_all' })
-                                    })
-                                        .then(response => response.json())
-                                        .then(data => {
-                                            if (data.success) {
-                                                displayNotifications();
-                                            } else {
-                                                console.warn('Failed to clear notifications:', data.error);
-                                            }
-                                        })
-                                        .catch(error => console.error('Error clearing notifications:', error));
+                                    if (!data.success) {
+                                        console.warn('Failed to mark notifications as read:', data.error);
+                                    }
+                                })
+                                .catch(error => console.error('Error marking notifications as read:', error));
+                        }
+
+                        function formatTime(timestamp, element) {
+                            const updateTime = () => {
+                                const now = new Date();
+                                const notificationTime = new Date(timestamp);
+                                const diffInSeconds = Math.floor((now - notificationTime) / 1000);
+
+                                if (diffInSeconds < 60) {
+                                    element.textContent = 'Just now';
+                                } else if (diffInSeconds < 3600) {
+                                    const minutes = Math.floor(diffInSeconds / 60);
+                                    element.textContent = `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
+                                } else if (diffInSeconds < 86400) {
+                                    const hours = Math.floor(diffInSeconds / 3600);
+                                    element.textContent = `${hours} hour${hours !== 1 ? 's' : ''} ago`;
+                                } else {
+                                    element.textContent = notificationTime.toLocaleDateString();
+                                    clearInterval(timestampUpdaters[timestamp]);
+                                    delete timestampUpdaters[timestamp];
                                 }
+                            };
+
+                            updateTime();
+                            if (!timestampUpdaters[timestamp]) {
+                                timestampUpdaters[timestamp] = setInterval(updateTime, 60000);
+                            }
+                        }
+
+                        function displayNotifications() {
+                            notificationsContainer.innerHTML = '';
+
+                            if (notifications.length === 0) {
+                                notificationsContainer.innerHTML = '<p class="text-gray-500 text-center py-4">No notifications</p>';
+                                return;
+                            }
+
+                            notifications.forEach((notification, index) => {
+                                const notificationElement = document.createElement('div');
+                                notificationElement.className = 'p-3 bg-gray-50 rounded border-l-4 border-blue-500 flex justify-between items-start';
+                                notificationElement.innerHTML = `
+                                        <div>
+                                            <p class="text-sm">${notification.message}</p>
+                                            <p class="text-xs text-gray-500 mt-1 timestamp" data-timestamp="${notification.timestamp}"></p>
+                                        </div>
+                                        <button class="text-gray-400 hover:text-gray-600 delete-notification" data-index="${index}">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    `;
+                                notificationsContainer.appendChild(notificationElement);
+
+                                const timestampElement = notificationElement.querySelector('.timestamp');
+                                formatTime(notification.timestamp, timestampElement);
                             });
 
-                            refreshBtn.addEventListener('click', function() {
-                                refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Refreshing';
-                                fetchNotifications();
-                                setTimeout(() => {
-                                    refreshBtn.innerHTML = '<i class="fas fa-sync-alt mr-1"></i>Refresh';
-                                }, 1000);
+                            document.querySelectorAll('.delete-notification').forEach(btn => {
+                                btn.addEventListener('click', function() {
+                                    const index = parseInt(this.getAttribute('data-index'));
+                                    const timestamp = notifications[index].timestamp;
+                                    if (timestampUpdaters[timestamp]) {
+                                        clearInterval(timestampUpdaters[timestamp]);
+                                        delete timestampUpdaters[timestamp];
+                                    }
+                                    notifications.splice(index, 1);
+                                    localStorage.setItem('notifications', JSON.stringify(notifications));
+                                    displayNotifications();
+                                });
                             });
+                        }
 
-                            fetchNotifications();
-                            displayNotifications();
-
-                            window.addEventListener('beforeunload', function() {
+                        clearBtn.addEventListener('click', function() {
+                            if (confirm('Are you sure you want to clear all notifications?')) {
                                 Object.values(timestampUpdaters).forEach(interval => clearInterval(interval));
-                            });
+                                timestampUpdaters = {};
+                                notifications = [];
+                                localStorage.setItem('notifications', JSON.stringify(notifications));
+                                fetch('../controller/notifications.php', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ action: 'clear_all' })
+                                })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.success) {
+                                            displayNotifications();
+                                        } else {
+                                            console.warn('Failed to clear notifications:', data.error);
+                                        }
+                                    })
+                                    .catch(error => console.error('Error clearing notifications:', error));
+                            }
                         });
-                    </script>
 
+                        refreshBtn.addEventListener('click', function() {
+                            refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Refreshing';
+                            fetchNotifications();
+                            setTimeout(() => {
+                                refreshBtn.innerHTML = '<i class="fas fa-sync-alt mr-1"></i>Refresh';
+                            }, 1000);
+                        });
+
+                        fetchNotifications();
+                        displayNotifications();
+
+                        window.addEventListener('beforeunload', function() {
+                            Object.values(timestampUpdaters).forEach(interval => clearInterval(interval));
+                        });
+                    });
+                </script>
 
 
 
@@ -723,7 +706,7 @@
                                     $conn = new mysqli($host, $username, $password, $dbname);
                                     if ($conn->connect_error) {
                                         echo '<tr><td colspan="7" class="px-6 py-4 text-sm text-gray-500 text-center">Database connection failed</td></tr>';
->>>>>>> 59aec3e9f9389d334d59671d188fca365e087b6d
+
                                     } else {
                                         if (isset($_SESSION['user']['id'])) {
                                             $user_id = $_SESSION['user']['id'];
@@ -799,78 +782,19 @@
                                         }
                                         $conn->close();
                                     }
-<<<<<<< HEAD
-                                })
-                                .catch(error => {
-                                    notificationsContainer.innerHTML = '<p class="text-red-500">Failed to mark notifications as read: ${error.message}</p>';
-                                    console.error('Error marking notifications as read:', error);
-                                });
-                        }
 
-                        // Initial fetch
-                        fetchNotifications();
-
-                        // Event listeners
-                        refreshButton.addEventListener('click', fetchNotifications);
-                        clearButton.addEventListener('click', clearNotifications);
-                        markAllReadButton.addEventListener('click', markAllAsRead);
-
-                        // Poll for new notifications every 30 seconds
-                        setInterval(fetchNotifications, 30000);
-                    });
-                </script>
-=======
-                            clearBtn.addEventListener('click', function() {
-                                if (confirm('Are you sure you want to clear all notifications?')) {
-                                    Object.values(timestampUpdaters).forEach(interval => clearInterval(interval));
-                                    timestampUpdaters = {};
-                                    notifications = [];
-                                    localStorage.setItem('notifications', JSON.stringify(notifications));
-                                    fetch('../controller/notifications.php', {
-                                        method: 'POST',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify({ action: 'clear_all' })
-                                    })
-                                        .then(response => response.json())
-                                        .then(data => {
-                                            if (data.success) {
-                                                displayNotifications();
-                                            } else {
-                                                console.warn('Failed to clear notifications:', data.error);
-                                            }
-                                        })
-                                        .catch(error => console.error('Error clearing notifications:', error));
-                                }
-                            });
-
-                            refreshBtn.addEventListener('click', function() {
-                                refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Refreshing';
-                                fetchNotifications();
-                                setTimeout(() => {
-                                    refreshBtn.innerHTML = '<i class="fas fa-sync-alt mr-1"></i>Refresh';
-                                }, 1000);
-                            });
-
-                            fetchNotifications();
-                            displayNotifications();
-
-                            window.addEventListener('beforeunload', function() {
-                                Object.values(timestampUpdaters).forEach(interval => clearInterval(interval));
-                            });
-                        });
-                    </script>
-    
-
-
->>>>>>> parent of d613f21 (achievement merge with notification)
-=======
                                     ?>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
->>>>>>> 59aec3e9f9389d334d59671d188fca365e087b6d
+
+
+    
+
+
+
 
                     <script>
                         // Open/Close Modal
