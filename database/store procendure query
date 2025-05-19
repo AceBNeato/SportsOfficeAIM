@@ -199,14 +199,80 @@ BEGIN
 END$$
 DELIMITER ;
 
+//ACHIEVEMENT
+DELIMITER //
+CREATE PROCEDURE AddAchievement(
+        IN p_user_id INT,
+        IN p_athlete_name VARCHAR(255),
+        IN p_level_of_competition VARCHAR(50),
+        IN p_performance VARCHAR(50),
+        IN p_number_of_events VARCHAR(50),
+        IN p_leadership_role VARCHAR(50),
+        IN p_sportsmanship VARCHAR(50),
+        IN p_community_impact VARCHAR(50),
+        IN p_completeness_of_documents VARCHAR(50),
+        IN p_total_points INT,
+        IN p_documents TEXT,
+        IN p_status ENUM('Pending', 'Approved', 'Rejected'),
+        IN p_rejection_reason TEXT
+    )
+    BEGIN
+        INSERT INTO achievements (
+            user_id, athlete_name, level_of_competition, performance, number_of_events,
+            leadership_role, sportsmanship, community_impact, completeness_of_documents,
+            total_points, documents, status, rejection_reason, submission_date
+        ) VALUES (
+            p_user_id, p_athlete_name, p_level_of_competition, p_performance, p_number_of_events,
+            p_leadership_role, p_sportsmanship, p_community_impact, p_completeness_of_documents,
+            p_total_points, p_documents, p_status, p_rejection_reason, NOW()
+        );
+    END //
+
+    DELIMITER ;
+
+-- Stored Procedure to Get User Achievements
+DELIMITER //
+
+CREATE PROCEDURE GetUserAchievements(IN p_user_id INT)
+BEGIN
+    SELECT
+        id,
+        athlete_name,
+        level_of_competition,
+        performance,
+        number_of_events,
+        leadership_role,
+        sportsmanship,
+        community_impact,
+        completeness_of_documents,
+        total_points,
+        documents,
+        DATE_FORMAT(submission_date, '%m-%d-%Y') AS submission_date,
+        status,
+        rejection_reason
+    FROM achievements
+    WHERE user_id = p_user_id
+    ORDER BY submission_date DESC;
+END //
+
+DELIMITER ;
 
 
 
+DELIMITER //
 
+CREATE PROCEDURE GetLeaderboard()
+BEGIN
+    SELECT
+        athlete_name,
+        SUM(total_points) AS total_points
+    FROM achievements
+    WHERE status = 'Approved'
+    GROUP BY athlete_name
+    ORDER BY total_points DESC;
+END //
 
-
-
-
+DELIMITER ;
 
 
 trigger
