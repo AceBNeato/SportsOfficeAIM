@@ -1,9 +1,11 @@
 <?php
+session_start();
 $conn = new mysqli("localhost", "root", "", "SportOfficeDB");
 if ($conn->connect_error) {
     die(json_encode(['success' => false, 'message' => 'Database connection failed']));
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 $submission_id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
 $comments = isset($_POST['comments']) ? trim($_POST['comments']) : '';
@@ -31,8 +33,15 @@ if (!$submission_id || !is_numeric($submission_id)) {
 $stmt = $conn->prepare("UPDATE submissions SET status = 'rejected', comments = ? WHERE id = ?");
 >>>>>>> d71ba2ea996a2c74e499c10c8180ae18088e5673
 $stmt->bind_param("si", $comments, $submission_id);
+=======
+$submission_id = $_POST['id'];
+
+$stmt = $conn->prepare("UPDATE submissions SET status = 'rejected' WHERE id = ?");
+$stmt->bind_param("i", $submission_id);
+>>>>>>> parent of d71ba2e (ok na jud ang comment sa rejection all goods)
 $success = $stmt->execute();
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 if ($success) {
     // Optionally, create a notification for the user
@@ -60,5 +69,8 @@ echo json_encode([
 ]);
 
 >>>>>>> d71ba2ea996a2c74e499c10c8180ae18088e5673
+=======
+echo json_encode(['success' => $success, 'message' => $success ? 'Submission rejected' : 'Failed to reject submission']);
+>>>>>>> parent of d71ba2e (ok na jud ang comment sa rejection all goods)
 $conn->close();
 ?>
