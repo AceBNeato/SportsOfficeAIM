@@ -127,10 +127,10 @@ $action = $_GET['action'] ?? '';
         <nav class="space-y-2 w-full px-2 mt-4">
             <?php
             $currentPage = isset($_GET['page']) ? $_GET['page'] : 'Achievement';
-            $menu = ['Achievement', 'Approve Docs', 'Evaluation', 'Reports', 'Student Athletes', 'Account Approvals', 'Log-out'];
+            $menu = ['Achievement', 'Approved Docs', 'Evaluation', 'Reports', 'Student Athletes', 'Account Approvals', 'Log-out'];
             $icon = [
                 'Achievement' => "<box-icon name='trophy' type='solid' color='white'></box-icon>",
-                'Approve Docs' => "<box-icon name='file-doc' type='solid' color='white'></box-icon>",
+                'Approved Docs' => "<box-icon name='file-doc' type='solid' color='white'></box-icon>",
                 'Evaluation' => "<box-icon name='line-chart' color='white'></box-icon>",
                 'Reports' => "<box-icon name='report' type='solid' color='white'></box-icon>",
                 'Student Athletes' => "<box-icon name='user-circle' color='white'></box-icon>",
@@ -666,10 +666,19 @@ $action = $_GET['action'] ?? '';
             });
         </script>
 
-    <?php elseif ($currentPage === 'Reports'): ?>
+
+
+
+
+
+
+
+
+        <?php elseif ($currentPage === 'Reports'): ?>
         <div class="p-4 sm:p-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div class="bg-white rounded-xl shadow p-4 flex items-center space-x-4">
+                <!-- Total Athletes Card -->
+                <a href="?page=Student Athletes" class="bg-white rounded-xl shadow p-4 flex items-center space-x-4 hover:bg-gray-50 transition">
                     <div class="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 flex justify-center items-center text-red-500 bg-red-100 rounded-full text-2xl">
                         <i class='bx bxs-user-account'></i>
                     </div>
@@ -678,44 +687,248 @@ $action = $_GET['action'] ?? '';
                         <?php
                         $conn = Database::getInstance();
                         $totalStudents = 0;
-                        if ($result = $conn->query("CALL GetTotalStudents()")) {
-                            if ($row = $result->fetch_assoc()) {
-                                $totalStudents = $row['total'];
+                        try {
+                            if (!$conn || $conn->connect_error) {
+                                error_log("Database connection failed in Total Athletes: " . ($conn ? $conn->connect_error : "No connection"));
+                                echo "<p class='text-red-600'>Unable to fetch athlete count. Please try again later.</p>";
+                            } else {
+                                if ($result = $conn->query("CALL GetTotalStudents()")) {
+                                    if ($row = $result->fetch_assoc()) {
+                                        $totalStudents = $row['total'];
+                                    }
+                                    $result->free();
+                                    while ($conn->more_results() && $conn->next_result()) {
+                                        if ($extra_result = $conn->store_result()) {
+                                            $extra_result->free();
+                                        }
+                                    }
+                                } else {
+                                    error_log("Error calling GetTotalStudents: " . $conn->error);
+                                    echo "<p class='text-red-600'>Unable to fetch athlete count. Please try again later.</p>";
+                                }
                             }
-                            $result->free();
+                        } catch (Exception $e) {
+                            error_log("Exception in Total Athletes query: " . $e->getMessage());
+                            echo "<p class='text-red-600'>An error occurred. Please try again later.</p>";
                         }
                         ?>
-                        <p class="text-2xl sm:text-3xl font-bold text-gray-900"><?= $totalStudents ?></p>
+                        <p class="text-2xl sm:text-3xl font-bold text-gray-900"><?= htmlspecialchars($totalStudents) ?></p>
                     </div>
-                </div>
-                <div class="bg-white rounded-xl shadow p-4 flex items-center space-x-4">
+                </a>
+                <!-- Approved Reports Card -->
+                <a href="?page=Approved Docs" class="bg-white rounded-xl shadow p-4 flex items-center space-x-4 hover:bg-gray-50 transition">
                     <div class="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 flex justify-center items-center text-green-600 bg-green-100 rounded-full text-2xl">
                         <i class='bx bxs-file-doc'></i>
                     </div>
                     <div>
                         <p class="text-gray-800 font-semibold text-sm sm:text-base">Approved Reports</p>
-                        <p class="text-2xl sm:text-3xl font-bold text-gray-900">0</p>
+                        <?php
+                        $approvedCount = 0;
+                        try {
+                            if (!$conn || $conn->connect_error) {
+                                error_log("Database connection failed in Approved Reports: " . ($conn ? $conn->connect_error : "No connection"));
+                                echo "<p class='text-red-600'>Unable to fetch approved reports count. Please try again later.</p>";
+                            } else {
+                                $query = "SELECT COUNT(*) as total FROM submissions WHERE status = 'approved'";
+                                if ($result = $conn->query($query)) {
+                                    if ($row = $result->fetch_assoc()) {
+                                        $approvedCount = $row['total'];
+                                    }
+                                    $result->free();
+                                } else {
+                                    error_log("Error fetching approved count: " . $conn->error);
+                                    echo "<p class='text-red-600'>Unable to fetch approved reports count. Please try again later.</p>";
+                                }
+                            }
+                        } catch (Exception $e) {
+                            error_log("Exception in Approved Reports query: " . $e->getMessage());
+                            echo "<p class='text-red-600'>An error occurred. Please try again later.</p>";
+                        }
+                        ?>
+                        <p class="text-2xl sm:text-3xl font-bold text-gray-900"><?= htmlspecialchars($approvedCount) ?></p>
                     </div>
-                </div>
-                <div class="bg-white rounded-xl shadow p-4 sm:p-8 flex flex-col md:flex-row items-center justify-center col-span-1 md:col-span-2 space-y-4 md:space-y-0 md:space-x-8">
-                    <div class="flex justify-center items-center w-24 sm:w-32 h-24 sm:h-32 text-blue-600 bg-blue-100 rounded-full text-5xl">
+                </a>
+                <!-- Total Achievements Card -->
+                <a href="?page=Achievement" class="bg-white rounded-xl shadow p-4 flex items-center space-x-4 hover:bg-gray-50 transition">
+                    <div class="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 flex justify-center items-center text-purple-600 bg-purple-100 rounded-full text-2xl">
+                        <i class='bx bxs-trophy'></i>
+                    </div>
+                    <div>
+                        <p class="text-gray-800 font-semibold text-sm sm:text-base">Total Achievements</p>
+                        <?php
+                        $totalAchievements = 0;
+                        try {
+                            if (!$conn || $conn->connect_error) {
+                                error_log("Database connection failed in Total Achievements: " . ($conn ? $conn->connect_error : "No connection"));
+                                echo "<p class='text-red-600'>Unable to fetch achievements count. Please try again later.</p>";
+                            } else {
+                                $query = "SELECT COUNT(*) as total FROM achievements";
+                                if ($result = $conn->query($query)) {
+                                    if ($row = $result->fetch_assoc()) {
+                                        $totalAchievements = $row['total'];
+                                    }
+                                    $result->free();
+                                } else {
+                                    error_log("Error fetching achievements count: " . $conn->error);
+                                    echo "<p class='text-red-600'>Unable to fetch achievements count. Please try again later.</p>";
+                                }
+                            }
+                        } catch (Exception $e) {
+                            error_log("Exception in Total Achievements query: " . $e->getMessage());
+                            echo "<p class='text-red-600'>An error occurred. Please try again later.</p>";
+                        }
+                        ?>
+                        <p class="text-2xl sm:text-3xl font-bold text-gray-900"><?= htmlspecialchars($totalAchievements) ?></p>
+                    </div>
+                </a>
+
+
+                <!-- Pending Account Approvals Card -->
+                <a href="?page=Account Approvals" class="bg-white rounded-xl shadow p-4 flex items-center space-x-4 hover:bg-gray-50 transition">
+                    <div class="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 flex justify-center items-center text-yellow-600 bg-yellow-100 rounded-full text-2xl">
+                        <i class='bx bxs-user-check'></i>
+                    </div>
+                    <div>
+                        <p class="text-gray-800 font-semibold text-sm sm:text-base">Pending Account Approvals</p>
+                        <?php
+                        $pendingApprovals = 0;
+                        try {
+                            if (!$conn || $conn->connect_error) {
+                                error_log("Database connection failed in Pending Approvals: " . ($conn ? $conn->connect_error : "No connection"));
+                                echo "<p class='text-red-600'>Unable to fetch pending approvals count. Please try again later.</p>";
+                            } else {
+                                $query = "SELECT COUNT(*) as total FROM account_approvals WHERE approval_status = 'pending'";
+                                if ($result = $conn->query($query)) {
+                                    if ($row = $result->fetch_assoc()) {
+                                        $pendingApprovals = $row['total'];
+                                    }
+                                    $result->free();
+                                } else {
+                                    error_log("Error fetching pending approvals count: " . $conn->error);
+                                    echo "<p class='text-red-600'>Unable to fetch pending approvals count. Please try again later.</p>";
+                                }
+                            }
+                        } catch (Exception $e) {
+                            error_log("Exception in Pending Approvals query: " . $e->getMessage());
+                            echo "<p class='text-red-600'>An error occurred. Please try again later.</p>";
+                        }
+                        ?>
+                        <p class="text-2xl sm:text-3xl font-bold text-gray-900"><?= htmlspecialchars($pendingApprovals) ?></p>
+                    </div>
+                </a>
+
+
+                <!-- Pending and Verified Documents Card -->
+                <a href="?page=Evaluation" class="bg-white rounded-xl shadow p-4 flex justify-center items-center space-x-4 hover:bg-gray-50 transition col-span-1 md:col-span-2">
+                    <div class="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 flex justify-center items-center text-blue-600 bg-blue-100 rounded-full text-2xl">
                         <i class='bx bxs-bar-chart-alt-2'></i>
                     </div>
-                    <div class="flex flex-col justify-center space-y-4 text-center md:text-left">
-                        <div class="flex flex-col md:flex-row items-center md:space-x-4">
-                            <div class="text-2xl sm:text-3xl font-bold text-gray-800">0</div>
-                            <div class="text-gray-800 font-semibold text-sm sm:text-base">Ongoing Submission</div>
+                    <div class="flex flex-col justify-center space-y-2 text-center mx-auto">
+                        <!-- Pending Submissions -->
+                        <?php
+                        $pendingCount = 0;
+                        $approvedCount = 0;
+
+                        try {
+                            if (!$conn || $conn->connect_error) {
+                                error_log("Database connection failed: " . ($conn ? $conn->connect_error : "No connection"));
+                                echo "<p class='text-red-600 text-sm'>Unable to connect to the database. Please try again later.</p>";
+                            } else {
+                                // Query for pending submissions
+                                $pendingQuery = "SELECT COUNT(*) as total FROM submissions WHERE status = 'pending'";
+                                if ($pendingResult = $conn->query($pendingQuery)) {
+                                    if ($pendingRow = $pendingResult->fetch_assoc()) {
+                                        $pendingCount = $pendingRow['total'];
+                                    }
+                                    $pendingResult->free();
+                                } else {
+                                    error_log("Error fetching pending count: " . $conn->error);
+                                    echo "<p class='text-red-600 text-sm'>Unable to fetch pending submissions count.</p>";
+                                }
+
+                                // Query for approved (verified) documents
+                                $approvedQuery = "SELECT COUNT(*) as total FROM submissions WHERE status = 'approved'";
+                                if ($approvedResult = $conn->query($approvedQuery)) {
+                                    if ($approvedRow = $approvedResult->fetch_assoc()) {
+                                        $approvedCount = $approvedRow['total'];
+                                    }
+                                    $approvedResult->free();
+                                } else {
+                                    error_log("Error fetching approved count: " . $conn->error);
+                                    echo "<p class='text-red-600 text-sm'>Unable to fetch verified documents count.</p>";
+                                }
+                            }
+                        } catch (Exception $e) {
+                            error_log("Exception in submissions query: " . $e->getMessage());
+                            echo "<p class='text-red-600 text-sm'>An error occurred. Please try again later.</p>";
+                        }
+                        ?>
+                        <!-- Pending Submissions Display -->
+                        <div class="flex flex-col">
+                            <div class="text-lg sm:text-xl font-bold text-gray-900"><?= htmlspecialchars($pendingCount, ENT_QUOTES, 'UTF-8') ?></div>
+                            <div class="text-gray-600 font-semibold text-sm sm:text-base">Pending Submissions</div>
                         </div>
-                        <div class="flex flex-col md:flex-row items-center md:space-x-4">
-                            <div class="text-2xl sm:text-3xl font-bold text-gray-800">0</div>
-                            <div class="text-gray-800 font-semibold text-sm sm:text-base">Verified Document</div>
+                        <!-- Approved Documents Display -->
+                        <div class="flex flex-col">
+                            <div class="text-lg sm:text-xl font-bold text-gray-900"><?= htmlspecialchars($approvedCount, ENT_QUOTES, 'UTF-8') ?></div>
+                            <div class="text-gray-600 font-semibold text-sm sm:text-base">Verified Documents</div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
+                </a>
 
-        <?php elseif ($currentPage === 'Approve Docs'): ?>
+
+
+
+
+
+                <!-- Athletes by Campus Card (Unchanged) -->
+                <a href="?page=Student Athletes" class="bg-white rounded-xl shadow p-4 flex items-center space-x-4 hover:bg-gray-50 transition col-span-1 md:col-span-2">
+                    <div class="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 flex justify-center items-center text-blue-600 bg-blue-100 rounded-full text-2xl">
+                        <i class='bx bxs-school'></i>
+                    </div>
+                    <div>
+                        <p class="text-gray-800 font-semibold text-sm sm:text-base">Athletes by Campus</p>
+                        <?php
+                        $tagumCount = 0;
+                        $mabiniCount = 0;
+                        try {
+                            if (!$conn || $conn->connect_error) {
+                                error_log("Database connection failed in Athletes by Campus: " . ($conn ? $conn->connect_error : "No connection"));
+                                echo "<p class='text-red-600'>Unable to fetch campus counts. Please try again later.</p>";
+                            } else {
+                                $query = "SELECT campus, COUNT(*) as total FROM users WHERE campus IN ('Tagum', 'Mabini') GROUP BY campus";
+                                if ($result = $conn->query($query)) {
+                                    while ($row = $result->fetch_assoc()) {
+                                        if ($row['campus'] === 'Tagum') {
+                                            $tagumCount = $row['total'];
+                                        } elseif ($row['campus'] === 'Mabini') {
+                                            $mabiniCount = $row['total'];
+                                        }
+                                    }
+                                    $result->free();
+                                } else {
+                                    error_log("Error fetching campus counts: " . $conn->error);
+                                    echo "<p class='text-red-600'>Unable to fetch campus counts. Please try again later.</p>";
+                                }
+                            }
+                        } catch (Exception $e) {
+                            error_log("Exception in Athletes by Campus query: " . $e->getMessage());
+                            echo "<p class='text-red-600'>An error occurred. Please try again later.</p>";
+                        }
+                        ?>
+                        <p class="text-lg sm:text-xl font-bold text-gray-900">Tagum: <?= htmlspecialchars($tagumCount) ?> | Mabini: <?= htmlspecialchars($mabiniCount) ?></p>
+                    </div>
+                </a>
+
+
+
+
+
+
+
+
+
+        <?php elseif ($currentPage === 'Approved Docs'): ?>
         <?php
         // Database configuration (using your existing Database class)
         $conn = Database::getInstance();

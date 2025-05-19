@@ -14,7 +14,7 @@ if ($conn->connect_error) {
 }
 
 // Validate and get form data
-$requiredFields = ['student_id', 'full_name', 'address', 'email', 'password', 'status'];
+$requiredFields = ['student_id', 'full_name', 'email', 'password', 'status'];
 foreach ($requiredFields as $field) {
     if (empty($_POST[$field])) {
         header("Location: ../view/adminView.php?message=" . urlencode("Missing required field: $field"));
@@ -24,7 +24,8 @@ foreach ($requiredFields as $field) {
 
 $student_id = trim($_POST['student_id']);
 $full_name = trim($_POST['full_name']);
-$address = trim($_POST['address']);
+// Set address to "N/A" if empty or not provided
+$address = !empty(trim($_POST['address'])) ? trim($_POST['address']) : 'N/A';
 $email = trim($_POST['email']);
 $password = $_POST['password'];
 $status = isset($_POST['status']) && !empty(trim($_POST['status'])) ? trim($_POST['status']) : 'User';
@@ -66,6 +67,8 @@ if ($stmt->execute()) {
         }
     }
     exit();
+} else {
+    header("Location: ../view/adminView.php?message=" . urlencode("Execution failed: " . $stmt->error));
 }
 
 $stmt->close();
