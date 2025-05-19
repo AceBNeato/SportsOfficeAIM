@@ -172,61 +172,274 @@ $action = $_GET['action'] ?? '';
 
         </div>
 
-        <?php if ($currentPage === 'Users'): ?>
-        <div class="hidden sm:block w-full bg-red-500 text-white font-semibold rounded-t-lg px-5 mt-2 mb-4">
-            <div class="hidden sm:flex items-center px-4 py-6">
-                <div class="w-1/12 text-center"></div>
-                <div class="w-3/12">Student ID</div>
-                <div class="w-4/12">Student Name</div>
-                <div class="w-4/12">Student Address</div>
-            </div>
-        </div>
-        <?php
-        $users = searchUsers(isset($_GET['search']) ? $_GET['search'] : '');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    `<?php
+        if ($currentPage === 'Student Athletes'):
+        // Database configuration
+        try {
+            $conn = Database::getInstance();
+            if (!$conn) {
+                throw new Exception('Database connection failed.');
+            }
+        } catch (Exception $e) {
+            error_log("Database error: " . $e->getMessage());
+            echo '<div class="text-center py-12 text-red-500 font-medium">Unable to connect to the database. Please try again later.</div>';
+            exit;
+        }
+
+        // Search and fetch users function
+        function fetchUsers($searchTerm, $conn, $page = 1, $perPage = 10) {
+            $offset = ($page - 1) * $perPage;
+            $searchTerm = trim($searchTerm);
+
+            if (empty($searchTerm)) {
+                // Fetch all users when no search term
+                $stmt = $conn->prepare("
+                SELECT id, student_id, full_name, address
+                FROM users
+                ORDER BY full_name ASC
+                LIMIT ? OFFSET ?
+            ");
+                if (!$stmt) {
+                    error_log("Prepare failed: " . $conn->error);
+                    return ['users' => [], 'total' => 0];
+                }
+                $stmt->bind_param("ii", $perPage, $offset);
+            } else {
+                // Search query
+                $searchTerm = '%' . $conn->real_escape_string($searchTerm) . '%';
+                $stmt = $conn->prepare("
+                SELECT id, student_id, full_name, address
+                FROM users
+                WHERE student_id LIKE ? OR full_name LIKE ?
+                ORDER BY full_name ASC
+                LIMIT ? OFFSET ?
+            ");
+                if (!$stmt) {
+                    error_log("Prepare failed: " . $conn->error);
+                    return ['users' => [], 'total' => 0];
+                }
+                $stmt->bind_param("ssii", $searchTerm, $searchTerm, $perPage, $offset);
+            }
+
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $users = $result->fetch_all(MYSQLI_ASSOC);
+            $stmt->close();
+
+            // Get total count for pagination
+            $countStmt = $conn->prepare(empty($searchTerm) ?
+                "SELECT COUNT(*) as total FROM users" :
+                "SELECT COUNT(*) as total FROM users WHERE student_id LIKE ? OR full_name LIKE ?"
+            );
+            if ($countStmt) {
+                if (!empty($searchTerm)) {
+                    $countStmt->bind_param("ss", $searchTerm, $searchTerm);
+                }
+                $countStmt->execute();
+                $total = $countStmt->get_result()->fetch_assoc()['total'];
+                $countStmt->close();
+            } else {
+                $total = 0;
+            }
+
+            return ['users' => $users, 'total' => $total];
+        }
+
+        // Get parameters
+        $searchTerm = isset($_GET['search']) ? trim($_GET['search']) : '';
+        $page = isset($_GET['page_num']) ? max(1, (int)$_GET['page_num']) : 1;
+        $perPage = 10;
+
+        // Fetch users
+        $result = fetchUsers($searchTerm, $conn, $page, $perPage);
+        $users = $result['users'];
+        $totalUsers = $result['total'];
+        $totalPages = ceil($totalUsers / $perPage);
         ?>
-        <div class="max-h-[calc(100vh-10rem)] overflow-y-auto overflow-x-hidden scroll-thin">
-            <div class="w-full px-4 sm:px-8 lg:px-8 space-y-2">
+
+        <div class="w-full max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 mt-4">
+            <!-- Search Form -->
+            <form method="GET" action="?page=Student Athletes" class="mb-4 flex flex-col sm:flex-row gap-2">
+                <input type="hidden" name="page" value="Student Athletes"/>
+                <div class="relative flex-1">
+                    <input
+                            type="text"
+                            name="search"
+                            placeholder="Search by Student ID or Name..."
+                            value="<?php echo htmlspecialchars($searchTerm); ?>"
+                            class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-sm"
+                    >
+                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+                <button
+                        type="submit"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors text-sm"
+                >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    Search
+                </button>
+            </form>
+
+            <!-- Results Header -->
+            <div class="hidden sm:grid grid-cols-12 gap-2 bg-gray-100 text-gray-700 font-semibold py-3 px-4 rounded-t-lg text-sm">
+                <div class="col-span-3">Student ID</div>
+                <div class="col-span-4">Student Name</div>
+                <div class="col-span-5">Address</div>
+            </div>
+
+            <!-- Results -->
+            <div class="max-h-[calc(100vh-20rem)] overflow-y-auto rounded-b-lg border border-gray-200 bg-white">
                 <?php if (count($users) > 0): ?>
                     <?php foreach ($users as $row): ?>
-                        <div class="bg-white p-4 rounded-lg shadow-sm space-y-2 sm:space-y-0 sm:grid sm:grid-cols-12 sm:items-center">
-                            <div class="text-center text-xl text-gray-600 sm:col-span-1">
-                                <button type="button" class="text-blue-500 hover:text-blue-700 focus:outline-none"
-                                        title="Edit User"
-                                        data-student-id="<?= htmlspecialchars($row['student_id'], ENT_QUOTES, 'UTF-8') ?>"
-                                        data-full-name="<?= htmlspecialchars($row['full_name'], ENT_QUOTES, 'UTF-8') ?>"
-                                        data-address="<?= htmlspecialchars($row['address'], ENT_QUOTES, 'UTF-8') ?>"
-                                        data-status="<?= isset($row['status']) ? htmlspecialchars($row['status'], ENT_QUOTES, 'UTF-8') : '' ?>"
-                                        onclick="openEditModal(this)">
-                                    <i class="fas fa-edit"></i>
-                                </button>
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 p-3 sm:p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors text-sm">
+                            <div class="col-span-1 sm:col-span-3">
+                                <span class="block sm:hidden font-medium text-gray-600 text-xs">Student ID:</span>
+                                <?php echo htmlspecialchars($row['student_id']); ?>
                             </div>
-                            <div class="text-gray-800 font-medium sm:col-span-3">
-                                <span class="block sm:hidden font-semibold text-gray-600">Student ID:</span>
-                                <?= htmlspecialchars($row['student_id']) ?>
+                            <div class="col-span-1 sm:col-span-4 flex items-center gap-2">
+                                <span class="block sm:hidden font-medium text-gray-600 text-xs">Name:</span>
+                                <a href="?page=StudentProfile&id=<?php echo urlencode($row['id']); ?>" class="text-blue-600 hover:underline flex items-center gap-1">
+                                    <?php echo htmlspecialchars($row['full_name']); ?>
+                                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                </a>
                             </div>
-                            <div class="text-gray-800 sm:col-span-4">
-                                <span class="block sm:hidden font-semibold text-gray-600">Name:</span>
-                                <?= htmlspecialchars($row['full_name']) ?>
-                            </div>
-                            <div class="text-gray-700 sm:col-span-4">
-                                <span class="block sm:hidden font-semibold text-gray-600">Address:</span>
-                                <?= htmlspecialchars($row['address']) ?>
-                            </div>
-                            <div class="text-center text-xl text-gray-600 sm:col-span-1">
-                                <button onclick="confirmDeleteUser('<?= htmlspecialchars($row['student_id']) ?>', '<?= htmlspecialchars($row['id'] ?? $row['student_id']) ?>')"
-                                        class="text-red-500 hover:text-red-700">
-                                    <i class="fas fa-trash"></i>
-                                </button>
+                            <div class="col-span-1 sm:col-span-5">
+                                <span class="block sm:hidden font-medium text-gray-600 text-xs">Address:</span>
+                                <?php echo htmlspecialchars($row['address'] ?? 'N/A'); ?>
                             </div>
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <div class="text-center text-gray-500 py-6 font-semibold">
-                        No users found matching your search.
+                    <div class="text-center py-8 text-gray-500 font-medium text-sm">
+                        <?php echo $searchTerm ? 'No students found matching your search.' : 'No students available.'; ?>
                     </div>
                 <?php endif; ?>
             </div>
+
+            <!-- Pagination -->
+            <?php if ($totalPages > 1): ?>
+                <div class="mt-4 flex flex-wrap justify-center gap-2">
+                    <?php
+                    $queryParams = $_GET;
+                    $queryParams['page'] = 'Student Athletes';
+                    for ($i = 1; $i <= $totalPages; $i++):
+                        $queryParams['page_num'] = $i;
+                        $isActive = $i === $page;
+                        ?>
+                        <a
+                                href="?<?php echo http_build_query($queryParams); ?>"
+                                class="px-3 py-1 rounded-lg text-sm <?php echo $isActive ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'; ?> transition-colors"
+                        >
+                            <?php echo $i; ?>
+                        </a>
+                    <?php endfor; ?>
+                </div>
+            <?php endif; ?>
         </div>
+
+        <style>
+            /* Responsive adjustments */
+            @media (max-width: 640px) {
+                .max-w-7xl {
+                    padding-left: 1rem;
+                    padding-right: 1rem;
+                }
+
+                .grid-cols-12 {
+                    grid-template-columns: 1fr;
+                }
+
+                .text-sm {
+                    font-size: 0.85rem;
+                }
+
+                .p-4 {
+                    padding: 0.75rem;
+                }
+
+                .py-3 {
+                    padding-top: 0.5rem;
+                    padding-bottom: 0.5rem;
+                }
+
+                .gap-2 {
+                    gap: 0.5rem;
+                }
+
+                .rounded-lg {
+                    border-radius: 0.375rem;
+                }
+            }
+
+            @media (min-width: 640px) and (max-width: 1024px) {
+                .grid-cols-12 {
+                    grid-template-columns: repeat(12, minmax(0, 1fr));
+                }
+
+                .col-span-3 {
+                    grid-column: span 3 / span 3;
+                }
+
+                .col-span-4 {
+                    grid-column: span 4 / span 4;
+                }
+
+                .col-span-5 {
+                    grid-column: span 5 / span 5;
+                }
+            }
+        </style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <?php elseif ($currentPage === 'Achievement'): ?>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" style="padding-top: 1rem;">
@@ -457,7 +670,7 @@ $action = $_GET['action'] ?? '';
             </div>
         </div>
 
-        <?php elseif ($currentPage === 'Student Athletes'): ?>
+        <?php elseif ($currentPage === 'Approve Docs'): ?>
         <?php
         // Database configuration (using your existing Database class)
         $conn = Database::getInstance();

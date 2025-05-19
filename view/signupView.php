@@ -71,6 +71,25 @@
                     <option value="undergraduate">Undergraduate</option>
                     <option value="alumni">Alumni</option>
                 </select>
+                <select name="sport">
+                    <option value="" disabled selected>Select Sport (Optional)</option>
+                    <option value="Athletics">Athletics</option>
+                    <option value="Badminton">Badminton</option>
+                    <option value="Basketball">Basketball</option>
+                    <option value="Chess">Chess</option>
+                    <option value="Football">Football</option>
+                    <option value="Sepak Takraw">Sepak Takraw</option>
+                    <option value="Swimming">Swimming</option>
+                    <option value="Table Tennis">Table Tennis</option>
+                    <option value="Taekwondo">Taekwondo</option>
+                    <option value="Tennis">Tennis</option>
+                    <option value="Volleyball">Volleyball</option>
+                </select>
+                <select name="campus">
+                    <option value="" disabled selected>Select Campus (Optional)</option>
+                    <option value="Tagum">Tagum</option>
+                    <option value="Mabini">Mabini</option>
+                </select>
                 <h2><span class="highlight">Upload Verification Documents</span></h2>
 
                 <div class="drop-zone" id="dropZone">

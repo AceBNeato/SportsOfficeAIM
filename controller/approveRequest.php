@@ -49,8 +49,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // Fetch request details
-    $stmt = $conn->prepare("SELECT student_id, full_name, email, status FROM account_approvals WHERE id = ?");
+    // Fetch request details, including sport and campus
+    $stmt = $conn->prepare("SELECT student_id, full_name, email, status, sport, campus FROM account_approvals WHERE id = ?");
     $stmt->bind_param("i", $approvalId);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -63,10 +63,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $plainPassword = $request['student_id'];
             $hashedPassword = password_hash($plainPassword, PASSWORD_DEFAULT);
 
-            // Insert into users table
-            $stmt = $conn->prepare("INSERT INTO users (student_id, full_name, address, email, password, status) VALUES (?, ?, ?, ?, ?, ?)");
+            // Insert into users table, including sport and campus
+            $stmt = $conn->prepare("INSERT INTO users (student_id, full_name, address, email, password, status, sport, campus) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
             $address = 'Unknown'; // Update if address is collected
-            $stmt->bind_param("ssssss", $request['student_id'], $request['full_name'], $address, $request['email'], $hashedPassword, $request['status']);
+            $stmt->bind_param("ssssssss", $request['student_id'], $request['full_name'], $address, $request['email'], $hashedPassword, $request['status'], $request['sport'], $request['campus']);
             $userInserted = $stmt->execute();
             $newUserId = $conn->insert_id; // Get the ID of the newly inserted user
             $stmt->close();
@@ -124,4 +124,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $conn->close();
 exit;
-?>  
+?>
