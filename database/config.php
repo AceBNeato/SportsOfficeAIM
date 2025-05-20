@@ -121,7 +121,6 @@ if (!$conn->query($sql)) {
     die("Error creating notifications table: " . $conn->error);
 }
 
-// 10. Create achievements table
 $sql = "CREATE TABLE IF NOT EXISTS achievements (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -147,7 +146,10 @@ if (!$conn->query($sql)) {
     error_log("Achievements table created or already exists");
 }
 
-// 11. Add admin using stored procedure
+
+
+
+
 $fullName = "Gian Glen Vincent Garcia";
 $address = "Tagum City";
 $sampleEmail = "admin@usep.edu.ph";
