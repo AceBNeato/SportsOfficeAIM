@@ -253,7 +253,7 @@ DELIMITER //
 CREATE PROCEDURE GetUserAchievements(IN p_user_id INT)
 BEGIN
     SELECT
-        id,
+        achievement_id,
         athlete_name,
         level_of_competition,
         performance,

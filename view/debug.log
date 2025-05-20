@@ -28739,3 +28739,3748 @@ Admin View - Session: Array
 )
 
 Admin View - Session ID: s202vairrvcae65j61d4ajr3k3
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747764995
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Invalid CSRF token.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747765226
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747765237
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747765250
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [message_class] => bg-red-100
+    [achievement_message] => Invalid CSRF token.
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747765276
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747765277
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747765280
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747765283
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747765284
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747765290
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747765292
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747765293
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747765295
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747765305
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747765310
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747765314
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747765317
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747765321
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747765325
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747765327
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747765329
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747765331
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747766082
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747766930
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747766997
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747767631
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747767641
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747767706
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Invalid CSRF token.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747767933
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Invalid CSRF token.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747767947
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Invalid CSRF token.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747767958
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Invalid CSRF token.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747767963
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Invalid CSRF token.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747768165
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747768551
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747768556
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747768740
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747768805
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747768816
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747768882
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747768884
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747768894
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747768993
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747768997
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747769005
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747769008
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747769017
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747769021
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747769025
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747769029
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Invalid CSRF token.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747769266
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747769270
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747769384
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [achievement_message] => Invalid CSRF token.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: 1f8613eehb74614hr1ki7raima
+Admin View - Session: Array
+(
+    [achievement_message] => Invalid CSRF token.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: 1f8613eehb74614hr1ki7raima
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747769389
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Invalid CSRF token.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747769397
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747769502
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Invalid CSRF token.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747769559
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747769563
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747769594
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747769598
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747769599
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747769661
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747769664
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747769766
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747769968
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747770025
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747770031
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747770388
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747770391
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747770435
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747770443
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747770540
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747770543
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Invalid CSRF token.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747770751
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747770768
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747770798
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747770882
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747770901
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747771062
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747771115
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747771119
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747771205
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747771213
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747771411
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747771555
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747771596
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747771602
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747771771
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747771780
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747771788
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Invalid CSRF token.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747771816
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Invalid CSRF token.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747771824
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Invalid CSRF token.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747771868
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Invalid CSRF token.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747771876
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Invalid CSRF token.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747771878
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Invalid CSRF token.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747771891
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Invalid CSRF token.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747771892
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Invalid CSRF token.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747771904
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747771907
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747771911
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747771966
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747772007
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [message_class] => bg-red-100
+    [achievement_message] => Invalid CSRF token.
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747772122
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [message_class] => bg-red-100
+    [achievement_message] => Invalid CSRF token.
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747772218
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [message_class] => bg-red-100
+    [achievement_message] => Invalid CSRF token.
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747772258
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [message_class] => bg-red-100
+    [achievement_message] => Invalid CSRF token.
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747772344
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [message_class] => bg-red-100
+    [achievement_message] => Invalid CSRF token.
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747772394
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [message_class] => bg-red-100
+    [achievement_message] => Unauthorized access.
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747772399
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [message_class] => bg-red-100
+    [achievement_message] => Unauthorized access.
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747773130
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [message_class] => bg-red-100
+    [achievement_message] => Unauthorized access.
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747773214
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Invalid CSRF token.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747773276
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Unauthorized access.
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$F/nR7WYEjWzJtaicKpPUu.pyu0LSnhJThbqgzaR1xztpFE89E7.FW
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747773287
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 0
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Admin View - Session ID: b895m1jl8gj9n1kcug67jmapm9
+Admin View - Session: Array
+(
+    [csrf_token] => 693ac021a44d8cba8543b5434f3f3415ef6ceb45bfe7511cea379cebf5bed50e
+)
+
+Admin View - Session ID: g9655ot4hhbp042jnc5ukp16kg
+Admin View - Session: Array
+(
+    [csrf_token] => 4aa3806aa6de16d1779e87337ed32422dcdffb8a1bdd81d19230311fbc9650b6
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1747782222
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Admin View - Session ID: jafcgi7rp0jtnutr7kj0cf7srj
+Admin View - Session: Array
+(
+    [csrf_token] => 4aa3806aa6de16d1779e87337ed32422dcdffb8a1bdd81d19230311fbc9650b6
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1747782222
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Failed to approve achievement: Unknown column 'created_at' in 'field list'
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: jafcgi7rp0jtnutr7kj0cf7srj
+Admin View - Session: Array
+(
+    [csrf_token] => 4aa3806aa6de16d1779e87337ed32422dcdffb8a1bdd81d19230311fbc9650b6
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1747782227
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Failed to approve achievement: Unknown column 'created_at' in 'field list'
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: jafcgi7rp0jtnutr7kj0cf7srj
+Admin View - Session: Array
+(
+    [csrf_token] => 4aa3806aa6de16d1779e87337ed32422dcdffb8a1bdd81d19230311fbc9650b6
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1747782227
+            [ip_address] => 127.0.0.1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [achievement_message] => Failed to reject achievement: Unknown column 'created_at' in 'field list'
+    [message_class] => bg-red-100
+)
+
+Admin View - Session ID: jafcgi7rp0jtnutr7kj0cf7srj
