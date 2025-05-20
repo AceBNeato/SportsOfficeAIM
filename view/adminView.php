@@ -214,8 +214,6 @@ $action = $_GET['action'] ?? '';
 
 
 
-
-
         <?php
         if ($currentPage === 'Student Athletes'):
         // Database configuration
@@ -231,40 +229,58 @@ $action = $_GET['action'] ?? '';
         }
 
         // Search and fetch users function
-        function fetchUsers($searchTerm, $conn, $page = 1, $perPage = 10) {
+        function fetchUsers($searchTerm, $sport, $campus, $conn, $page = 1, $perPage = 10) {
             $offset = ($page - 1) * $perPage;
             $searchTerm = trim($searchTerm);
+            $sport = trim($sport);
+            $campus = trim($campus);
 
-            if (empty($searchTerm)) {
-                // Fetch all users when no search term
-                $stmt = $conn->prepare("
-                SELECT u.id, u.student_id, u.full_name, u.address, ui.image, ui.image_type
-                FROM users u
-                LEFT JOIN user_images ui ON u.id = ui.user_id
-                ORDER BY u.full_name ASC
-                LIMIT ? OFFSET ?
-            ");
-                if (!$stmt) {
-                    error_log("Prepare failed: " . $conn->error);
-                    return ['users' => [], 'total' => 0];
-                }
-                $stmt->bind_param("ii", $perPage, $offset);
-            } else {
-                // Search query
+            // Build base query
+            $query = "
+            SELECT u.id, u.student_id, u.full_name, u.address, u.sport, u.campus, ui.image, ui.image_type
+            FROM users u
+            LEFT JOIN user_images ui ON u.id = ui.user_id
+            WHERE 1=1
+        ";
+
+            $params = [];
+            $types = "";
+
+            // Add search conditions
+            if (!empty($searchTerm)) {
+                $query .= " AND (u.student_id LIKE ? OR u.full_name LIKE ?)";
                 $searchTerm = '%' . $conn->real_escape_string($searchTerm) . '%';
-                $stmt = $conn->prepare("
-                SELECT u.id, u.student_id, u.full_name, u.address, ui.image, ui.image_type
-                FROM users u
-                LEFT JOIN user_images ui ON u.id = ui.user_id
-                WHERE u.student_id LIKE ? OR u.full_name LIKE ?
-                ORDER BY u.full_name ASC
-                LIMIT ? OFFSET ?
-            ");
-                if (!$stmt) {
-                    error_log("Prepare failed: " . $conn->error);
-                    return ['users' => [], 'total' => 0];
-                }
-                $stmt->bind_param("ssii", $searchTerm, $searchTerm, $perPage, $offset);
+                $params[] = $searchTerm;
+                $params[] = $searchTerm;
+                $types .= "ss";
+            }
+
+            if (!empty($sport)) {
+                $query .= " AND u.sport = ?";
+                $params[] = $sport;
+                $types .= "s";
+            }
+
+            if (!empty($campus)) {
+                $query .= " AND u.campus = ?";
+                $params[] = $campus;
+                $types .= "s";
+            }
+
+            $query .= " ORDER BY u.full_name ASC LIMIT ? OFFSET ?";
+            $params[] = $perPage;
+            $params[] = $offset;
+            $types .= "ii";
+
+            // Prepare and execute query
+            $stmt = $conn->prepare($query);
+            if (!$stmt) {
+                error_log("Prepare failed: " . $conn->error);
+                return ['users' => [], 'total' => 0];
+            }
+
+            if (!empty($params)) {
+                $stmt->bind_param($types, ...$params);
             }
 
             $stmt->execute();
@@ -273,13 +289,33 @@ $action = $_GET['action'] ?? '';
             $stmt->close();
 
             // Get total count for pagination
-            $countStmt = $conn->prepare(empty($searchTerm) ?
-                "SELECT COUNT(*) as total FROM users" :
-                "SELECT COUNT(*) as total FROM users WHERE student_id LIKE ? OR full_name LIKE ?"
-            );
+            $countQuery = "SELECT COUNT(*) as total FROM users WHERE 1=1";
+            $countParams = [];
+            $countTypes = "";
+
+            if (!empty($searchTerm)) {
+                $countQuery .= " AND (student_id LIKE ? OR full_name LIKE ?)";
+                $countParams[] = $searchTerm;
+                $countParams[] = $searchTerm;
+                $countTypes .= "ss";
+            }
+
+            if (!empty($sport)) {
+                $countQuery .= " AND sport = ?";
+                $countParams[] = $sport;
+                $countTypes .= "s";
+            }
+
+            if (!empty($campus)) {
+                $countQuery .= " AND campus = ?";
+                $countParams[] = $campus;
+                $countTypes .= "s";
+            }
+
+            $countStmt = $conn->prepare($countQuery);
             if ($countStmt) {
-                if (!empty($searchTerm)) {
-                    $countStmt->bind_param("ss", $searchTerm, $searchTerm);
+                if (!empty($countParams)) {
+                    $countStmt->bind_param($countTypes, ...$countParams);
                 }
                 $countStmt->execute();
                 $total = $countStmt->get_result()->fetch_assoc()['total'];
@@ -293,32 +329,63 @@ $action = $_GET['action'] ?? '';
 
         // Get parameters
         $searchTerm = isset($_GET['search']) ? trim($_GET['search']) : '';
+        $sport = isset($_GET['sport']) ? trim($_GET['sport']) : '';
+        $campus = isset($_GET['campus']) ? trim($_GET['campus']) : '';
         $page = isset($_GET['page_num']) ? max(1, (int)$_GET['page_num']) : 1;
         $perPage = 10;
 
         // Fetch users
-        $result = fetchUsers($searchTerm, $conn, $page, $perPage);
+        $result = fetchUsers($searchTerm, $sport, $campus, $conn, $page, $perPage);
         $users = $result['users'];
         $totalUsers = $result['total'];
         $totalPages = ceil($totalUsers / $perPage);
         ?>
 
-        <div class="w-full max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 mt-4">
+        <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
             <!-- Search Form -->
-            <form method="GET" class="mb-4 flex flex-col sm:flex-row gap-2">
+            <form method="GET" class="mb-6 flex flex-col sm:flex-row gap-3 items-center">
                 <input type="hidden" name="page" value="Student Athletes"/>
-                <div class="relative flex-1">
+                <div class="flex-1 w-full">
                     <input
                             type="text"
                             name="search"
                             placeholder="Search by Student ID or Name..."
                             value="<?php echo htmlspecialchars($searchTerm); ?>"
-                            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-sm"
+                            class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-sm"
                     >
+                </div>
+                <div class="flex-1 w-full">
+                    <select
+                            name="sport"
+                            class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-sm bg-white"
+                    >
+                        <option value="" <?php echo empty($sport) ? 'selected' : ''; ?>>Select Sport (Optional)</option>
+                        <option value="Athletics" <?php echo $sport === 'Athletics' ? 'selected' : ''; ?>>Athletics</option>
+                        <option value="Badminton" <?php echo $sport === 'Badminton' ? 'selected' : ''; ?>>Badminton</option>
+                        <option value="Basketball" <?php echo $sport === 'Basketball' ? 'selected' : ''; ?>>Basketball</option>
+                        <option value="Chess" <?php echo $sport === 'Chess' ? 'selected' : ''; ?>>Chess</option>
+                        <option value="Football" <?php echo $sport === 'Football' ? 'selected' : ''; ?>>Football</option>
+                        <option value="Sepak Takraw" <?php echo $sport === 'Sepak Takraw' ? 'selected' : ''; ?>>Sepak Takraw</option>
+                        <option value="Swimming" <?php echo $sport === 'Swimming' ? 'selected' : ''; ?>>Swimming</option>
+                        <option value="Table Tennis" <?php echo $sport === 'Table Tennis' ? 'selected' : ''; ?>>Table Tennis</option>
+                        <option value="Taekwondo" <?php echo $sport === 'Taekwondo' ? 'selected' : ''; ?>>Taekwondo</option>
+                        <option value="Tennis" <?php echo $sport === 'Tennis' ? 'selected' : ''; ?>>Tennis</option>
+                        <option value="Volleyball" <?php echo $sport === 'Volleyball' ? 'selected' : ''; ?>>Volleyball</option>
+                    </select>
+                </div>
+                <div class="flex-1 w-full">
+                    <select
+                            name="campus"
+                            class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-sm bg-white"
+                    >
+                        <option value="" <?php echo empty($campus) ? 'selected' : ''; ?>>Select Campus (Optional)</option>
+                        <option value="Tagum" <?php echo $campus === 'Tagum' ? 'selected' : ''; ?>>Tagum</option>
+                        <option value="Mabini" <?php echo $campus === 'Mabini' ? 'selected' : ''; ?>>Mabini</option>
+                    </select>
                 </div>
                 <button
                         type="submit"
-                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors text-sm"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 transition-colors text-sm"
                 >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -328,44 +395,54 @@ $action = $_GET['action'] ?? '';
             </form>
 
             <!-- Results Header -->
-            <div class="hidden sm:grid grid-cols-12 gap-2 bg-gray-100 text-gray-700 font-semibold py-3 px-4 rounded-t-lg text-sm">
+            <div class="hidden sm:grid grid-cols-12 gap-4 bg-gray-100 text-gray-700 font-semibold py-3 px-4 rounded-t-lg text-sm">
                 <div class="col-span-2">Profile Picture</div>
-                <div class="col-span-3">Student ID</div>
-                <div class="col-span-3">Student Name</div>
-                <div class="col-span-4">Address</div>
+                <div class="col-span-2">Student ID</div>
+                <div class="col-span-2">Student Name</div>
+                <div class="col-span-2">Sport</div>
+                <div class="col-span-2">Campus</div>
+                <div class="col-span-2">Address</div>
             </div>
 
             <!-- Results -->
             <div class="max-h-[calc(100vh-20rem)] overflow-y-auto rounded-b-lg border border-gray-200 bg-white">
                 <?php if (count($users) > 0): ?>
                     <?php foreach ($users as $row): ?>
-                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 p-3 sm:p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors text-sm">
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors text-sm">
                             <div class="col-span-1 sm:col-span-2 flex items-center">
                                 <span class="block sm:hidden font-medium text-gray-600 text-xs">Profile Picture:</span>
                                 <?php if (!empty($row['image']) && !empty($row['image_type'])): ?>
                                     <img
                                             src="data:<?php echo htmlspecialchars($row['image_type']); ?>;base64,<?php echo base64_encode($row['image']); ?>"
                                             alt="Profile picture of <?php echo htmlspecialchars($row['full_name']); ?>"
-                                            class="w-10 h-10 rounded-full object-cover"
+                                            class="w-12 h-12 rounded-full object-cover"
                                             onerror="this.src='/images/default-profile.png'"
                                     >
                                 <?php else: ?>
                                     <img
                                             src="/images/default-profile.png"
                                             alt="Default profile picture"
-                                            class="w-10 h-10 rounded-full object-cover"
+                                            class="w-12 h-12 rounded-full object-cover"
                                     >
                                 <?php endif; ?>
                             </div>
-                            <div class="col-span-1 sm:col-span-3">
+                            <div class="col-span-1 sm:col-span-2 flex items-center">
                                 <span class="block sm:hidden font-medium text-gray-600 text-xs">Student ID:</span>
                                 <?php echo htmlspecialchars($row['student_id']); ?>
                             </div>
-                            <div class="col-span-1 sm:col-span-3 flex items-center gap-2">
+                            <div class="col-span-1 sm:col-span-2 flex items-center">
                                 <span class="block sm:hidden font-medium text-gray-600 text-xs">Name:</span>
                                 <?php echo htmlspecialchars($row['full_name']); ?>
                             </div>
-                            <div class="col-span-1 sm:col-span-4">
+                            <div class="col-span-1 sm:col-span-2 flex items-center">
+                                <span class="block sm:hidden font-medium text-gray-600 text-xs">Sport:</span>
+                                <?php echo htmlspecialchars($row['sport'] ?? 'N/A'); ?>
+                            </div>
+                            <div class="col-span-1 sm:col-span-2 flex items-center">
+                                <span class="block sm:hidden font-medium text-gray-600 text-xs">Campus:</span>
+                                <?php echo htmlspecialchars($row['campus'] ?? 'N/A'); ?>
+                            </div>
+                            <div class="col-span-1 sm:col-span-2 flex items-center">
                                 <span class="block sm:hidden font-medium text-gray-600 text-xs">Address:</span>
                                 <?php echo htmlspecialchars($row['address'] ?? 'N/A'); ?>
                             </div>
@@ -373,14 +450,14 @@ $action = $_GET['action'] ?? '';
                     <?php endforeach; ?>
                 <?php else: ?>
                     <div class="text-center py-8 text-gray-500 font-medium text-sm">
-                        <?php echo $searchTerm ? 'No students found matching your search.' : 'No students available.'; ?>
+                        <?php echo ($searchTerm || $sport || $campus) ? 'No students found matching your search.' : 'No students available.'; ?>
                     </div>
                 <?php endif; ?>
             </div>
 
             <!-- Pagination -->
             <?php if ($totalPages > 1): ?>
-                <div class="mt-4 flex flex-wrap justify-center gap-2">
+                <div class="mt-6 flex flex-wrap justify-center gap-2">
                     <?php
                     $queryParams = $_GET;
                     $queryParams['page'] = 'Student Athletes';
@@ -390,7 +467,7 @@ $action = $_GET['action'] ?? '';
                         ?>
                         <a
                                 href="?<?php echo http_build_query($queryParams); ?>"
-                                class="px-3 py-1 rounded-lg text-sm <?php echo $isActive ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'; ?> transition-colors"
+                                class="px-4 py-2 rounded-lg text-sm <?php echo $isActive ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'; ?> transition-colors"
                         >
                             <?php echo $i; ?>
                         </a>
@@ -400,6 +477,52 @@ $action = $_GET['action'] ?? '';
         </div>
 
         <style>
+            /* Base styles */
+            .max-w-7xl {
+                max-width: 80rem;
+            }
+
+            .grid-cols-12 {
+                display: grid;
+                grid-template-columns: repeat(12, minmax(0, 1fr));
+            }
+
+            .col-span-2 {
+                grid-column: span 2 / span 2;
+            }
+
+            .rounded-lg {
+                border-radius: 0.5rem;
+            }
+
+            .text-sm {
+                font-size: 0.875rem;
+                line-height: 1.25rem;
+            }
+
+            .w-12 {
+                width: 3rem;
+            }
+
+            .h-12 {
+                height: 3rem;
+            }
+
+            /* Form and input styles */
+            select, input[type="text"] {
+                appearance: none;
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                height: 2.75rem;
+            }
+
+            select {
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+                background-repeat: no-repeat;
+                background-position: right 0.75rem center;
+                background-size: 1rem;
+            }
+
             /* Responsive adjustments */
             @media (max-width: 640px) {
                 .max-w-7xl {
@@ -411,32 +534,25 @@ $action = $_GET['action'] ?? '';
                     grid-template-columns: 1fr;
                 }
 
+                .gap-4 {
+                    gap: 0.75rem;
+                }
+
+                .p-4 {
+                    padding: 1rem;
+                }
+
+                .py-3 {
+                    padding-top: 0.75rem;
+                    padding-bottom: 0.75rem;
+                }
+
                 .text-sm {
                     font-size: 0.85rem;
                 }
 
-                .p-4 {
-                    padding: 0.75rem;
-                }
-
-                .py-3 {
-                    padding-top: 0.5rem;
-                    padding-bottom: 0.5rem;
-                }
-
-                .gap-2 {
-                    gap: 0.5rem;
-                }
-
-                .rounded-lg {
-                    border-radius: 0.375rem;
-                }
-
-                .w-10 {
+                .w-12, .h-12 {
                     width: 2.5rem;
-                }
-
-                .h-10 {
                     height: 2.5rem;
                 }
             }
@@ -444,18 +560,6 @@ $action = $_GET['action'] ?? '';
             @media (min-width: 640px) and (max-width: 1024px) {
                 .grid-cols-12 {
                     grid-template-columns: repeat(12, minmax(0, 1fr));
-                }
-
-                .col-span-2 {
-                    grid-column: span 2 / span 2;
-                }
-
-                .col-span-3 {
-                    grid-column: span 3 / span 3;
-                }
-
-                .col-span-4 {
-                    grid-column: span 4 / span 4;
                 }
             }
 
@@ -467,8 +571,17 @@ $action = $_GET['action'] ?? '';
             .object-cover {
                 object-fit: cover;
             }
-        </style>
 
+            /* Hover and transition effects */
+            .hover\:bg-gray-50:hover {
+                background-color: #f9fafb;
+            }
+
+            .transition-colors {
+                transition: background-color 0.2s ease, color 0.2s ease;
+            }
+        </style>
+        
 
 
 

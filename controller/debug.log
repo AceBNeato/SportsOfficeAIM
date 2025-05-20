@@ -1400,3 +1400,67 @@ Approve Request - POST Data: Array
 )
 
 Approve Request - Session ID: 6bcj82d0n10r7dcoi0135l540i
+Session Data: Array
+(
+    [csrf_token] => be60c8eba39facdf67a611ec4d5f40fbe1cfd3aee63fbf0455afbe991d0fa679
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 12
+            [student_id] => 2023-66666
+            [email] => arthurdaleenrique@gmail.com
+            [password] => $2y$10$bc2qD5BPciDZ9CSGLAwnkOBQOE/CvaBCPnw43DigBdP/YOjzjTJjq
+            [address] => Prk. Mahayahay Kingking Pantukan Davao de Oro 8809
+            [role] => user
+            [full_name] => Enrique U. Micaroz
+            [year_section] => 2IT-BSIT
+            [sport] => Sepak Takraw
+            [campus] => Mabini
+            [last_activity] => 1747749442
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 2IT-BSIT
+        )
+
+)
+
+Input Data: submission_id=16, description=''
+Session Data: Array
+(
+    [csrf_token] => be60c8eba39facdf67a611ec4d5f40fbe1cfd3aee63fbf0455afbe991d0fa679
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 12
+            [student_id] => 2023-66666
+            [email] => arthurdaleenrique@gmail.com
+            [password] => $2y$10$bc2qD5BPciDZ9CSGLAwnkOBQOE/CvaBCPnw43DigBdP/YOjzjTJjq
+            [address] => Prk. Mahayahay Kingking Pantukan Davao de Oro 8809
+            [role] => user
+            [full_name] => Enrique U. Micaroz
+            [year_section] => 2IT-BSIT
+            [sport] => Sepak Takraw
+            [campus] => Mabini
+            [last_activity] => 1747749549
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 2IT-BSIT
+        )
+
+)
+
+Input Data: submission_id=16, description='saasasasasas'
+File Data: name=FB_IMG_1644814087304.jpg, size=57730, type=image/jpeg, error=0
+Update Successful: submission_id=16
