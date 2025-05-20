@@ -122,7 +122,7 @@ if (!$conn->query($sql)) {
 }
 
 $sql = "CREATE TABLE IF NOT EXISTS achievements (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    achievement_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     athlete_name VARCHAR(255) NOT NULL,
     level_of_competition VARCHAR(50) NOT NULL,

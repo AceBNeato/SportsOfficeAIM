@@ -1,0 +1,24 @@
+handleAchievementAction started at 2025-05-20 22:10:16 PST
+CSRF token validation failed. Received: none, Expected: 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13 at 2025-05-20 22:10:16 PST
+approveAchievement started at 2025-05-20 22:15:21 PST
+CSRF token validation failed. Received: none, Expected: 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13 at 2025-05-20 22:15:21 PST
+approveAchievement started at 2025-05-20 22:16:58 PST
+CSRF token validation failed. Received: none, Expected: 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13 at 2025-05-20 22:16:58 PST
+rejectAchievement started at 2025-05-20 22:17:38 PST
+CSRF token validation failed. Received: none, Expected: 2405fe2db8c5b673e5cc6dda3e7726a0c9502fa25137dbe6dee1f093501d7d13 at 2025-05-20 22:17:38 PST
+approveAchievement started at 2025-05-20 22:19:59 PST
+Unauthorized access attempt by user: user at 2025-05-20 22:19:59 PST
+approveAchievement started at 2025-05-20 22:32:24 PST
+Unauthorized access attempt by user: user at 2025-05-20 22:32:24 PST
+approveAchievement started at 2025-05-20 22:32:24 PST
+Unauthorized access attempt by user: user at 2025-05-20 22:32:24 PST
+rejectAchievement started at 2025-05-20 22:34:36 PST
+CSRF token validation failed. at 2025-05-20 22:34:36 PST
+rejectAchievement started at 2025-05-20 22:34:43 PST
+Unauthorized access attempt. at 2025-05-20 22:34:43 PST
+approveAchievement started at 2025-05-21 01:03:47 PST
+Error: Unknown column 'created_at' in 'field list' at 2025-05-21 01:03:47 PST
+approveAchievement started at 2025-05-21 01:03:47 PST
+Error: Unknown column 'created_at' in 'field list' at 2025-05-21 01:03:47 PST
+rejectAchievement started at 2025-05-21 01:04:01 PST
+Error: Unknown column 'created_at' in 'field list' at 2025-05-21 01:04:01 PST
