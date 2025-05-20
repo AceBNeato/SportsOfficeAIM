@@ -716,12 +716,15 @@ $action = $_GET['action'] ?? '';
                     </div>
                 </a>
                 <!-- Approved Reports Card -->
+
+
+
                 <a href="?page=Approved Docs" class="bg-white rounded-xl shadow p-4 flex items-center space-x-4 hover:bg-gray-50 transition">
                     <div class="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 flex justify-center items-center text-green-600 bg-green-100 rounded-full text-2xl">
                         <i class='bx bxs-file-doc'></i>
                     </div>
                     <div>
-                        <p class="text-gray-800 font-semibold text-sm sm:text-base">Approved Reports</p>
+                        <p class="text-gray-800 font-semibold text-sm sm:text-base">Verified Documents</p>
                         <?php
                         $approvedCount = 0;
                         try {
@@ -748,46 +751,30 @@ $action = $_GET['action'] ?? '';
                         <p class="text-2xl sm:text-3xl font-bold text-gray-900"><?= htmlspecialchars($approvedCount) ?></p>
                     </div>
                 </a>
-                <!-- Total Achievements Card -->
-                <a href="?page=Achievement" class="bg-white rounded-xl shadow p-4 flex items-center space-x-4 hover:bg-gray-50 transition">
-                    <div class="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 flex justify-center items-center text-purple-600 bg-purple-100 rounded-full text-2xl">
-                        <i class='bx bxs-trophy'></i>
-                    </div>
-                    <div>
-                        <p class="text-gray-800 font-semibold text-sm sm:text-base">Total Achievements</p>
-                        <?php
-                        $totalAchievements = 0;
-                        try {
-                            if (!$conn || $conn->connect_error) {
-                                error_log("Database connection failed in Total Achievements: " . ($conn ? $conn->connect_error : "No connection"));
-                                echo "<p class='text-red-600'>Unable to fetch achievements count. Please try again later.</p>";
-                            } else {
-                                $query = "SELECT COUNT(*) as total FROM achievements";
-                                if ($result = $conn->query($query)) {
-                                    if ($row = $result->fetch_assoc()) {
-                                        $totalAchievements = $row['total'];
-                                    }
-                                    $result->free();
-                                } else {
-                                    error_log("Error fetching achievements count: " . $conn->error);
-                                    echo "<p class='text-red-600'>Unable to fetch achievements count. Please try again later.</p>";
-                                }
-                            }
-                        } catch (Exception $e) {
-                            error_log("Exception in Total Achievements query: " . $e->getMessage());
-                            echo "<p class='text-red-600'>An error occurred. Please try again later.</p>";
-                        }
-                        ?>
-                        <p class="text-2xl sm:text-3xl font-bold text-gray-900"><?= htmlspecialchars($totalAchievements) ?></p>
-                    </div>
-                </a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
                 <!-- Pending Account Approvals Card -->
                 <a href="?page=Account Approvals" class="bg-white rounded-xl shadow p-4 flex items-center space-x-4 hover:bg-gray-50 transition">
-                    <div class="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 flex justify-center items-center text-yellow-600 bg-yellow-100 rounded-full text-2xl">
-                        <i class='bx bxs-user-check'></i>
+                    <div class="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 flex justify-center items-center text-green-600 bg-green-100 rounded-full text-2xl">
+                    <i class='bx bxs-user-check'></i>
+
                     </div>
+
                     <div>
                         <p class="text-gray-800 font-semibold text-sm sm:text-base">Pending Account Approvals</p>
                         <?php
@@ -818,16 +805,33 @@ $action = $_GET['action'] ?? '';
                 </a>
 
 
-                <!-- Pending and Verified Documents Card -->
-                <a href="?page=Evaluation" class="bg-white rounded-xl shadow p-4 flex justify-center items-center space-x-4 hover:bg-gray-50 transition col-span-1 md:col-span-2">
-                    <div class="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 flex justify-center items-center text-blue-600 bg-blue-100 rounded-full text-2xl">
-                        <i class='bx bxs-bar-chart-alt-2'></i>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                <a href="?page=Evaluation"class="bg-white rounded-xl shadow p-4 flex items-center space-x-4 hover:bg-gray-50 transition">
+                    <div class="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 flex justify-center items-center text-green-600 bg-green-100 rounded-full text-2xl">
+
+                    <i class='bx bxs-bar-chart-alt-2'></i>
                     </div>
-                    <div class="flex flex-col justify-center space-y-2 text-center mx-auto">
-                        <!-- Pending Submissions -->
+
+                    <div>
+
+                        <p class="text-gray-800 font-semibold text-sm sm:text-base">Pending Submissions</p>
+
+
                         <?php
                         $pendingCount = 0;
-                        $approvedCount = 0;
 
                         try {
                             if (!$conn || $conn->connect_error) {
@@ -863,16 +867,74 @@ $action = $_GET['action'] ?? '';
                             echo "<p class='text-red-600 text-sm'>An error occurred. Please try again later.</p>";
                         }
                         ?>
-                        <!-- Pending Submissions Display -->
-                        <div class="flex flex-col">
-                            <div class="text-lg sm:text-xl font-bold text-gray-900"><?= htmlspecialchars($pendingCount, ENT_QUOTES, 'UTF-8') ?></div>
-                            <div class="text-gray-600 font-semibold text-sm sm:text-base">Pending Submissions</div>
-                        </div>
-                        <!-- Approved Documents Display -->
-                        <div class="flex flex-col">
-                            <div class="text-lg sm:text-xl font-bold text-gray-900"><?= htmlspecialchars($approvedCount, ENT_QUOTES, 'UTF-8') ?></div>
-                            <div class="text-gray-600 font-semibold text-sm sm:text-base">Verified Documents</div>
-                        </div>
+
+
+
+                        <p class="text-2xl sm:text-3xl font-bold text-gray-900"><?= htmlspecialchars( $pendingCount) ?></p>
+                    </div>
+
+
+                </a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                <a href="?page=Achievement" class="bg-white rounded-xl shadow p-4 flex justify-center items-center space-x-4 hover:bg-gray-50 transition col-span-1 md:col-span-2">
+                    <div class="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 flex justify-center items-center text-blue-600 bg-blue-100 rounded-full text-2xl">
+                        <i class='bx bxs-trophy'></i>
+                    </div>
+
+                    <div class="flex flex-col justify-center space-y-2 text-center mx-auto">
+                        <p class="text-gray-800 font-semibold text-sm sm:text-base">Total Achivements</p>
+                        <?php
+                        $totalAchievements = 0;
+                        try {
+                            if (!$conn || $conn->connect_error) {
+                                error_log("Database connection failed in Total Achievements: " . ($conn ? $conn->connect_error : "No connection"));
+                                echo "<p class='text-red-600'>Unable to fetch achievements count. Please try again later.</p>";
+                            } else {
+                                $query = "SELECT COUNT(*) as total FROM achievements";
+                                if ($result = $conn->query($query)) {
+                                    if ($row = $result->fetch_assoc()) {
+                                        $totalAchievements = $row['total'];
+                                    }
+                                    $result->free();
+                                } else {
+                                    error_log("Error fetching achievements count: " . $conn->error);
+                                    echo "<p class='text-red-600'>Unable to fetch achievements count. Please try again later.</p>";
+                                }
+                            }
+                        } catch (Exception $e) {
+                            error_log("Exception in Total Achievements query: " . $e->getMessage());
+                            echo "<p class='text-red-600'>An error occurred. Please try again later.</p>";
+                        }
+                        ?>
+
+                    <p class="text-lg sm:text-xl font-bold text-gray-900"><?= htmlspecialchars($totalAchievements) ?></p>
                     </div>
                 </a>
 
@@ -881,12 +943,19 @@ $action = $_GET['action'] ?? '';
 
 
 
+
+
+
+
+
+
                 <!-- Athletes by Campus Card (Unchanged) -->
-                <a href="?page=Student Athletes" class="bg-white rounded-xl shadow p-4 flex items-center space-x-4 hover:bg-gray-50 transition col-span-1 md:col-span-2">
+                <a href="?page=Student Athletes" class="bg-white rounded-xl shadow p-4 flex justify-center items-center space-x-4 hover:bg-gray-50 transition col-span-1 md:col-span-2">
                     <div class="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 flex justify-center items-center text-blue-600 bg-blue-100 rounded-full text-2xl">
-                        <i class='bx bxs-school'></i>
+                    <i class='bx bxs-school'></i>
                     </div>
-                    <div>
+
+                    <div class="flex flex-col justify-center space-y-2 text-center mx-auto">
                         <p class="text-gray-800 font-semibold text-sm sm:text-base">Athletes by Campus</p>
                         <?php
                         $tagumCount = 0;
