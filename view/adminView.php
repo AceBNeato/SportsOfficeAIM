@@ -129,13 +129,13 @@ $action = $_GET['action'] ?? '';
         <nav class="space-y-2 w-full px-2 mt-4">
             <?php
             $currentPage = isset($_GET['page']) ? $_GET['page'] : 'Achievement';
-            $menu = ['Achievement', 'Student Athletes', 'Evaluation', 'Reports', 'Users', 'Account Approvals', 'Log-out'];
+            $menu = ['Achievement', 'Approved Docs', 'Evaluation', 'Reports', 'Student Athletes', 'Account Approvals', 'Log-out'];
             $icon = [
                 'Achievement' => "<box-icon name='trophy' type='solid' color='white'></box-icon>",
-                'Student Athletes' => "<box-icon name='file-doc' type='solid' color='white'></box-icon>",
+                'Approved Docs' => "<box-icon name='file-doc' type='solid' color='white'></box-icon>",
                 'Evaluation' => "<box-icon name='line-chart' color='white'></box-icon>",
                 'Reports' => "<box-icon name='report' type='solid' color='white'></box-icon>",
-                'Users' => "<box-icon name='user-circle' color='white'></box-icon>",
+                'Student Athletes' => "<box-icon name='user-circle' color='white'></box-icon>",
                 'Account Approvals' => "<box-icon name='user-check' color='white'></box-icon>",
                 'Log-out' => "<box-icon name='log-out' color='white'></box-icon>"
             ];
@@ -166,69 +166,440 @@ $action = $_GET['action'] ?? '';
 
 <!-- Main Content -->
 <div id="mainContent" class="main-content px-1 sm:px-4 lg:px-0">
-    <div class="sticky top-0 z-30 bg-gray-100 w-full px-1 sm:px-4 lg:px-3">
-        <div class="border-b-4 border-red-500 px-5 pt-2 pb-1 flex justify-between items-center">
+    <div class="sticky top-0 z-30 bg-gray-100 w-full px-1 sm:px-4 lg:px-3"><div class="border-b-4 border-red-500 px-5 pt-2 pb-1 flex justify-between items-center">
             <h1 class="text-2xl sm:text-3xl font-semibold text-gray-900 tracking-tight">
                 <?php echo htmlspecialchars($currentPage); ?>
             </h1>
-
         </div>
 
-        <?php if ($currentPage === 'Users'): ?>
-        <div class="hidden sm:block w-full bg-red-500 text-white font-semibold rounded-t-lg px-5 mt-2 mb-4">
-            <div class="hidden sm:flex items-center px-4 py-6">
-                <div class="w-1/12 text-center"></div>
-                <div class="w-3/12">Student ID</div>
-                <div class="w-4/12">Student Name</div>
-                <div class="w-4/12">Student Address</div>
-            </div>
-        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         <?php
-        $users = searchUsers(isset($_GET['search']) ? $_GET['search'] : '');
+        if ($currentPage === 'Student Athletes'):
+        // Database configuration
+        try {
+            $conn = Database::getInstance();
+            if (!$conn) {
+                throw new Exception('Database connection failed.');
+            }
+        } catch (Exception $e) {
+            error_log("Database error: " . $e->getMessage());
+            echo '<div class="text-center py-12 text-red-500 font-medium">Unable to connect to the database. Please try again later.</div>';
+            exit;
+        }
+
+        // Search and fetch users function
+        function fetchUsers($searchTerm, $sport, $campus, $conn, $page = 1, $perPage = 10) {
+            $offset = ($page - 1) * $perPage;
+            $searchTerm = trim($searchTerm);
+            $sport = trim($sport);
+            $campus = trim($campus);
+
+            // Build base query
+            $query = "
+            SELECT u.id, u.student_id, u.full_name, u.address, u.sport, u.campus, ui.image, ui.image_type
+            FROM users u
+            LEFT JOIN user_images ui ON u.id = ui.user_id
+            WHERE 1=1
+        ";
+
+            $params = [];
+            $types = "";
+
+            // Add search conditions
+            if (!empty($searchTerm)) {
+                $query .= " AND (u.student_id LIKE ? OR u.full_name LIKE ?)";
+                $searchTerm = '%' . $conn->real_escape_string($searchTerm) . '%';
+                $params[] = $searchTerm;
+                $params[] = $searchTerm;
+                $types .= "ss";
+            }
+
+            if (!empty($sport)) {
+                $query .= " AND u.sport = ?";
+                $params[] = $sport;
+                $types .= "s";
+            }
+
+            if (!empty($campus)) {
+                $query .= " AND u.campus = ?";
+                $params[] = $campus;
+                $types .= "s";
+            }
+
+            $query .= " ORDER BY u.full_name ASC LIMIT ? OFFSET ?";
+            $params[] = $perPage;
+            $params[] = $offset;
+            $types .= "ii";
+
+            // Prepare and execute query
+            $stmt = $conn->prepare($query);
+            if (!$stmt) {
+                error_log("Prepare failed: " . $conn->error);
+                return ['users' => [], 'total' => 0];
+            }
+
+            if (!empty($params)) {
+                $stmt->bind_param($types, ...$params);
+            }
+
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $users = $result->fetch_all(MYSQLI_ASSOC);
+            $stmt->close();
+
+            // Get total count for pagination
+            $countQuery = "SELECT COUNT(*) as total FROM users WHERE 1=1";
+            $countParams = [];
+            $countTypes = "";
+
+            if (!empty($searchTerm)) {
+                $countQuery .= " AND (student_id LIKE ? OR full_name LIKE ?)";
+                $countParams[] = $searchTerm;
+                $countParams[] = $searchTerm;
+                $countTypes .= "ss";
+            }
+
+            if (!empty($sport)) {
+                $countQuery .= " AND sport = ?";
+                $countParams[] = $sport;
+                $countTypes .= "s";
+            }
+
+            if (!empty($campus)) {
+                $countQuery .= " AND campus = ?";
+                $countParams[] = $campus;
+                $countTypes .= "s";
+            }
+
+            $countStmt = $conn->prepare($countQuery);
+            if ($countStmt) {
+                if (!empty($countParams)) {
+                    $countStmt->bind_param($countTypes, ...$countParams);
+                }
+                $countStmt->execute();
+                $total = $countStmt->get_result()->fetch_assoc()['total'];
+                $countStmt->close();
+            } else {
+                $total = 0;
+            }
+
+            return ['users' => $users, 'total' => $total];
+        }
+
+        // Get parameters
+        $searchTerm = isset($_GET['search']) ? trim($_GET['search']) : '';
+        $sport = isset($_GET['sport']) ? trim($_GET['sport']) : '';
+        $campus = isset($_GET['campus']) ? trim($_GET['campus']) : '';
+        $page = isset($_GET['page_num']) ? max(1, (int)$_GET['page_num']) : 1;
+        $perPage = 10;
+
+        // Fetch users
+        $result = fetchUsers($searchTerm, $sport, $campus, $conn, $page, $perPage);
+        $users = $result['users'];
+        $totalUsers = $result['total'];
+        $totalPages = ceil($totalUsers / $perPage);
         ?>
-        <div class="max-h-[calc(100vh-10rem)] overflow-y-auto overflow-x-hidden scroll-thin">
-            <div class="w-full px-4 sm:px-8 lg:px-8 space-y-2">
+
+        <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+            <!-- Search Form -->
+            <form method="GET" class="mb-6 flex flex-col sm:flex-row gap-3 items-center">
+                <input type="hidden" name="page" value="Student Athletes"/>
+                <div class="flex-1 w-full">
+                    <input
+                            type="text"
+                            name="search"
+                            placeholder="Search by Student ID or Name..."
+                            value="<?php echo htmlspecialchars($searchTerm); ?>"
+                            class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-sm"
+                    >
+                </div>
+                <div class="flex-1 w-full">
+                    <select
+                            name="sport"
+                            class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-sm bg-white"
+                    >
+                        <option value="" <?php echo empty($sport) ? 'selected' : ''; ?>>Select Sport (Optional)</option>
+                        <option value="Athletics" <?php echo $sport === 'Athletics' ? 'selected' : ''; ?>>Athletics</option>
+                        <option value="Badminton" <?php echo $sport === 'Badminton' ? 'selected' : ''; ?>>Badminton</option>
+                        <option value="Basketball" <?php echo $sport === 'Basketball' ? 'selected' : ''; ?>>Basketball</option>
+                        <option value="Chess" <?php echo $sport === 'Chess' ? 'selected' : ''; ?>>Chess</option>
+                        <option value="Football" <?php echo $sport === 'Football' ? 'selected' : ''; ?>>Football</option>
+                        <option value="Sepak Takraw" <?php echo $sport === 'Sepak Takraw' ? 'selected' : ''; ?>>Sepak Takraw</option>
+                        <option value="Swimming" <?php echo $sport === 'Swimming' ? 'selected' : ''; ?>>Swimming</option>
+                        <option value="Table Tennis" <?php echo $sport === 'Table Tennis' ? 'selected' : ''; ?>>Table Tennis</option>
+                        <option value="Taekwondo" <?php echo $sport === 'Taekwondo' ? 'selected' : ''; ?>>Taekwondo</option>
+                        <option value="Tennis" <?php echo $sport === 'Tennis' ? 'selected' : ''; ?>>Tennis</option>
+                        <option value="Volleyball" <?php echo $sport === 'Volleyball' ? 'selected' : ''; ?>>Volleyball</option>
+                    </select>
+                </div>
+                <div class="flex-1 w-full">
+                    <select
+                            name="campus"
+                            class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-sm bg-white"
+                    >
+                        <option value="" <?php echo empty($campus) ? 'selected' : ''; ?>>Select Campus (Optional)</option>
+                        <option value="Tagum" <?php echo $campus === 'Tagum' ? 'selected' : ''; ?>>Tagum</option>
+                        <option value="Mabini" <?php echo $campus === 'Mabini' ? 'selected' : ''; ?>>Mabini</option>
+                    </select>
+                </div>
+                <button
+                        type="submit"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 transition-colors text-sm"
+                >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    Search
+                </button>
+            </form>
+
+            <!-- Results Header -->
+            <div class="hidden sm:grid grid-cols-12 gap-4 bg-gray-100 text-gray-700 font-semibold py-3 px-4 rounded-t-lg text-sm">
+                <div class="col-span-2">Profile Picture</div>
+                <div class="col-span-2">Student ID</div>
+                <div class="col-span-2">Student Name</div>
+                <div class="col-span-2">Sport</div>
+                <div class="col-span-2">Campus</div>
+                <div class="col-span-2">Address</div>
+            </div>
+
+            <!-- Results -->
+            <div class="max-h-[calc(100vh-20rem)] overflow-y-auto rounded-b-lg border border-gray-200 bg-white">
                 <?php if (count($users) > 0): ?>
                     <?php foreach ($users as $row): ?>
-                        <div class="bg-white p-4 rounded-lg shadow-sm space-y-2 sm:space-y-0 sm:grid sm:grid-cols-12 sm:items-center">
-                            <div class="text-center text-xl text-gray-600 sm:col-span-1">
-                                <button type="button" class="text-blue-500 hover:text-blue-700 focus:outline-none"
-                                        title="Edit User"
-                                        data-student-id="<?= htmlspecialchars($row['student_id'], ENT_QUOTES, 'UTF-8') ?>"
-                                        data-full-name="<?= htmlspecialchars($row['full_name'], ENT_QUOTES, 'UTF-8') ?>"
-                                        data-address="<?= htmlspecialchars($row['address'], ENT_QUOTES, 'UTF-8') ?>"
-                                        data-status="<?= isset($row['status']) ? htmlspecialchars($row['status'], ENT_QUOTES, 'UTF-8') : '' ?>"
-                                        onclick="openEditModal(this)">
-                                    <i class="fas fa-edit"></i>
-                                </button>
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors text-sm">
+                            <div class="col-span-1 sm:col-span-2 flex items-center">
+                                <span class="block sm:hidden font-medium text-gray-600 text-xs">Profile Picture:</span>
+                                <?php if (!empty($row['image']) && !empty($row['image_type'])): ?>
+                                    <img
+                                            src="data:<?php echo htmlspecialchars($row['image_type']); ?>;base64,<?php echo base64_encode($row['image']); ?>"
+                                            alt="Profile picture of <?php echo htmlspecialchars($row['full_name']); ?>"
+                                            class="w-12 h-12 rounded-full object-cover"
+                                            onerror="this.src='/images/default-profile.png'"
+                                    >
+                                <?php else: ?>
+                                    <img
+                                            src="/images/default-profile.png"
+                                            alt="Default profile picture"
+                                            class="w-12 h-12 rounded-full object-cover"
+                                    >
+                                <?php endif; ?>
                             </div>
-                            <div class="text-gray-800 font-medium sm:col-span-3">
-                                <span class="block sm:hidden font-semibold text-gray-600">Student ID:</span>
-                                <?= htmlspecialchars($row['student_id']) ?>
+                            <div class="col-span-1 sm:col-span-2 flex items-center">
+                                <span class="block sm:hidden font-medium text-gray-600 text-xs">Student ID:</span>
+                                <?php echo htmlspecialchars($row['student_id']); ?>
                             </div>
-                            <div class="text-gray-800 sm:col-span-4">
-                                <span class="block sm:hidden font-semibold text-gray-600">Name:</span>
-                                <?= htmlspecialchars($row['full_name']) ?>
+                            <div class="col-span-1 sm:col-span-2 flex items-center">
+                                <span class="block sm:hidden font-medium text-gray-600 text-xs">Name:</span>
+                                <?php echo htmlspecialchars($row['full_name']); ?>
                             </div>
-                            <div class="text-gray-700 sm:col-span-4">
-                                <span class="block sm:hidden font-semibold text-gray-600">Address:</span>
-                                <?= htmlspecialchars($row['address']) ?>
+                            <div class="col-span-1 sm:col-span-2 flex items-center">
+                                <span class="block sm:hidden font-medium text-gray-600 text-xs">Sport:</span>
+                                <?php echo htmlspecialchars($row['sport'] ?? 'N/A'); ?>
                             </div>
-                            <div class="text-center text-xl text-gray-600 sm:col-span-1">
-                                <button onclick="confirmDeleteUser('<?= htmlspecialchars($row['student_id']) ?>', '<?= htmlspecialchars($row['id'] ?? $row['student_id']) ?>')"
-                                        class="text-red-500 hover:text-red-700">
-                                    <i class="fas fa-trash"></i>
-                                </button>
+                            <div class="col-span-1 sm:col-span-2 flex items-center">
+                                <span class="block sm:hidden font-medium text-gray-600 text-xs">Campus:</span>
+                                <?php echo htmlspecialchars($row['campus'] ?? 'N/A'); ?>
+                            </div>
+                            <div class="col-span-1 sm:col-span-2 flex items-center">
+                                <span class="block sm:hidden font-medium text-gray-600 text-xs">Address:</span>
+                                <?php echo htmlspecialchars($row['address'] ?? 'N/A'); ?>
                             </div>
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <div class="text-center text-gray-500 py-6 font-semibold">
-                        No users found matching your search.
+                    <div class="text-center py-8 text-gray-500 font-medium text-sm">
+                        <?php echo ($searchTerm || $sport || $campus) ? 'No students found matching your search.' : 'No students available.'; ?>
                     </div>
                 <?php endif; ?>
             </div>
+
+            <!-- Pagination -->
+            <?php if ($totalPages > 1): ?>
+                <div class="mt-6 flex flex-wrap justify-center gap-2">
+                    <?php
+                    $queryParams = $_GET;
+                    $queryParams['page'] = 'Student Athletes';
+                    for ($i = 1; $i <= $totalPages; $i++):
+                        $queryParams['page_num'] = $i;
+                        $isActive = $i === $page;
+                        ?>
+                        <a
+                                href="?<?php echo http_build_query($queryParams); ?>"
+                                class="px-4 py-2 rounded-lg text-sm <?php echo $isActive ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'; ?> transition-colors"
+                        >
+                            <?php echo $i; ?>
+                        </a>
+                    <?php endfor; ?>
+                </div>
+            <?php endif; ?>
         </div>
+
+        <style>
+            /* Base styles */
+            .max-w-7xl {
+                max-width: 80rem;
+            }
+
+            .grid-cols-12 {
+                display: grid;
+                grid-template-columns: repeat(12, minmax(0, 1fr));
+            }
+
+            .col-span-2 {
+                grid-column: span 2 / span 2;
+            }
+
+            .rounded-lg {
+                border-radius: 0.5rem;
+            }
+
+            .text-sm {
+                font-size: 0.875rem;
+                line-height: 1.25rem;
+            }
+
+            .w-12 {
+                width: 3rem;
+            }
+
+            .h-12 {
+                height: 3rem;
+            }
+
+            /* Form and input styles */
+            select, input[type="text"] {
+                appearance: none;
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                height: 2.75rem;
+            }
+
+            select {
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+                background-repeat: no-repeat;
+                background-position: right 0.75rem center;
+                background-size: 1rem;
+            }
+
+            /* Responsive adjustments */
+            @media (max-width: 640px) {
+                .max-w-7xl {
+                    padding-left: 1rem;
+                    padding-right: 1rem;
+                }
+
+                .grid-cols-12 {
+                    grid-template-columns: 1fr;
+                }
+
+                .gap-4 {
+                    gap: 0.75rem;
+                }
+
+                .p-4 {
+                    padding: 1rem;
+                }
+
+                .py-3 {
+                    padding-top: 0.75rem;
+                    padding-bottom: 0.75rem;
+                }
+
+                .text-sm {
+                    font-size: 0.85rem;
+                }
+
+                .w-12, .h-12 {
+                    width: 2.5rem;
+                    height: 2.5rem;
+                }
+            }
+
+            @media (min-width: 640px) and (max-width: 1024px) {
+                .grid-cols-12 {
+                    grid-template-columns: repeat(12, minmax(0, 1fr));
+                }
+            }
+
+            /* Profile picture styles */
+            .rounded-full {
+                border-radius: 50%;
+            }
+
+            .object-cover {
+                object-fit: cover;
+            }
+
+            /* Hover and transition effects */
+            .hover\:bg-gray-50:hover {
+                background-color: #f9fafb;
+            }
+
+            .transition-colors {
+                transition: background-color 0.2s ease, color 0.2s ease;
+            }
+        </style>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <?php elseif ($currentPage === 'Achievement'): ?>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" style="padding-top: 1rem;">
@@ -410,10 +781,19 @@ $action = $_GET['action'] ?? '';
             });
         </script>
 
-    <?php elseif ($currentPage === 'Reports'): ?>
+
+
+
+
+
+
+
+
+        <?php elseif ($currentPage === 'Reports'): ?>
         <div class="p-4 sm:p-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div class="bg-white rounded-xl shadow p-4 flex items-center space-x-4">
+                <!-- Total Athletes Card -->
+                <a href="?page=Student Athletes" class="bg-white rounded-xl shadow p-4 flex items-center space-x-4 hover:bg-gray-50 transition">
                     <div class="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 flex justify-center items-center text-red-500 bg-red-100 rounded-full text-2xl">
                         <i class='bx bxs-user-account'></i>
                     </div>
@@ -422,44 +802,317 @@ $action = $_GET['action'] ?? '';
                         <?php
                         $conn = Database::getInstance();
                         $totalStudents = 0;
-                        if ($result = $conn->query("CALL GetTotalStudents()")) {
-                            if ($row = $result->fetch_assoc()) {
-                                $totalStudents = $row['total'];
+                        try {
+                            if (!$conn || $conn->connect_error) {
+                                error_log("Database connection failed in Total Athletes: " . ($conn ? $conn->connect_error : "No connection"));
+                                echo "<p class='text-red-600'>Unable to fetch athlete count. Please try again later.</p>";
+                            } else {
+                                if ($result = $conn->query("CALL GetTotalStudents()")) {
+                                    if ($row = $result->fetch_assoc()) {
+                                        $totalStudents = $row['total'];
+                                    }
+                                    $result->free();
+                                    while ($conn->more_results() && $conn->next_result()) {
+                                        if ($extra_result = $conn->store_result()) {
+                                            $extra_result->free();
+                                        }
+                                    }
+                                } else {
+                                    error_log("Error calling GetTotalStudents: " . $conn->error);
+                                    echo "<p class='text-red-600'>Unable to fetch athlete count. Please try again later.</p>";
+                                }
                             }
-                            $result->free();
+                        } catch (Exception $e) {
+                            error_log("Exception in Total Athletes query: " . $e->getMessage());
+                            echo "<p class='text-red-600'>An error occurred. Please try again later.</p>";
                         }
                         ?>
-                        <p class="text-2xl sm:text-3xl font-bold text-gray-900"><?= $totalStudents ?></p>
+                        <p class="text-2xl sm:text-3xl font-bold text-gray-900"><?= htmlspecialchars($totalStudents) ?></p>
                     </div>
-                </div>
-                <div class="bg-white rounded-xl shadow p-4 flex items-center space-x-4">
+                </a>
+                <!-- Approved Reports Card -->
+
+
+
+                <a href="?page=Approved Docs" class="bg-white rounded-xl shadow p-4 flex items-center space-x-4 hover:bg-gray-50 transition">
                     <div class="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 flex justify-center items-center text-green-600 bg-green-100 rounded-full text-2xl">
                         <i class='bx bxs-file-doc'></i>
                     </div>
                     <div>
-                        <p class="text-gray-800 font-semibold text-sm sm:text-base">Approved Reports</p>
-                        <p class="text-2xl sm:text-3xl font-bold text-gray-900">0</p>
+                        <p class="text-gray-800 font-semibold text-sm sm:text-base">Verified Documents</p>
+                        <?php
+                        $approvedCount = 0;
+                        try {
+                            if (!$conn || $conn->connect_error) {
+                                error_log("Database connection failed in Approved Reports: " . ($conn ? $conn->connect_error : "No connection"));
+                                echo "<p class='text-red-600'>Unable to fetch approved reports count. Please try again later.</p>";
+                            } else {
+                                $query = "SELECT COUNT(*) as total FROM submissions WHERE status = 'approved'";
+                                if ($result = $conn->query($query)) {
+                                    if ($row = $result->fetch_assoc()) {
+                                        $approvedCount = $row['total'];
+                                    }
+                                    $result->free();
+                                } else {
+                                    error_log("Error fetching approved count: " . $conn->error);
+                                    echo "<p class='text-red-600'>Unable to fetch approved reports count. Please try again later.</p>";
+                                }
+                            }
+                        } catch (Exception $e) {
+                            error_log("Exception in Approved Reports query: " . $e->getMessage());
+                            echo "<p class='text-red-600'>An error occurred. Please try again later.</p>";
+                        }
+                        ?>
+                        <p class="text-2xl sm:text-3xl font-bold text-gray-900"><?= htmlspecialchars($approvedCount) ?></p>
                     </div>
-                </div>
-                <div class="bg-white rounded-xl shadow p-4 sm:p-8 flex flex-col md:flex-row items-center justify-center col-span-1 md:col-span-2 space-y-4 md:space-y-0 md:space-x-8">
-                    <div class="flex justify-center items-center w-24 sm:w-32 h-24 sm:h-32 text-blue-600 bg-blue-100 rounded-full text-5xl">
-                        <i class='bx bxs-bar-chart-alt-2'></i>
-                    </div>
-                    <div class="flex flex-col justify-center space-y-4 text-center md:text-left">
-                        <div class="flex flex-col md:flex-row items-center md:space-x-4">
-                            <div class="text-2xl sm:text-3xl font-bold text-gray-800">0</div>
-                            <div class="text-gray-800 font-semibold text-sm sm:text-base">Ongoing Submission</div>
-                        </div>
-                        <div class="flex flex-col md:flex-row items-center md:space-x-4">
-                            <div class="text-2xl sm:text-3xl font-bold text-gray-800">0</div>
-                            <div class="text-gray-800 font-semibold text-sm sm:text-base">Verified Document</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                </a>
 
-        <?php elseif ($currentPage === 'Student Athletes'): ?>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                <!-- Pending Account Approvals Card -->
+                <a href="?page=Account Approvals" class="bg-white rounded-xl shadow p-4 flex items-center space-x-4 hover:bg-gray-50 transition">
+                    <div class="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 flex justify-center items-center text-green-600 bg-green-100 rounded-full text-2xl">
+                    <i class='bx bxs-user-check'></i>
+
+                    </div>
+
+                    <div>
+                        <p class="text-gray-800 font-semibold text-sm sm:text-base">Pending Account Approvals</p>
+                        <?php
+                        $pendingApprovals = 0;
+                        try {
+                            if (!$conn || $conn->connect_error) {
+                                error_log("Database connection failed in Pending Approvals: " . ($conn ? $conn->connect_error : "No connection"));
+                                echo "<p class='text-red-600'>Unable to fetch pending approvals count. Please try again later.</p>";
+                            } else {
+                                $query = "SELECT COUNT(*) as total FROM account_approvals WHERE approval_status = 'pending'";
+                                if ($result = $conn->query($query)) {
+                                    if ($row = $result->fetch_assoc()) {
+                                        $pendingApprovals = $row['total'];
+                                    }
+                                    $result->free();
+                                } else {
+                                    error_log("Error fetching pending approvals count: " . $conn->error);
+                                    echo "<p class='text-red-600'>Unable to fetch pending approvals count. Please try again later.</p>";
+                                }
+                            }
+                        } catch (Exception $e) {
+                            error_log("Exception in Pending Approvals query: " . $e->getMessage());
+                            echo "<p class='text-red-600'>An error occurred. Please try again later.</p>";
+                        }
+                        ?>
+                        <p class="text-2xl sm:text-3xl font-bold text-gray-900"><?= htmlspecialchars($pendingApprovals) ?></p>
+                    </div>
+                </a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                <a href="?page=Evaluation"class="bg-white rounded-xl shadow p-4 flex items-center space-x-4 hover:bg-gray-50 transition">
+                    <div class="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 flex justify-center items-center text-green-600 bg-green-100 rounded-full text-2xl">
+
+                    <i class='bx bxs-bar-chart-alt-2'></i>
+                    </div>
+
+                    <div>
+
+                        <p class="text-gray-800 font-semibold text-sm sm:text-base">Pending Submissions</p>
+
+
+                        <?php
+                        $pendingCount = 0;
+
+                        try {
+                            if (!$conn || $conn->connect_error) {
+                                error_log("Database connection failed: " . ($conn ? $conn->connect_error : "No connection"));
+                                echo "<p class='text-red-600 text-sm'>Unable to connect to the database. Please try again later.</p>";
+                            } else {
+                                // Query for pending submissions
+                                $pendingQuery = "SELECT COUNT(*) as total FROM submissions WHERE status = 'pending'";
+                                if ($pendingResult = $conn->query($pendingQuery)) {
+                                    if ($pendingRow = $pendingResult->fetch_assoc()) {
+                                        $pendingCount = $pendingRow['total'];
+                                    }
+                                    $pendingResult->free();
+                                } else {
+                                    error_log("Error fetching pending count: " . $conn->error);
+                                    echo "<p class='text-red-600 text-sm'>Unable to fetch pending submissions count.</p>";
+                                }
+
+                                // Query for approved (verified) documents
+                                $approvedQuery = "SELECT COUNT(*) as total FROM submissions WHERE status = 'approved'";
+                                if ($approvedResult = $conn->query($approvedQuery)) {
+                                    if ($approvedRow = $approvedResult->fetch_assoc()) {
+                                        $approvedCount = $approvedRow['total'];
+                                    }
+                                    $approvedResult->free();
+                                } else {
+                                    error_log("Error fetching approved count: " . $conn->error);
+                                    echo "<p class='text-red-600 text-sm'>Unable to fetch verified documents count.</p>";
+                                }
+                            }
+                        } catch (Exception $e) {
+                            error_log("Exception in submissions query: " . $e->getMessage());
+                            echo "<p class='text-red-600 text-sm'>An error occurred. Please try again later.</p>";
+                        }
+                        ?>
+
+
+
+                        <p class="text-2xl sm:text-3xl font-bold text-gray-900"><?= htmlspecialchars( $pendingCount) ?></p>
+                    </div>
+
+
+                </a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                <a href="?page=Achievement" class="bg-white rounded-xl shadow p-4 flex justify-center items-center space-x-4 hover:bg-gray-50 transition col-span-1 md:col-span-2">
+                    <div class="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 flex justify-center items-center text-blue-600 bg-blue-100 rounded-full text-2xl">
+                        <i class='bx bxs-trophy'></i>
+                    </div>
+
+                    <div class="flex flex-col justify-center space-y-2 text-center mx-auto">
+                        <p class="text-gray-800 font-semibold text-sm sm:text-base">Total Achivements</p>
+                        <?php
+                        $totalAchievements = 0;
+                        try {
+                            if (!$conn || $conn->connect_error) {
+                                error_log("Database connection failed in Total Achievements: " . ($conn ? $conn->connect_error : "No connection"));
+                                echo "<p class='text-red-600'>Unable to fetch achievements count. Please try again later.</p>";
+                            } else {
+                                $query = "SELECT COUNT(*) as total FROM achievements";
+                                if ($result = $conn->query($query)) {
+                                    if ($row = $result->fetch_assoc()) {
+                                        $totalAchievements = $row['total'];
+                                    }
+                                    $result->free();
+                                } else {
+                                    error_log("Error fetching achievements count: " . $conn->error);
+                                    echo "<p class='text-red-600'>Unable to fetch achievements count. Please try again later.</p>";
+                                }
+                            }
+                        } catch (Exception $e) {
+                            error_log("Exception in Total Achievements query: " . $e->getMessage());
+                            echo "<p class='text-red-600'>An error occurred. Please try again later.</p>";
+                        }
+                        ?>
+
+                    <p class="text-lg sm:text-xl font-bold text-gray-900"><?= htmlspecialchars($totalAchievements) ?></p>
+                    </div>
+                </a>
+
+
+
+
+
+
+
+
+
+
+
+
+                <!-- Athletes by Campus Card (Unchanged) -->
+                <a href="?page=Student Athletes" class="bg-white rounded-xl shadow p-4 flex justify-center items-center space-x-4 hover:bg-gray-50 transition col-span-1 md:col-span-2">
+                    <div class="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 flex justify-center items-center text-blue-600 bg-blue-100 rounded-full text-2xl">
+                    <i class='bx bxs-school'></i>
+                    </div>
+
+                    <div class="flex flex-col justify-center space-y-2 text-center mx-auto">
+                        <p class="text-gray-800 font-semibold text-sm sm:text-base">Athletes by Campus</p>
+                        <?php
+                        $tagumCount = 0;
+                        $mabiniCount = 0;
+                        try {
+                            if (!$conn || $conn->connect_error) {
+                                error_log("Database connection failed in Athletes by Campus: " . ($conn ? $conn->connect_error : "No connection"));
+                                echo "<p class='text-red-600'>Unable to fetch campus counts. Please try again later.</p>";
+                            } else {
+                                $query = "SELECT campus, COUNT(*) as total FROM users WHERE campus IN ('Tagum', 'Mabini') GROUP BY campus";
+                                if ($result = $conn->query($query)) {
+                                    while ($row = $result->fetch_assoc()) {
+                                        if ($row['campus'] === 'Tagum') {
+                                            $tagumCount = $row['total'];
+                                        } elseif ($row['campus'] === 'Mabini') {
+                                            $mabiniCount = $row['total'];
+                                        }
+                                    }
+                                    $result->free();
+                                } else {
+                                    error_log("Error fetching campus counts: " . $conn->error);
+                                    echo "<p class='text-red-600'>Unable to fetch campus counts. Please try again later.</p>";
+                                }
+                            }
+                        } catch (Exception $e) {
+                            error_log("Exception in Athletes by Campus query: " . $e->getMessage());
+                            echo "<p class='text-red-600'>An error occurred. Please try again later.</p>";
+                        }
+                        ?>
+                        <p class="text-lg sm:text-xl font-bold text-gray-900">Tagum: <?= htmlspecialchars($tagumCount) ?> | Mabini: <?= htmlspecialchars($mabiniCount) ?></p>
+                    </div>
+                </a>
+
+
+
+
+
+
+
+
+
+        <?php elseif ($currentPage === 'Approved Docs'): ?>
         <?php
         // Database configuration (using your existing Database class)
         $conn = Database::getInstance();
