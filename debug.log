@@ -22,3 +22,7 @@ approveAchievement started at 2025-05-21 01:03:47 PST
 Error: Unknown column 'created_at' in 'field list' at 2025-05-21 01:03:47 PST
 rejectAchievement started at 2025-05-21 01:04:01 PST
 Error: Unknown column 'created_at' in 'field list' at 2025-05-21 01:04:01 PST
+Debug started at 2025-05-21 02:35:27 PST
+Debug started at 2025-05-21 02:35:38 PST
+Debug started at 2025-05-21 02:38:02 PST
+handleAchievement started at 2025-05-21 02:59:15 PST

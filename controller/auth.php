@@ -160,7 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $sport = null;
         $campus = null;
     } else {
-        $query = "SELECT id, student_id, full_name, address, email, password, sport, campus FROM users WHERE email = ?";
+        $query = "SELECT id, student_id, full_name, address, email, password, sport, campus, year_section FROM users WHERE email = ?";
         $stmt = $conn->prepare($query);
         if (!$stmt) {
             error_log("Database error: " . $conn->error);
@@ -187,22 +187,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $student_id = $user_details['student_id'];
         $sport = $user_details['sport'];
         $campus = $user_details['campus'];
+        $year_section = $user_details['year_section'];
         $password = $user_details['password'];
-
-        // Get year_section from submissions table
-        $year_section = null;
-        $submission_query = "SELECT year_section FROM submissions WHERE user_id = ? LIMIT 1";
-        $submission_stmt = $conn->prepare($submission_query);
-        if ($submission_stmt) {
-            $submission_stmt->bind_param("i", $id);
-            $submission_stmt->execute();
-            $submission_result = $submission_stmt->get_result();
-            if ($submission_result->num_rows > 0) {
-                $submission_data = $submission_result->fetch_assoc();
-                $year_section = $submission_data['year_section'];
-            }
-            $submission_stmt->close();
-        }
     }
 
     // Check if user has a profile image

@@ -564,12 +564,579 @@
 
 
 
-                <?php
-                // Generate CSRF token
-                if (!isset($_SESSION['csrf_token'])) {
-                    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+
+                <!-- Edit Profile Modal -->
+                <div id="edit-profile-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
+                    <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl mx-4 overflow-y-auto max-h-screen">
+                        <!-- Flex direction changes based on screen size -->
+                        <div class="flex flex-col md:flex-row">
+                            <!-- Profile Picture Section - Full width on mobile, 1/3 on desktop -->
+                            <div class="bg-blue-600 text-white p-6 md:w-1/3 flex flex-col items-center justify-center">
+                                <div class="relative group mb-6">
+                                    <div class="w-40 h-40 rounded-full bg-gray-200 overflow-hidden border-[6px] border-blue-100 relative">
+                                        <?php if (isset($_SESSION['user']['has_profile_image'])): ?>
+                                            <img id="profile-image"
+                                                 src="../controller/get_profile_image.php?id=<?php echo $_SESSION['user']['id']; ?>&t=<?php echo time(); ?>"
+                                                 onerror="this.onerror=null; this.src='../public/image/user.png'"
+                                                 alt="Profile Image"
+                                                 class="w-full h-full object-cover">
+                                            <div id="profile-initials" class="hidden"></div>
+                                        <?php else: ?>
+                                            <div id="profile-initials" class="w-full h-full flex items-center justify-center text-center bg-blue-500 text-white text-5xl font-bold">
+                                                <?php
+                                                $initials = '';
+                                                $fullName = $_SESSION['user']['full_name'] ?? '';
+                                                $nameParts = explode(' ', $fullName);
+                                                if (count($nameParts) >= 2) {
+                                                    $initials = substr($nameParts[0], 0, 1) . substr($nameParts[count($nameParts)-1], 0, 1);
+                                                } elseif (count($nameParts) === 1) {
+                                                    $initials = substr($nameParts[0], 0, 1);
+                                                }
+                                                echo strtoupper($initials ?: 'U');
+                                                ?>
+                                            </div>
+                                            <img id="profile-image" src="" alt="Profile" class="hidden w-full h-full object-cover">
+                                        <?php endif; ?>
+                                    </div>
+                                    <label for="modal-profile-upload" class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-full bg-black/50 cursor-pointer">
+                                        <span class="text-white text-sm font-medium bg-blue-600 px-2 py-1 rounded">Change Photo</span>
+                                        <input id="modal-profile-upload" type="file" accept="image/*" class="hidden">
+                                    </label>
+                                </div>
+                                <h3 class="text-xl font-semibold mb-1 text-center break-words"><?php echo htmlspecialchars($_SESSION['user']['full_name'] ?? 'User'); ?></h3>
+                                <p class="text-blue-100 text-base text-center break-words"><?php echo htmlspecialchars($_SESSION['user']['student_id'] ?? ''); ?></p>
+                            </div>
+                            <!-- Form Section - Full width on mobile, 2/3 on desktop -->
+                            <div class="p-4 md:p-6 md:w-2/3 mx-auto">
+                                <div class="flex justify-between items-center mb-4 md:mb-6">
+                                    <h3 class="text-lg md:text-xl font-semibold text-gray-800">Edit Profile</h3>
+                                    <button onclick="closeModal('edit-profile-modal')" class="text-gray-500 hover:text-gray-700">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+                                <form id="profile-edit-form" class="space-y-4 md:space-y-6" method="post" action="../controller/update_profile.php" enctype="multipart/form-data">
+                                    <!-- Single column on mobile, two columns on desktop -->
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                                        <!-- Full Name -->
+                                        <div>
+                                            <label for="full_name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                                            <input type="text" id="full_name" name="full_name"
+                                                   value="<?php echo htmlspecialchars($_SESSION['user']['full_name'] ?? 'N/A'); ?>"
+                                                   class="w-full px-3 py-2 md:px-4 md:py-2.5 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        </div>
+
+                                        <!-- Email -->
+                                        <div>
+                                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                            <input type="email" id="email" name="email"
+                                                   value="<?php echo htmlspecialchars($_SESSION['user']['email'] ?? 'N/A'); ?>"
+                                                   class="w-full px-3 py-2 md:px-4 md:py-2.5 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        </div>
+
+                                        <!-- Address (Wider) -->
+                                        <div class="w-full md:w-[110%]">
+                                            <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                                            <input type="text" id="address" name="address"
+                                                   value="<?php echo htmlspecialchars($_SESSION['user']['address'] ?? 'N/A'); ?>"
+                                                   class="w-full px-4 py-2.5 md:px-5 md:py-3 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        </div>
+                                        <!-- Sport -->
+                                        <div>
+                                            <label for="sport" class="block text-sm font-medium text-gray-700 mb-1">Sport</label>
+                                            <select id="sport" name="sport" class="w-full px-3 py-2 md:px-4 md:py-2.5 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                                <option value="" disabled <?php echo (!isset($_SESSION['user']['sport']) || $_SESSION['user']['sport'] === 'N/A') ? 'selected' : ''; ?>>Select Sport (Optional)</option>
+                                                <option value="Athletics" <?php echo (isset($_SESSION['user']['sport']) && $_SESSION['user']['sport'] === 'Athletics') ? 'selected' : ''; ?>>Athletics</option>
+                                                <option value="Badminton" <?php echo (isset($_SESSION['user']['sport']) && $_SESSION['user']['sport'] === 'Badminton') ? 'selected' : ''; ?>>Badminton</option>
+                                                <option value="Basketball" <?php echo (isset($_SESSION['user']['sport']) && $_SESSION['user']['sport'] === 'Basketball') ? 'selected' : ''; ?>>Basketball</option>
+                                                <option value="Chess" <?php echo (isset($_SESSION['user']['sport']) && $_SESSION['user']['sport'] === 'Chess') ? 'selected' : ''; ?>>Chess</option>
+                                                <option value="Football" <?php echo (isset($_SESSION['user']['sport']) && $_SESSION['user']['sport'] === 'Football') ? 'selected' : ''; ?>>Football</option>
+                                                <option value="Sepak Takraw" <?php echo (isset($_SESSION['user']['sport']) && $_SESSION['user']['sport'] === 'Sepak Takraw') ? 'selected' : ''; ?>>Sepak Takraw</option>
+                                                <option value="Swimming" <?php echo (isset($_SESSION['user']['sport']) && $_SESSION['user']['sport'] === 'Swimming') ? 'selected' : ''; ?>>Swimming</option>
+                                                <option value="Table Tennis" <?php echo (isset($_SESSION['user']['sport']) && $_SESSION['user']['sport'] === 'Table Tennis') ? 'selected' : ''; ?>>Table Tennis</option>
+                                                <option value="Taekwondo" <?php echo (isset($_SESSION['user']['sport']) && $_SESSION['user']['sport'] === 'Taekwondo') ? 'selected' : ''; ?>>Taekwondo</option>
+                                                <option value="Tennis" <?php echo (isset($_SESSION['user']['sport']) && $_SESSION['user']['sport'] === 'Tennis') ? 'selected' : ''; ?>>Tennis</option>
+                                                <option value="Volleyball" <?php echo (isset($_SESSION['user']['sport']) && $_SESSION['user']['sport'] === 'Volleyball') ? 'selected' : ''; ?>>Volleyball</option>
+                                            </select>
+                                        </div>
+
+
+                                        <!-- Year Section -->
+                                        <div>
+                                            <label for="year_section" class="block text-sm font-medium text-gray-700 mb-1">Year & Section</label>
+                                            <input type="text" id="year_section" name="year_section"
+                                                   value="<?php echo htmlspecialchars($_SESSION['user']['year_section'] ?? ''); ?>"
+                                                   class="w-full px-3 py-2 md:px-4 md:py-2.5 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                   placeholder="e.g., BSIT 3-A (Optional)">
+                                        </div>
+
+
+                                        <!-- Campus -->
+                                        <div>
+                                            <label for="campus" class="block text-sm font-medium text-gray-700 mb-1">Campus</label>
+                                            <select id="campus" name="campus" class="w-full px-3 py-2 md:px-4 md:py-2.5 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                                <option value="Tagum" <?php echo (isset($_SESSION['user']['campus']) && $_SESSION['user']['campus'] === 'Tagum') ? 'selected' : ''; ?>>Tagum</option>
+                                                <option value="Mabini" <?php echo (isset($_SESSION['user']['campus']) && $_SESSION['user']['campus'] === 'Mabini') ? 'selected' : ''; ?>>Mabini</option>
+                                            </select>
+                                        </div>
+
+
+                                        <!-- Password Fields - Vertically aligned -->
+                                        <div class="space-y-4">
+                                            <!-- New Password -->
+                                            <div>
+                                                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+                                                <div class="relative">
+                                                    <input type="password" id="password" name="password" value=""
+                                                           class="w-full px-3 py-2 md:px-4 md:py-2.5 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10"
+                                                           placeholder="Enter new password">
+                                                    <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700" onclick="togglePassword('password')">
+                                                        <svg class="h-4 w-4 md:h-5 md:w-5 eye-icon" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                        </svg>
+                                                        <svg class="h-4 w-4 md:h-5 md:w-5 eye-slash-icon hidden" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <!-- Confirm Password -->
+                                            <div>
+                                                <label for="confirm_password" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                                                <div class="relative">
+                                                    <input type="password" id="confirm_password" name="confirm_password" value=""
+                                                           class="w-full px-3 py-2 md:px-4 md:py-2.5 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10"
+                                                           placeholder="Confirm password">
+                                                    <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700" onclick="togglePassword('confirm_password')">
+                                                        <svg class="h-4 w-4 md:h-5 md:w-5 eye-icon" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                        </svg>
+                                                        <svg class="h-4 w-4 md:h-5 md:w-5 eye-slash-icon hidden" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Buttons -->
+                                    <div class="flex flex-col sm:flex-row justify-end gap-3 mt-6">
+                                        <button type="button" onclick="closeModal('edit-profile-modal')"
+                                                class="w-full sm:w-auto px-4 py-2 md:px-5 md:py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+                                            Cancel
+                                        </button>
+                                        <button type="submit"
+                                                class="w-full sm:w-auto px-4 py-2 md:px-5 md:py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
+                                            Save Changes
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- JavaScript to handle profile image upload and preview -->
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Handle profile image upload in the edit profile modal
+                    const profileUpload = document.getElementById('modal-profile-upload');
+                    const profileForm = document.getElementById('profile-edit-form');
+
+                    if (profileUpload) {
+                        profileUpload.addEventListener('change', function(e) {
+                            if (e.target.files && e.target.files[0]) {
+                                const file = e.target.files[0];
+
+                                // Validate file
+                                if (file.size > 2 * 1024 * 1024) {
+                                    alert('Image size exceeds 2MB. Please choose a smaller file.');
+                                    return;
+                                }
+
+                                const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                                if (!validTypes.includes(file.type)) {
+                                    alert('Only JPG, PNG and GIF images are allowed.');
+                                    return;
+                                }
+
+                                // Create a preview
+                                const reader = new FileReader();
+                                reader.onload = function(e) {
+                                    const profileImage = document.getElementById('profile-image');
+                                    const profileInitials = document.getElementById('profile-initials');
+
+                                    profileImage.src = e.target.result;
+                                    profileImage.classList.remove('hidden');
+                                    profileInitials.classList.add('hidden');
+                                };
+                                reader.readAsDataURL(file);
+
+                                // Create a hidden file input if it doesn't exist
+                                let fileInput = profileForm.querySelector('input[name="profile_image"]');
+                                if (!fileInput) {
+                                    fileInput = document.createElement('input');
+                                    fileInput.type = 'file';
+                                    fileInput.name = 'profile_image';
+                                    fileInput.classList.add('hidden');
+                                    profileForm.appendChild(fileInput);
+                                }
+
+                                // Create a new FileList-like object with our file
+                                const dataTransfer = new DataTransfer();
+                                dataTransfer.items.add(file);
+                                fileInput.files = dataTransfer.files;
+                            }
+                        });
+                    }
+
+                    // Handle form submission
+                    if (profileForm) {
+                        profileForm.addEventListener('submit', function(e) {
+                            const password = document.getElementById('password').value;
+                            const confirmPassword = document.getElementById('confirm_password').value;
+
+                            // If password fields are not empty, check if they match
+                            if (password || confirmPassword) {
+                                if (password !== confirmPassword) {
+                                    e.preventDefault();
+                                    document.getElementById('passwordModal').classList.remove('hidden');
+                                    return false;
+                                }
+
+                                // Check password length if provided
+                                if (password.length < 8) {
+                                    e.preventDefault();
+                                    alert('Password must be at least 8 characters long.');
+                                    return false;
+                                }
+                            }
+
+                            // Add enctype attribute to ensure file upload works
+                            profileForm.enctype = "multipart/form-data";
+                        });
+                    }
+                });
+
+                function refreshProfileImage() {
+                    const profileImage = document.getElementById('profile-image');
+                    if (profileImage) {
+                        // Add timestamp to prevent caching
+                        profileImage.src = profileImage.src.split('?')[0] + '?t=' + new Date().getTime();
+                    }
                 }
-                ?>
+
+                // Helper function to get user ID from the URL or data attribute
+                function getUserId() {
+                    // Try to get from data attribute first
+                    const userIdElement = document.querySelector('[data-user-id]');
+                    if (userIdElement && userIdElement.dataset.userId) {
+                        return userIdElement.dataset.userId;
+                    }
+
+                    // Default to session user ID (this should be set as a JS variable in your PHP)
+                    return window.currentUserId || '';
+                }
+
+                // Function to toggle password visibility
+                function togglePassword(inputId) {
+                    const passwordInput = document.getElementById(inputId);
+                    const eyeIcon = passwordInput.nextElementSibling.querySelector('.eye-icon');
+                    const eyeSlashIcon = passwordInput.nextElementSibling.querySelector('.eye-slash-icon');
+
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text';
+                        eyeIcon.classList.add('hidden');
+                        eyeSlashIcon.classList.remove('hidden');
+                    } else {
+                        passwordInput.type = 'password';
+                        eyeIcon.classList.remove('hidden');
+                        eyeSlashIcon.classList.add('hidden');
+                    }
+                }
+
+                // Function to close modal
+                function closeModal(modalId) {
+                    document.getElementById(modalId).classList.add('hidden');
+                }
+
+                // Function to show success modal
+                function showSuccessModal(message) {
+                    const modal = document.getElementById('success-modal');
+                    const messageElement = document.getElementById('success-message');
+
+                    if (messageElement && message) {
+                        messageElement.textContent = message;
+                    }
+
+                    if (modal) {
+                        modal.classList.remove('hidden');
+                    }
+                }
+            </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            <!-- Add this modal at the end of the body tag, before the closing </body> -->
+
+            <!-- Success Modal -->
+            <div id="success-modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 hidden">
+                <div class="bg-white rounded-lg shadow-lg p-6 max-w-md text-center">
+                    <div class="mb-4 flex justify-center">
+                        <div class="rounded-full bg-green-100 p-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                    </div>
+                    <h2 class="text-lg font-semibold mb-2">Success!</h2>
+                    <p id="success-message" class="text-gray-600 mb-4">Your profile has been updated successfully.</p>
+                    <button id="close-success-modal" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors">
+                        OK
+                    </button>
+                </div>
+            </div>
+
+            <!-- Add this script at the end of the body tag, before the closing </body> -->
+            <script>
+                // Function to show success modal
+                function showSuccessModal(message) {
+                    const modal = document.getElementById('success-modal');
+                    const messageElement = document.getElementById('success-message');
+
+                    if (messageElement && message) {
+                        messageElement.textContent = message;
+                    }
+
+                    if (modal) {
+                        modal.classList.remove('hidden');
+                    }
+                }
+
+                // Function to close success modal
+                function closeSuccessModal() {
+                    const modal = document.getElementById('success-modal');
+                    if (modal) {
+                        modal.classList.add('hidden');
+                    }
+                }
+
+                // Add event listener to close button
+                document.addEventListener('DOMContentLoaded', function() {
+                    const closeButton = document.getElementById('close-success-modal');
+                    if (closeButton) {
+                        closeButton.addEventListener('click', closeSuccessModal);
+                    }
+
+                    // Check for success message in PHP session
+                    <?php if (isset($_SESSION['profile_update_success']) && $_SESSION['profile_update_success'] === true): ?>
+                    showSuccessModal(<?php echo json_encode($_SESSION['profile_message'] ?? 'Profile updated successfully.'); ?>);
+                    <?php
+                    // Clear the message from session so it doesn't show again on refresh
+                    unset($_SESSION['profile_update_success']);
+                    unset($_SESSION['profile_message']);
+                    ?>
+                    <?php endif; ?>
+                });
+            </script>
+
+
+            <!-- Modal HTML -->
+            <div id="passwordModal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden z-50">
+                <div class="bg-white rounded-xl shadow-xl max-w-sm w-full p-5">
+                    <h2 class="text-lg font-semibold mb-4 text-red-600">Password Mismatch</h2>
+                    <p class="text-sm text-gray-600 mb-4">New password and confirm password do not match.</p>
+                    <div class="flex justify-end">
+                        <button onclick="closeModal('passwordModal')" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">OK</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- JavaScript -->
+            <script>
+                function togglePassword(id) {
+                    const input = document.getElementById(id);
+                    const icon = input.nextElementSibling;
+                    const [eye, eyeSlash] = icon.querySelectorAll('svg');
+
+                    if (input.type === "password") {
+                        input.type = "text";
+                        eye.classList.add("hidden");
+                        eyeSlash.classList.remove("hidden");
+                    } else {
+                        input.type = "password";
+                        eye.classList.remove("hidden");
+                        eyeSlash.classList.add("hidden");
+                    }
+                }
+
+                function validatePasswords() {
+                    const password = document.getElementById('password').value;
+                    const confirm = document.getElementById('confirm_password').value;
+                    if (password !== confirm) {
+                        document.getElementById('passwordModal').classList.remove('hidden');
+                        return false;
+                    }
+                    return true;
+                }
+
+                function closeModal() {
+                    document.getElementById('passwordModal').classList.add('hidden');
+                }
+
+                // Attach to your form (you can adjust selector as needed)
+                document.querySelector('form')?.addEventListener('submit', function(e) {
+                    if (!validatePasswords()) {
+                        e.preventDefault();
+                    }
+                });
+            </script>
+
+        <?php if (isset($_GET['message'])): ?>
+            document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('messageModal').classList.remove('hidden');
+            });
+        <?php endif; ?>
+
+
+            <!-- Submission Success Modal -->
+            <div id="submissionSuccessModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 hidden">
+                <div class="bg-white rounded-lg shadow-lg p-6 w-80 text-center">
+                    <div class="mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-green-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                    <h2 class="text-lg font-semibold mb-2">Submission Successful!</h2>
+                    <p id="submissionSuccessMessage" class="text-gray-600 mb-4">Your document has been submitted successfully!</p>
+                    <div class="flex justify-between mt-4 gap-2">
+                        <button id="goToDashboardBtn" class="px-3 py-1.5 text-sm bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors">
+                            Back to Dashboard
+                        </button>
+                        <button id="submitAnotherBtn" class="px-3 py-1.5 text-sm bg-green-500 text-white rounded hover:bg-green-600 transition-colors">
+                            Submit Another
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                // Handle form submission with AJAX
+                document.querySelector('.submissions-form')?.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    const form = e.target;
+                    const formData = new FormData(form);
+
+                    // Show loading state
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    const originalBtnText = submitBtn.innerHTML;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Submitting...';
+                    submitBtn.disabled = true;
+
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Show success modal
+                                document.getElementById('submissionSuccessMessage').textContent = data.message;
+                                document.getElementById('submissionSuccessModal').classList.remove('hidden');
+
+                                // Reset form
+                                form.reset();
+                                document.getElementById('file_info').classList.add('hidden');
+                            } else {
+                                // Show error modal
+                                const errorContainer = document.getElementById('submissionErrorMessages');
+                                errorContainer.innerHTML = '';
+
+                                data.errors.forEach(error => {
+                                    const errorElement = document.createElement('p');
+                                    errorElement.className = 'text-sm mb-1';
+                                    errorElement.textContent = `• ${error}`;
+                                    errorContainer.appendChild(errorElement);
+                                });
+
+                                document.getElementById('submissionErrorModal').classList.remove('hidden');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            // Show error modal
+                            const errorContainer = document.getElementById('submissionErrorMessages');
+                            errorContainer.innerHTML = '<p class="text-sm mb-1">• An unexpected error occurred. Please try again.</p>';
+                            document.getElementById('submissionErrorModal').classList.remove('hidden');
+                        })
+                        .finally(() => {
+                            submitBtn.innerHTML = originalBtnText;
+                            submitBtn.disabled = false;
+                        });
+                });
+
+                // Close buttons for modals
+                document.getElementById('closeSubmissionError')?.addEventListener('click', function() {
+                    document.getElementById('submissionErrorModal').classList.add('hidden');
+                });
+
+                // Success modal buttons
+                document.getElementById('goToDashboardBtn')?.addEventListener('click', function() {
+                    window.location.href = 'userView.php?page=Dashboard';
+                });
+
+                document.getElementById('submitAnotherBtn')?.addEventListener('click', function() {
+                    document.getElementById('submissionSuccessModal').classList.add('hidden');
+                    // Optionally focus on the first form field if needed
+                    // document.querySelector('.submissions-form input').focus();
+                });
+            </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
                 <?php elseif ($currentPage === 'Achievement'): ?>
                     <!-- Achievement Section -->
@@ -637,7 +1204,7 @@
                                     <h2 class="text-xl font-bold">Athlete Achievement Form</h2>
                                     <button id="closeAchievementModal" class="text-gray-500 hover:text-gray-700">×</button>
                                 </div>
-                                <form method="POST" enctype="multipart/form-data" action="../controller/handleAchievements.php" id="achievementForm" class="space-y-4">
+                                <form method="POST" enctype="multipart/form-data" action="../controller/handleAchievement.php" id="achievementForm" class="space-y-4">
                                     <input type="hidden" name="submit_achievement" value="1">
                                     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -2396,553 +2963,6 @@
 
 
 
-
-
-
-    <!-- Edit Profile Modal -->
-    <div id="edit-profile-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl mx-4 overflow-y-auto max-h-screen">
-            <!-- Flex direction changes based on screen size -->
-            <div class="flex flex-col md:flex-row">
-                <!-- Profile Picture Section - Full width on mobile, 1/3 on desktop -->
-                <div class="bg-blue-600 text-white p-6 md:w-1/3 flex flex-col items-center justify-center">
-                    <div class="relative group mb-6">
-                        <div class="w-40 h-40 rounded-full bg-gray-200 overflow-hidden border-[6px] border-blue-100 relative">
-                            <?php if (isset($_SESSION['user']['has_profile_image'])): ?>
-                                <img id="profile-image"
-                                     src="../controller/get_profile_image.php?id=<?php echo $_SESSION['user']['id']; ?>&t=<?php echo time(); ?>"
-                                     onerror="this.onerror=null; this.src='../public/image/user.png'"
-                                     alt="Profile Image"
-                                     class="w-full h-full object-cover">
-                                <div id="profile-initials" class="hidden"></div>
-                            <?php else: ?>
-                                <div id="profile-initials" class="w-full h-full flex items-center justify-center text-center bg-blue-500 text-white text-5xl font-bold">
-                                    <?php
-                                    $initials = '';
-                                    $fullName = $_SESSION['user']['full_name'] ?? '';
-                                    $nameParts = explode(' ', $fullName);
-                                    if (count($nameParts) >= 2) {
-                                        $initials = substr($nameParts[0], 0, 1) . substr($nameParts[count($nameParts)-1], 0, 1);
-                                    } elseif (count($nameParts) === 1) {
-                                        $initials = substr($nameParts[0], 0, 1);
-                                    }
-                                    echo strtoupper($initials ?: 'U');
-                                    ?>
-                                </div>
-                                <img id="profile-image" src="" alt="Profile" class="hidden w-full h-full object-cover">
-                            <?php endif; ?>
-                        </div>
-                        <label for="modal-profile-upload" class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-full bg-black/50 cursor-pointer">
-                            <span class="text-white text-sm font-medium bg-blue-600 px-2 py-1 rounded">Change Photo</span>
-                            <input id="modal-profile-upload" type="file" accept="image/*" class="hidden">
-                        </label>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-1 text-center break-words"><?php echo htmlspecialchars($_SESSION['user']['full_name'] ?? 'User'); ?></h3>
-                    <p class="text-blue-100 text-base text-center break-words"><?php echo htmlspecialchars($_SESSION['user']['student_id'] ?? ''); ?></p>
-                </div>
-                <!-- Form Section - Full width on mobile, 2/3 on desktop -->
-                <div class="p-4 md:p-6 md:w-2/3 mx-auto">
-                    <div class="flex justify-between items-center mb-4 md:mb-6">
-                        <h3 class="text-lg md:text-xl font-semibold text-gray-800">Edit Profile</h3>
-                        <button onclick="closeModal('edit-profile-modal')" class="text-gray-500 hover:text-gray-700">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-                    <form id="profile-edit-form" class="space-y-4 md:space-y-6" method="post" action="../controller/update_profile.php" enctype="multipart/form-data">
-                        <!-- Single column on mobile, two columns on desktop -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                            <!-- Full Name -->
-                            <div>
-                                <label for="full_name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                                <input type="text" id="full_name" name="full_name"
-                                       value="<?php echo htmlspecialchars($_SESSION['user']['full_name'] ?? 'N/A'); ?>"
-                                       class="w-full px-3 py-2 md:px-4 md:py-2.5 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            </div>
-
-                            <!-- Email -->
-                            <div>
-                                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                                <input type="email" id="email" name="email"
-                                       value="<?php echo htmlspecialchars($_SESSION['user']['email'] ?? 'N/A'); ?>"
-                                       class="w-full px-3 py-2 md:px-4 md:py-2.5 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            </div>
-
-                            <!-- Address (Wider) -->
-                            <div class="w-full md:w-[110%]">
-                                <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                                <input type="text" id="address" name="address"
-                                       value="<?php echo htmlspecialchars($_SESSION['user']['address'] ?? 'N/A'); ?>"
-                                       class="w-full px-4 py-2.5 md:px-5 md:py-3 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            </div>
-
-                            <div>
-                                <label for="campus" class="block text-sm font-medium text-gray-700 mb-1">Campus</label>
-                                <select id="campus" name="campus" class="w-full px-3 py-2 md:px-4 md:py-2.5 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                    <option value="Tagum" <?php echo (isset($_SESSION['user']['campus']) && $_SESSION['user']['campus'] === 'Tagum') ? 'selected' : ''; ?>>Tagum</option>
-                                    <option value="Mabini" <?php echo (isset($_SESSION['user']['campus']) && $_SESSION['user']['campus'] === 'Mabini') ? 'selected' : ''; ?>>Mabini</option>
-                                </select>
-                            </div>
-
-                            <!-- Sport -->
-                            <div>
-                                <label for="sport" class="block text-sm font-medium text-gray-700 mb-1">Sport</label>
-                                <select id="sport" name="sport" class="w-full px-3 py-2 md:px-4 md:py-2.5 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                    <option value="" disabled <?php echo (!isset($_SESSION['user']['sport']) || $_SESSION['user']['sport'] === 'N/A') ? 'selected' : ''; ?>>Select Sport (Optional)</option>
-                                    <option value="Athletics" <?php echo (isset($_SESSION['user']['sport']) && $_SESSION['user']['sport'] === 'Athletics') ? 'selected' : ''; ?>>Athletics</option>
-                                    <option value="Badminton" <?php echo (isset($_SESSION['user']['sport']) && $_SESSION['user']['sport'] === 'Badminton') ? 'selected' : ''; ?>>Badminton</option>
-                                    <option value="Basketball" <?php echo (isset($_SESSION['user']['sport']) && $_SESSION['user']['sport'] === 'Basketball') ? 'selected' : ''; ?>>Basketball</option>
-                                    <option value="Chess" <?php echo (isset($_SESSION['user']['sport']) && $_SESSION['user']['sport'] === 'Chess') ? 'selected' : ''; ?>>Chess</option>
-                                    <option value="Football" <?php echo (isset($_SESSION['user']['sport']) && $_SESSION['user']['sport'] === 'Football') ? 'selected' : ''; ?>>Football</option>
-                                    <option value="Sepak Takraw" <?php echo (isset($_SESSION['user']['sport']) && $_SESSION['user']['sport'] === 'Sepak Takraw') ? 'selected' : ''; ?>>Sepak Takraw</option>
-                                    <option value="Swimming" <?php echo (isset($_SESSION['user']['sport']) && $_SESSION['user']['sport'] === 'Swimming') ? 'selected' : ''; ?>>Swimming</option>
-                                    <option value="Table Tennis" <?php echo (isset($_SESSION['user']['sport']) && $_SESSION['user']['sport'] === 'Table Tennis') ? 'selected' : ''; ?>>Table Tennis</option>
-                                    <option value="Taekwondo" <?php echo (isset($_SESSION['user']['sport']) && $_SESSION['user']['sport'] === 'Taekwondo') ? 'selected' : ''; ?>>Taekwondo</option>
-                                    <option value="Tennis" <?php echo (isset($_SESSION['user']['sport']) && $_SESSION['user']['sport'] === 'Tennis') ? 'selected' : ''; ?>>Tennis</option>
-                                    <option value="Volleyball" <?php echo (isset($_SESSION['user']['sport']) && $_SESSION['user']['sport'] === 'Volleyball') ? 'selected' : ''; ?>>Volleyball</option>
-                                </select>
-                            </div>
-                            <!-- Campus -->
-
-
-                            <!-- Password Fields - Vertically aligned -->
-                            <div class="space-y-4">
-                                <!-- New Password -->
-                                <div>
-                                    <label for="password" class="block text-sm font-medium text-gray-700 BEFORE mb-1">New Password</label>
-                                    <div class="relative">
-                                        <input type="password" id="password" name="password" value=""
-                                               class="w-full px-3 py-2 md:px-4 md:py-2.5 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10"
-                                               placeholder="Enter new password">
-                                        <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700" onclick="togglePassword('password')">
-                                            <svg class="h-4 w-4 md:h-5 md:w-5 eye-icon" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943
-
-9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                            </svg>
-                                            <svg class="h-4 w-4 md:h-5 md:w-5 eye-slash-icon hidden" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0APassing 9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- Confirm Password -->
-                                <div>
-                                    <label for="confirm_password" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
-                                    <div class="relative">
-                                        <input type="password" id="confirm_password" name="confirm_password" value=""
-                                               class="w-full px-3 py-2 md:px-4 md:py-2.5 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10"
-                                               placeholder="Confirm password">
-                                        <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700" onclick="togglePassword('confirm_password')">
-                                            <svg class="h-4 w-4 md:h-5 md:w-5 eye-icon" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                            </svg>
-                                            <svg class="h-4 w-4 md:h-5 md:w-5 eye-slash-icon hidden" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Buttons -->
-                        <div class="flex flex-col sm:flex-row justify-end gap-3 mt-6">
-                            <button type="button" onclick="closeModal('edit-profile-modal')"
-                                    class="w-full sm:w-auto px-4 py-2 md:px-5 md:py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
-                                Cancel
-                            </button>
-                            <button type="submit"
-                                    class="w-full sm:w-auto px-4 py-2 md:px-5 md:py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
-                                Save Changes
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
-
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- JavaScript to handle profile image upload and preview -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Handle profile image upload in the edit profile modal
-            const profileUpload = document.getElementById('modal-profile-upload');
-            const profileForm = document.getElementById('profile-edit-form');
-
-            if (profileUpload) {
-                profileUpload.addEventListener('change', function(e) {
-                    if (e.target.files && e.target.files[0]) {
-                        const file = e.target.files[0];
-
-                        // Validate file
-                        if (file.size > 2 * 1024 * 1024) {
-                            alert('Image size exceeds 2MB. Please choose a smaller file.');
-                            return;
-                        }
-
-                        const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
-                        if (!validTypes.includes(file.type)) {
-                            alert('Only JPG, PNG and GIF images are allowed.');
-                            return;
-                        }
-
-                        // Create a preview
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            const profileImage = document.getElementById('profile-image');
-                            const profileInitials = document.getElementById('profile-initials');
-
-                            profileImage.src = e.target.result;
-                            profileImage.classList.remove('hidden');
-                            profileInitials.classList.add('hidden');
-                        };
-                        reader.readAsDataURL(file);
-
-                        // Create a hidden file input if it doesn't exist
-                        let fileInput = profileForm.querySelector('input[name="profile_image"]');
-                        if (!fileInput) {
-                            fileInput = document.createElement('input');
-                            fileInput.type = 'file';
-                            fileInput.name = 'profile_image';
-                            fileInput.classList.add('hidden');
-                            profileForm.appendChild(fileInput);
-                        }
-
-                        // Create a new FileList-like object with our file
-                        const dataTransfer = new DataTransfer();
-                        dataTransfer.items.add(file);
-                        fileInput.files = dataTransfer.files;
-                    }
-                });
-            }
-
-            // Handle form submission
-            if (profileForm) {
-                profileForm.addEventListener('submit', function(e) {
-                    const password = document.getElementById('password').value;
-                    const confirmPassword = document.getElementById('confirm_password').value;
-
-                    // If password fields are not empty, check if they match
-                    if (password || confirmPassword) {
-                        if (password !== confirmPassword) {
-                            e.preventDefault();
-                            document.getElementById('passwordModal').classList.remove('hidden');
-                            return false;
-                        }
-
-                        // Check password length if provided
-                        if (password.length < 8) {
-                            e.preventDefault();
-                            alert('Password must be at least 8 characters long.');
-                            return false;
-                        }
-                    }
-
-                    // Add enctype attribute to ensure file upload works
-                    profileForm.enctype = "multipart/form-data";
-                });
-            }
-        });
-
-        function refreshProfileImage() {
-            const profileImage = document.getElementById('profile-image');
-            if (profileImage) {
-                // Add timestamp to prevent caching
-                profileImage.src = profileImage.src.split('?')[0] + '?t=' + new Date().getTime();
-            }
-        }
-
-        // Helper function to get user ID from the URL or data attribute
-        function getUserId() {
-            // Try to get from data attribute first
-            const userIdElement = document.querySelector('[data-user-id]');
-            if (userIdElement && userIdElement.dataset.userId) {
-                return userIdElement.dataset.userId;
-            }
-
-            // Default to session user ID (this should be set as a JS variable in your PHP)
-            return window.currentUserId || '';
-        }
-
-        // Function to toggle password visibility
-        function togglePassword(inputId) {
-            const passwordInput = document.getElementById(inputId);
-            const eyeIcon = passwordInput.nextElementSibling.querySelector('.eye-icon');
-            const eyeSlashIcon = passwordInput.nextElementSibling.querySelector('.eye-slash-icon');
-
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                eyeIcon.classList.add('hidden');
-                eyeSlashIcon.classList.remove('hidden');
-            } else {
-                passwordInput.type = 'password';
-                eyeIcon.classList.remove('hidden');
-                eyeSlashIcon.classList.add('hidden');
-            }
-        }
-
-        // Function to close modal
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.add('hidden');
-        }
-
-        // Function to show success modal
-        function showSuccessModal(message) {
-            const modal = document.getElementById('success-modal');
-            const messageElement = document.getElementById('success-message');
-
-            if (messageElement && message) {
-                messageElement.textContent = message;
-            }
-
-            if (modal) {
-                modal.classList.remove('hidden');
-            }
-        }
-    </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- Add this modal at the end of the body tag, before the closing </body> -->
-
-<!-- Success Modal -->
-<div id="success-modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 hidden">
-    <div class="bg-white rounded-lg shadow-lg p-6 max-w-md text-center">
-        <div class="mb-4 flex justify-center">
-            <div class="rounded-full bg-green-100 p-3">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-            </div>
-        </div>
-        <h2 class="text-lg font-semibold mb-2">Success!</h2>
-        <p id="success-message" class="text-gray-600 mb-4">Your profile has been updated successfully.</p>
-        <button id="close-success-modal" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors">
-            OK
-        </button>
-    </div>
-</div>
-
-<!-- Add this script at the end of the body tag, before the closing </body> -->
-<script>
-    // Function to show success modal
-    function showSuccessModal(message) {
-        const modal = document.getElementById('success-modal');
-        const messageElement = document.getElementById('success-message');
-
-        if (messageElement && message) {
-            messageElement.textContent = message;
-        }
-
-        if (modal) {
-            modal.classList.remove('hidden');
-        }
-    }
-
-    // Function to close success modal
-    function closeSuccessModal() {
-        const modal = document.getElementById('success-modal');
-        if (modal) {
-            modal.classList.add('hidden');
-        }
-    }
-
-    // Add event listener to close button
-    document.addEventListener('DOMContentLoaded', function() {
-        const closeButton = document.getElementById('close-success-modal');
-        if (closeButton) {
-            closeButton.addEventListener('click', closeSuccessModal);
-        }
-
-        // Check for success message in PHP session
-        <?php if (isset($_SESSION['profile_update_success']) && $_SESSION['profile_update_success'] === true): ?>
-        showSuccessModal(<?php echo json_encode($_SESSION['profile_message'] ?? 'Profile updated successfully.'); ?>);
-        <?php
-        // Clear the message from session so it doesn't show again on refresh
-        unset($_SESSION['profile_update_success']);
-        unset($_SESSION['profile_message']);
-        ?>
-        <?php endif; ?>
-    });
-</script>
-
-
-<!-- Modal HTML -->
-<div id="passwordModal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden z-50">
-    <div class="bg-white rounded-xl shadow-xl max-w-sm w-full p-5">
-        <h2 class="text-lg font-semibold mb-4 text-red-600">Password Mismatch</h2>
-        <p class="text-sm text-gray-600 mb-4">New password and confirm password do not match.</p>
-        <div class="flex justify-end">
-            <button onclick="closeModal('passwordModal')" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">OK</button>
-        </div>
-    </div>
-</div>
-
-<!-- JavaScript -->
-<script>
-    function togglePassword(id) {
-        const input = document.getElementById(id);
-        const icon = input.nextElementSibling;
-        const [eye, eyeSlash] = icon.querySelectorAll('svg');
-
-        if (input.type === "password") {
-            input.type = "text";
-            eye.classList.add("hidden");
-            eyeSlash.classList.remove("hidden");
-        } else {
-            input.type = "password";
-            eye.classList.remove("hidden");
-            eyeSlash.classList.add("hidden");
-        }
-    }
-
-    function validatePasswords() {
-        const password = document.getElementById('password').value;
-        const confirm = document.getElementById('confirm_password').value;
-        if (password !== confirm) {
-            document.getElementById('passwordModal').classList.remove('hidden');
-            return false;
-        }
-        return true;
-    }
-
-    function closeModal() {
-        document.getElementById('passwordModal').classList.add('hidden');
-    }
-
-    // Attach to your form (you can adjust selector as needed)
-    document.querySelector('form')?.addEventListener('submit', function(e) {
-        if (!validatePasswords()) {
-            e.preventDefault();
-        }
-    });
-</script>
-
-    <?php if (isset($_GET['message'])): ?>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('messageModal').classList.remove('hidden');
-    });
-    <?php endif; ?>
-
-
-    <!-- Submission Success Modal -->
-    <div id="submissionSuccessModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 hidden">
-        <div class="bg-white rounded-lg shadow-lg p-6 w-80 text-center">
-            <div class="mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-green-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-            </div>
-            <h2 class="text-lg font-semibold mb-2">Submission Successful!</h2>
-            <p id="submissionSuccessMessage" class="text-gray-600 mb-4">Your document has been submitted successfully!</p>
-            <div class="flex justify-between mt-4 gap-2">
-                <button id="goToDashboardBtn" class="px-3 py-1.5 text-sm bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors">
-                    Back to Dashboard
-                </button>
-                <button id="submitAnotherBtn" class="px-3 py-1.5 text-sm bg-green-500 text-white rounded hover:bg-green-600 transition-colors">
-                    Submit Another
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Handle form submission with AJAX
-        document.querySelector('.submissions-form')?.addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const form = e.target;
-            const formData = new FormData(form);
-
-            // Show loading state
-            const submitBtn = form.querySelector('button[type="submit"]');
-            const originalBtnText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Submitting...';
-            submitBtn.disabled = true;
-
-            fetch(form.action, {
-                method: 'POST',
-                body: formData
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Show success modal
-                        document.getElementById('submissionSuccessMessage').textContent = data.message;
-                        document.getElementById('submissionSuccessModal').classList.remove('hidden');
-
-                        // Reset form
-                        form.reset();
-                        document.getElementById('file_info').classList.add('hidden');
-                    } else {
-                        // Show error modal
-                        const errorContainer = document.getElementById('submissionErrorMessages');
-                        errorContainer.innerHTML = '';
-
-                        data.errors.forEach(error => {
-                            const errorElement = document.createElement('p');
-                            errorElement.className = 'text-sm mb-1';
-                            errorElement.textContent = `• ${error}`;
-                            errorContainer.appendChild(errorElement);
-                        });
-
-                        document.getElementById('submissionErrorModal').classList.remove('hidden');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    // Show error modal
-                    const errorContainer = document.getElementById('submissionErrorMessages');
-                    errorContainer.innerHTML = '<p class="text-sm mb-1">• An unexpected error occurred. Please try again.</p>';
-                    document.getElementById('submissionErrorModal').classList.remove('hidden');
-                })
-                .finally(() => {
-                    submitBtn.innerHTML = originalBtnText;
-                    submitBtn.disabled = false;
-                });
-        });
-
-        // Close buttons for modals
-        document.getElementById('closeSubmissionError')?.addEventListener('click', function() {
-            document.getElementById('submissionErrorModal').classList.add('hidden');
-        });
-
-        // Success modal buttons
-        document.getElementById('goToDashboardBtn')?.addEventListener('click', function() {
-            window.location.href = 'userView.php?page=Dashboard';
-        });
-
-        document.getElementById('submitAnotherBtn')?.addEventListener('click', function() {
-            document.getElementById('submissionSuccessModal').classList.add('hidden');
-            // Optionally focus on the first form field if needed
-            // document.querySelector('.submissions-form input').focus();
-        });
-    </script>
 
 
 
