@@ -1497,644 +1497,698 @@
 
 
 
-                <?php elseif ($currentPage === 'Submissions'): ?>
-                <!-- Enhanced Submissions Content -->
-                <div class="submissions-container">
-                    <!-- Header Section with Icon -->
-                    <div class="submissions-header">
-                        <div class="header-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
+                <?php elseif ($currentPage === 'Submissions'): ?> <!-- Enhanced Submissions Content -->
+            <div class="submissions-container">
+                <!-- Header Section with Icon -->
+                <div class="submissions-header">
+                    <div class="header-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </div>
+                    <h2>Submit Your Documents</h2>
+                    <p>One Data. One USeP. OSAS-Sports Unit</p>
+                </div>
+
+                <!-- Card Container -->
+                <div class="submissions-card">
+                    <!-- Progress Indicator -->
+                    <div class="progress-indicator">
+                        <div class="progress-steps">
+                            <div class="step">
+                                <div class="step-number">1</div>
+                                <p class="step-label">Personal Info</p>
+                            </div>
+                            <div class="progress-line">
+                                <div class="progress-completed"></div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">2</div>
+                                <p class="step-label">Document Details</p>
+                            </div>
+                            <div class="progress-line">
+                                <div class="progress-completed"></div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">3</div>
+                                <p class="step-label">Submit</p>
+                            </div>
                         </div>
-                        <h2>Submit Your Documents</h2>
-                        <p>One Data. One USeP. OSAS-Sports Unit</p>
                     </div>
 
-                    <!-- Card Container -->
-                    <div class="submissions-card">
-                        <!-- Progress Indicator -->
-                        <div class="progress-indicator">
-                            <div class="progress-steps">
-                                <div class="step">
-                                    <div class="step-number">1</div>
-                                    <p class="step-label">Personal Info</p>
+                    <!-- Form -->
+                    <form action="../controller/submit_form.php" method="POST" enctype="multipart/form-data" class="submissions-form" id="submissionForm">
+                        <!-- Section: Personal Information -->
+                        <div class="form-section">
+                            <h3 class="section-title">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                                Personal Information
+                            </h3>
+
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="fullname">Full Name</label>
+                                    <input type="text" id="fullname" name="fullname"
+                                           placeholder="Enter your full name" required
+                                           value="<?php echo isset($_SESSION['user']['full_name']) ? htmlspecialchars($_SESSION['user']['full_name']) : ''; ?>">
                                 </div>
-                                <div class="progress-line">
-                                    <div class="progress-completed"></div>
+
+                                <div class="form-group">
+                                    <label for="year_section">Year & Section</label>
+                                    <input type="text" id="year_section" name="year_section"
+                                           placeholder="Ex: 1IT - BSIT" required
+                                           value="<?php echo htmlspecialchars($_SESSION['submissions']['year_section'] ?? ''); ?>">
                                 </div>
-                                <div class="step">
-                                    <div class="step-number">2</div>
-                                    <p class="step-label">Document Details</p>
+
+                                <div class="form-group">
+                                    <label for="student_id">Student Id</label>
+                                    <input type="text" id="student_id" name="student_id"
+                                           placeholder="Enter your student id" required
+                                           value="<?php echo htmlspecialchars($_SESSION['user']['student_id'] ?? ''); ?>">
                                 </div>
-                                <div class="progress-line">
-                                    <div class="progress-completed"></div>
-                                </div>
-                                <div class="step">
-                                    <div class="step-number">3</div>
-                                    <p class="step-label">Submit</p>
+
+                                <div class="form-group">
+                                    <label for="contact_email">Email</label>
+                                    <input type="email" id="contact_email" name="contact_email"
+                                           placeholder="Enter your email" required
+                                           value="<?php echo htmlspecialchars($_SESSION['user']['email'] ?? ''); ?>">
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Form -->
-                        <form action="../controller/submit_form.php" method="POST" enctype="multipart/form-data" class="submissions-form">
-                            <!-- Section: Personal Information -->
-                            <div class="form-section">
-                                <h3 class="section-title">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                    </svg>
-                                    Personal Information
-                                </h3>
+                        <!-- Section: Document Information -->
+                        <div class="form-section">
+                            <h3 class="section-title">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                Document Information
+                            </h3>
 
-                                <div class="form-grid">
-                                    <div class="form-group">
-                                        <label for="fullname">Full Name</label>
-                                        <input type="text" id="fullname" name="fullname"
-                                               placeholder="Enter your full name" required
-                                               value="<?php echo isset($_SESSION['user']['full_name']) ? htmlspecialchars($_SESSION['user']['full_name']) : ''; ?>">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="year_section">Year & Section</label>
-                                        <input type="text" id="year_section" name="year_section"
-                                               placeholder="Ex: 1IT - BSIT" required
-                                               value="<?php echo htmlspecialchars($_SESSION['submissions']['year_section'] ?? ''); ?>">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="student_id">Student Id</label>
-                                        <input type="text" id="student_id" name="student_id"
-                                               placeholder="Enter your student id" required
-                                               value="<?php echo htmlspecialchars($_SESSION['user']['student_id'] ?? ''); ?>">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="contact_email">Email</label>
-                                        <input type="email" id="contact_email" name="contact_email"
-                                               placeholder="Enter your email" required
-                                               value="<?php echo htmlspecialchars($_SESSION['user']['email'] ?? ''); ?>">
-                                    </div>
+                            <div class="form-stack">
+                                <div class="form-group">
+                                    <label for="document_type">Document Type</label>
+                                    <select id="document_type" name="document_type" required>
+                                        <option value="" disabled selected>Select document type</option>
+                                        <option value="Medical Certificate">Medical Certificate</option>
+                                        <option value="Certification">Certification</option>
+                                        <option value="Recommendation Letter">Recommendation Letter</option>
+                                        <option value="Sports Clearance">Sports Clearance</option>
+                                        <option value="Others">Others</option>
+                                    </select>
                                 </div>
-                            </div>
 
-                            <!-- Section: Document Information -->
-                            <div class="form-section">
-                                <h3 class="section-title">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                    </svg>
-                                    Document Information
-                                </h3>
+                                <div id="other_type_container" class="form-group hidden">
+                                    <label for="other_type">Specify Other Document Type</label>
+                                    <input type="text" id="other_type" name="other_type" placeholder="Specify document type">
+                                </div>
 
-                                <div class="form-stack">
-                                    <div class="form-group">
-                                        <label for="document_type">Document Type</label>
-                                        <select id="document_type" name="document_type" required>
-                                            <option value="" disabled selected>Select document type</option>
-                                            <option value="Medical Certificate">Medical Certificate</option>
-                                            <option value="Certification">Certification</option>
-                                            <option value="Recommendation Letter">Recommendation Letter</option>
-                                            <option value="Sports Clearance">Sports Clearance</option>
-                                            <option value="Others">Others</option>
-                                        </select>
-                                    </div>
-
-                                    <div id="other_type_container" class="form-group hidden">
-                                        <label for="other_type">Specify Other Document Type</label>
-                                        <input type="text" id="other_type" name="other_type" placeholder="Specify document type">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="uploaded_file">Upload Document</label>
-                                        <div class="file-upload-area">
-                                            <input type="file" id="uploaded_file" name="uploaded_file" class="hidden" required>
-                                            <label for="uploaded_file" class="file-upload-label">
-                                                <div class="upload-icon-container">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                                                    </svg>
-                                                </div>
-                                                <span class="upload-instruction">Click to upload or drag and drop</span>
-                                                <span class="upload-requirements">PDF, DOC, DOCX, JPG, PNG (Max 5MB)</span>
-                                            </label>
-                                            <div id="file_info" class="file-info hidden">
-                                                <span class="file-info-label">Selected file:</span> <span id="file_name"></span>
-                                                <button type="button" id="preview_button" class="ml-2 px-2 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 transition-colors" onclick="previewFile()">Preview</button>
+                                <div class="form-group">
+                                    <label for="uploaded_file">Upload Document</label>
+                                    <div class="file-upload-area">
+                                        <input type="file" id="uploaded_file" name="uploaded_file" class="hidden" required>
+                                        <label for="uploaded_file" class="file-upload-label">
+                                            <div class="upload-icon-container">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                                </svg>
                                             </div>
+                                            <span class="upload-instruction">Click to upload or drag and drop</span>
+                                            <span class="upload-requirements">PDF, DOC, DOCX, JPG, PNG (Max 5MB)</span>
+                                        </label>
+                                        <div id="file_info" class="file-info hidden">
+                                            <span class="file-info-label">Selected file:</span> <span id="file_name"></span>
+                                            <button type="button" id="preview_button" class="ml-2 px-2 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 transition-colors" onclick="previewFile()">Preview</button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- Section: Description -->
-                            <div class="form-section">
-                                <h3 class="section-title">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-                                    </svg>
-                                    Description
-                                </h3>
-
-                                <div class="form-group">
-                                    <label for="description">Document Description</label>
-                                    <textarea id="description" name="description" placeholder="Provide a brief description of the document" required></textarea>
-                                    <p class="form-hint">Please provide any relevant details about your document submission.</p>
-                                    <p id="desc-warning" style="color: red; display: none;">Description must be at least 10 characters long.</p>
-                                </div>
-                            </div>
-
-                            <!-- Submit Button -->
-                            <div class="form-submit">
-                                <button type="submit">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                                    </svg>
-                                    Submit Document
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- File Preview Modal -->
-                <div id="filePreviewModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70  hidden" role="dialog" aria-labelledby="filePreviewModalTitle" aria-modal="true">
-                    <div id="fileDownloadLink"  class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-3xl border border-gray-200 mx-4 flex flex-col" style="height: 45vw">
-                        <div class="modal-header relative mb-4">
-                            <h2 id="filePreviewModalTitle" class="text-lg font-semibold text-gray-800">Preview File</h2>
-                            <button onclick="closeModal('filePreviewModal')" class="modal-close-btn absolute top-0 right-0 text-gray-400 hover:text-gray-600 transition-colors" aria-label="Close modal">
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        <!-- Section: Description -->
+                        <div class="form-section">
+                            <h3 class="section-title">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
                                 </svg>
+                                Description
+                            </h3>
+
+                            <div class="form-group">
+                                <label for="description">Document Description</label>
+                                <textarea id="description" name="description" placeholder="Provide a brief description of the document" required></textarea>
+                                <p class="form-hint">Please provide any relevant details about your document submission.</p>
+                                <p id="desc-warning" style="color: red; display: none;">Description must be at least 10 characters long.</p>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="form-submit">
+                            <button type="submit">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                </svg>
+                                Submit Document
                             </button>
                         </div>
-                        <div id="filePreviewContent" class="w-full flex-1 overflow-auto bg-gray-50">
-                            <!-- Content will be injected here -->
-                        </div>
+                    </form>
+                </div>
+            </div>
 
+            <!-- File Preview Modal -->
+            <div id="filePreviewModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden" role="dialog" aria-labelledby="filePreviewModalTitle" aria-modal="true">
+                <div id="fileDownloadLink" class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-3xl border border-gray-200 mx-4 flex flex-col" style="height: 45vw">
+                    <div class="modal-header relative mb-4">
+                        <h2 id="filePreviewModalTitle" class="text-lg font-semibold text-gray-800">Preview File</h2>
+                        <button onclick="closeModal('filePreviewModal')" class="modal-close-btn absolute top-0 right-0 text-gray-400 hover:text-gray-600 transition-colors" aria-label="Close modal">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div id="filePreviewContent" class="w-full flex-1 overflow-auto bg-gray-50">
+                        <!-- Content will be injected here -->
                     </div>
                 </div>
+            </div>
 
-                <style>
-                    /* Submissions Page Responsive Styles */
+            <!-- Submission Confirmation Modal -->
+            <div id="submissionConfirmationModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 <?php echo isset($_SESSION['show_submission_modal']) && $_SESSION['show_submission_modal'] ? '' : 'hidden'; ?>" role="dialog" aria-labelledby="submissionConfirmationModalTitle" aria-modal="true">
+                <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md border border-gray-200 mx-4">
+                    <div class="modal-header relative mb-4">
+                        <h2 id="submissionConfirmationModalTitle" class="text-lg font-semibold text-gray-800">Submission Complete</h2>
+                        <button onclick="closeModal('submissionConfirmationModal')" class="modal-close-btn absolute top-0 right-0 text-gray-400 hover:text-gray-600 transition-colors" aria-label="Close modal">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-gray-600 mb-4">Your document has been submitted successfully! Would you like to submit another document or go to the dashboard?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button onclick="submitAnother()" class="action-btn bg-blue-500 text-white hover:bg-blue-600">Submit Another</button>
+                        <button onclick="goToDashboard()" class="action-btn bg-gray-500 text-white hover:bg-gray-600">Go to Dashboard</button>
+                    </div>
+                </div>
+            </div>
+
+            <style>
+                /* Submissions Page Responsive Styles */
+                .submissions-container {
+                    padding: 1rem;
+                    max-width: 1200px;
+                    margin: 0 auto;
+                }
+
+                .submissions-header {
+                    text-align: center;
+                    margin-bottom: 2rem;
+                }
+
+                .submissions-card {
+                    background-color: white;
+                    border-radius: 0.75rem;
+                    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+                    border: 1px solid #e5e7eb;
+                    padding: 1.25rem;
+                    margin-bottom: 2rem;
+                }
+
+                /* Progress Indicator */
+                .progress-steps {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    margin-bottom: 2rem;
+                }
+
+                .step {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    position: relative;
+                    z-index: 1;
+                    flex: 1;
+                }
+
+                .step-number {
+                    width: 2.5rem;
+                    height: 2.5rem;
+                    background-color: #ef4444;
+                    border-radius: 9999px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: white;
+                    font-weight: 700;
+                    margin-bottom: 0.5rem;
+                }
+
+                .step-label {
+                    font-size: 0.875rem;
+                    font-weight: 500;
+                    text-align: center;
+                    color: #1f2937;
+                }
+
+                .progress-line {
+                    flex: 1;
+                    height: 0.25rem;
+                    margin: 0 0.5rem;
+                    background-color: #fecaca;
+                    position: relative;
+                }
+
+                .progress-completed {
+                    height: 100%;
+                    width: 100%;
+                    background-color: #ef4444;
+                }
+
+                /* Form Sections */
+                .form-section {
+                    background-color: #f9fafb;
+                    padding: 1.5rem;
+                    border-radius: 0.5rem;
+                    margin-bottom: 1.5rem;
+                }
+
+                .section-title {
+                    font-size: 1.125rem;
+                    font-weight: 600;
+                    color: #1f2937;
+                    margin-bottom: 1rem;
+                    display: flex;
+                    align-items: center;
+                }
+
+                .section-title svg {
+                    height: 1.25rem;
+                    width: 1.25rem;
+                    color: #ef4444;
+                    margin-right: 0.5rem;
+                }
+
+                /* Form Grid Layout */
+                .form-grid {
+                    display: grid;
+                    gap: 1rem;
+                }
+
+                .form-stack {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 1rem;
+                }
+
+                .form-group {
+                    margin-bottom: 1rem;
+                }
+
+                .form-group label {
+                    display: block;
+                    font-size: 0.875rem;
+                    font-weight: 500;
+                    color: #374151;
+                    margin-bottom: 0.5rem;
+                }
+
+                .form-group input,
+                .form-group select,
+                .form-group textarea {
+                    width: 100%;
+                    border: 1px solid #d1d5db;
+                    border-radius: 0.5rem;
+                    padding: 0.75rem;
+                    font-size: 1rem;
+                    transition: all 0.2s ease;
+                }
+
+                .form-group textarea {
+                    min-height: 120px;
+                    resize: vertical;
+                }
+
+                /* File Upload Area */
+                .file-upload-area {
+                    border: 2px dashed #d1d5db;
+                    border-radius: 0.5rem;
+                    padding: 2rem;
+                    text-align: center;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                }
+
+                .file-upload-area:hover {
+                    border-color: #ef4444;
+                    background-color: #fef2f2;
+                }
+
+                .file-upload-label {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                }
+
+                .file-upload-label svg {
+                    height: 2.5rem;
+                    width: 2.5rem;
+                    color: #9ca3af;
+                    margin-bottom: 0.5rem;
+                }
+
+                .upload-instruction {
+                    font-size: 1rem;
+                    font-weight: 500;
+                    color: #374151;
+                    margin-bottom: 0.25rem;
+                }
+
+                .upload-requirements {
+                    font-size: 0.875rem;
+                    color: #6b7280;
+                }
+
+                /* Submit Button */
+                .form-submit {
+                    text-align: center;
+                    margin-top: 1.5rem;
+                }
+
+                .form-submit button {
+                    background-color: #ef4444;
+                    color: white;
+                    font-weight: 700;
+                    padding: 0.75rem 2rem;
+                    border-radius: 0.5rem;
+                    font-size: 1rem;
+                    border: none;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .form-submit button:hover {
+                    background-color: #dc2626;
+                }
+
+                .form-submit button svg {
+                    height: 1.25rem;
+                    width: 1.25rem;
+                    margin-right: 0.5rem;
+                }
+
+                /* Utility Classes */
+                .hidden {
+                    display: none;
+                }
+
+                /* Responsive Adjustments */
+                @media (min-width: 768px) {
                     .submissions-container {
-                        padding: 1rem;
-                        max-width: 1200px;
-                        margin: 0 auto;
-                    }
-
-                    .submissions-header {
-                        text-align: center;
-                        margin-bottom: 2rem;
+                        padding: 2rem;
                     }
 
                     .submissions-card {
-                        background-color: white;
-                        border-radius: 0.75rem;
-                        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-                        border: 1px solid #e5e7eb;
-                        padding: 1.25rem;
-                        margin-bottom: 2rem;
+                        padding: 2rem;
                     }
 
-                    /* Progress Indicator */
+                    .form-grid {
+                        grid-template-columns: repeat(2, 1fr);
+                    }
+
+                    .file-upload-area {
+                        padding: 3rem;
+                    }
+                }
+
+                @media (max-width: 767px) {
                     .progress-steps {
-                        display: flex;
-                        align-items: center;
-                        justify-content: space-between;
-                        margin-bottom: 2rem;
+                        flex-wrap: wrap;
+                        justify-content: center;
                     }
 
                     .step {
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        position: relative;
-                        z-index: 1;
-                        flex: 1;
-                    }
-
-                    .step-number {
-                        width: 2.5rem;
-                        height: 2.5rem;
-                        background-color: #ef4444;
-                        border-radius: 9999px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        color: white;
-                        font-weight: 700;
-                        margin-bottom: 0.5rem;
-                    }
-
-                    .step-label {
-                        font-size: 0.875rem;
-                        font-weight: 500;
-                        text-align: center;
-                        color: #1f2937;
+                        min-width: 80px;
+                        margin-bottom: 1rem;
                     }
 
                     .progress-line {
-                        flex: 1;
-                        height: 0.25rem;
-                        margin: 0 0.5rem;
-                        background-color: #fecaca;
-                        position: relative;
-                    }
-
-                    .progress-completed {
-                        height: 100%;
-                        width: 100%;
-                        background-color: #ef4444;
-                    }
-
-                    /* Form Sections */
-                    .form-section {
-                        background-color: #f9fafb;
-                        padding: 1.5rem;
-                        border-radius: 0.5rem;
-                        margin-bottom: 1.5rem;
-                    }
-
-                    .section-title {
-                        font-size: 1.125rem;
-                        font-weight: 600;
-                        color: #1f2937;
-                        margin-bottom: 1rem;
-                        display: flex;
-                        align-items: center;
-                    }
-
-                    .section-title svg {
-                        height: 1.25rem;
-                        width: 1.25rem;
-                        color: #ef4444;
-                        margin-right: 0.5rem;
-                    }
-
-                    /* Form Grid Layout */
-                    .form-grid {
-                        display: grid;
-                        gap: 1rem;
-                    }
-
-                    .form-stack {
-                        display: flex;
-                        flex-direction: column;
-                        gap: 1rem;
-                    }
-
-                    .form-group {
-                        margin-bottom: 1rem;
-                    }
-
-                    .form-group label {
-                        display: block;
-                        font-size: 0.875rem;
-                        font-weight: 500;
-                        color: #374151;
-                        margin-bottom: 0.5rem;
-                    }
-
-                    .form-group input,
-                    .form-group select,
-                    .form-group textarea {
-                        width: 100%;
-                        border: 1px solid #d1d5db;
-                        border-radius: 0.5rem;
-                        padding: 0.75rem;
-                        font-size: 1rem;
-                        transition: all 0.2s ease;
-                    }
-
-                    .form-group textarea {
-                        min-height: 120px;
-                        resize: vertical;
-                    }
-
-                    /* File Upload Area */
-                    .file-upload-area {
-                        border: 2px dashed #d1d5db;
-                        border-radius: 0.5rem;
-                        padding: 2rem;
-                        text-align: center;
-                        cursor: pointer;
-                        transition: all 0.2s ease;
-                    }
-
-                    .file-upload-area:hover {
-                        border-color: #ef4444;
-                        background-color: #fef2f2;
-                    }
-
-                    .file-upload-label {
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                    }
-
-                    .file-upload-label svg {
-                        height: 2.5rem;
-                        width: 2.5rem;
-                        color: #9ca3af;
-                        margin-bottom: 0.5rem;
-                    }
-
-                    .upload-instruction {
-                        font-size: 1rem;
-                        font-weight: 500;
-                        color: #374151;
-                        margin-bottom: 0.25rem;
-                    }
-
-                    .upload-requirements {
-                        font-size: 0.875rem;
-                        color: #6b7280;
-                    }
-
-                    /* Submit Button */
-                    .form-submit {
-                        text-align: center;
-                        margin-top: 1.5rem;
-                    }
-
-                    .form-submit button {
-                        background-color: #ef4444;
-                        color: white;
-                        font-weight: 700;
-                        padding: 0.75rem 2rem;
-                        border-radius: 0.5rem;
-                        font-size: 1rem;
-                        border: none;
-                        cursor: pointer;
-                        transition: all 0.2s ease;
-                        display: inline-flex;
-                        align-items: center;
-                        justify-content: center;
-                    }
-
-                    .form-submit button:hover {
-                        background-color: #dc2626;
-                    }
-
-                    .form-submit button svg {
-                        height: 1.25rem;
-                        width: 1.25rem;
-                        margin-right: 0.5rem;
-                    }
-
-                    /* Utility Classes */
-                    .hidden {
                         display: none;
                     }
 
-                    /* Responsive Adjustments */
-                    @media (min-width: 768px) {
-                        .submissions-container {
-                            padding: 2rem;
-                        }
-
-                        .submissions-card {
-                            padding: 2rem;
-                        }
-
-                        .form-grid {
-                            grid-template-columns: repeat(2, 1fr);
-                        }
-
-                        .file-upload-area {
-                            padding: 3rem;
-                        }
+                    .file-upload-area {
+                        padding: 1.5rem;
                     }
+                }
 
-                    @media (max-width: 767px) {
-                        .progress-steps {
-                            flex-wrap: wrap;
-                            justify-content: center;
+                /* Modal Styles */
+                .modal-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 0.75rem 1rem;
+                    border-bottom: 1px solid #e5e7eb;
+                }
+
+                .modal-close-btn {
+                    cursor: pointer;
+                }
+
+                .modal-footer {
+                    padding: 0.75rem;
+                    background-color: #f3f4f6;
+                    display: flex;
+                    justify-content: center;
+                    gap: 0.75rem;
+                    border-bottom-left-radius: 0.5rem;
+                    border-bottom-right-radius: 0.5rem;
+                    flex-shrink: 0;
+                }
+
+                .action-btn {
+                    padding: 0.75rem 1.25rem;
+                    border-radius: 0.375rem;
+                    font-weight: 500;
+                    transition: background-color 0.2s;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    border: none;
+                    cursor: pointer;
+                    font-size: 0.9rem;
+                }
+            </style>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Show SweetAlert if submission was successful
+                    <?php if (isset($_SESSION['show_success_alert']) && $_SESSION['show_success_alert']): ?>
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'Your submission was successful.',
+                        icon: 'success',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#ef4444'
+                    });
+                    <?php unset($_SESSION['show_success_alert']); ?>
+                    <?php endif; ?>
+
+                    // Show submission confirmation modal if set
+                    <?php if (isset($_SESSION['show_submission_modal']) && $_SESSION['show_submission_modal']): ?>
+                    document.getElementById('submissionConfirmationModal').classList.remove('hidden');
+                    <?php unset($_SESSION['show_submission_modal']); ?>
+                    <?php endif; ?>
+
+                    // Handle document type "Others" selection
+                    const documentTypeSelect = document.getElementById('document_type');
+                    const otherTypeContainer = document.getElementById('other_type_container');
+                    const otherTypeInput = document.getElementById('other_type');
+
+                    documentTypeSelect.addEventListener('change', function() {
+                        if (this.value === 'Others') {
+                            otherTypeContainer.classList.remove('hidden');
+                            otherTypeInput.setAttribute('required', 'required');
+                        } else {
+                            otherTypeContainer.classList.add('hidden');
+                            otherTypeInput.removeAttribute('required');
+                            otherTypeInput.value = '';
                         }
+                    });
 
-                        .step {
-                            min-width: 80px;
-                            margin-bottom: 1rem;
-                        }
+                    // File upload preview
+                    const fileInput = document.getElementById('uploaded_file');
+                    const fileInfo = document.getElementById('file_info');
+                    const fileName = document.getElementById('file_name');
+                    const previewButton = document.getElementById('preview_button');
 
-                        .progress-line {
-                            display: none;
-                        }
+                    fileInput.addEventListener('change', function() {
+                        if (this.files.length > 0) {
+                            const file = this.files[0];
+                            const fileSize = (file.size / (1024 * 1024)).toFixed(2); // Convert to MB
 
-                        .file-upload-area {
-                            padding: 1.5rem;
-                        }
-                    }
+                            fileName.textContent = `${file.name} (${fileSize} MB)`;
+                            fileInfo.classList.remove('hidden');
+                            previewButton.classList.remove('hidden');
 
-                    /* Modal Styles */
-                    .modal-header {
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                        padding: 0.75rem 1rem;
-                        border-bottom: 1px solid #e5e7eb;
-                    }
-
-                    .modal-close-btn {
-                        cursor: pointer;
-                    }
-
-                    .modal-footer {
-                        padding: 0.75rem;
-                        background-color: #f3f4f6;
-                        display: flex;
-                        justify-content: center;
-                        gap: 0.75rem;
-                        border-bottom-left-radius: 0.5rem;
-                        border-bottom-right-radius: 0.5rem;
-                        flex-shrink: 0;
-                    }
-
-                    .action-btn {
-                        padding: 0.75rem 1.25rem;
-                        border-radius: 0.375rem;
-                        font-weight: 500;
-                        transition: background-color 0.2s;
-                        display: inline-flex;
-                        align-items: center;
-                        gap: 0.5rem;
-                        border: none;
-                        cursor: pointer;
-                        font-size: 0.9rem;
-                    }
-                </style>
-
-                <script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        // Handle document type "Others" selection
-                        const documentTypeSelect = document.getElementById('document_type');
-                        const otherTypeContainer = document.getElementById('other_type_container');
-                        const otherTypeInput = document.getElementById('other_type');
-
-                        documentTypeSelect.addEventListener('change', function() {
-                            if (this.value === 'Others') {
-                                otherTypeContainer.classList.remove('hidden');
-                                otherTypeInput.setAttribute('required', 'required');
-                            } else {
-                                otherTypeContainer.classList.add('hidden');
-                                otherTypeInput.removeAttribute('required');
-                                otherTypeInput.value = '';
-                            }
-                        });
-
-                        // File upload preview
-                        const fileInput = document.getElementById('uploaded_file');
-                        const fileInfo = document.getElementById('file_info');
-                        const fileName = document.getElementById('file_name');
-                        const previewButton = document.getElementById('preview_button');
-
-                        fileInput.addEventListener('change', function() {
-                            if (this.files.length > 0) {
-                                const file = this.files[0];
-                                const fileSize = (file.size / (1024 * 1024)).toFixed(2); // Convert to MB
-
-                                fileName.textContent = `${file.name} (${fileSize} MB)`;
-                                fileInfo.classList.remove('hidden');
-                                previewButton.classList.remove('hidden');
-
-                                // Validate file size (5MB max)
-                                if (file.size > 5 * 1024 * 1024) {
-                                    alert('File size exceeds 5MB limit. Please choose a smaller file.');
-                                    this.value = ''; // Clear the input
-                                    fileInfo.classList.add('hidden');
-                                    previewButton.classList.add('hidden');
-                                }
-                            } else {
+                            // Validate file size (5MB max)
+                            if (file.size > 5 * 1024 * 1024) {
+                                alert('File size exceeds 5MB limit. Please choose a smaller file.');
+                                this.value = ''; // Clear the input
                                 fileInfo.classList.add('hidden');
                                 previewButton.classList.add('hidden');
                             }
-                        });
-
-                        // Drag and drop functionality
-                        const uploadArea = document.querySelector('.file-upload-area');
-
-                        uploadArea.addEventListener('dragover', (e) => {
-                            e.preventDefault();
-                            uploadArea.classList.add('drag-over');
-                        });
-
-                        uploadArea.addEventListener('dragleave', () => {
-                            uploadArea.classList.remove('drag-over');
-                        });
-
-                        uploadArea.addEventListener('drop', (e) => {
-                            e.preventDefault();
-                            uploadArea.classList.remove('drag-over');
-
-                            if (e.dataTransfer.files.length) {
-                                fileInput.files = e.dataTransfer.files;
-                                const event = new Event('change');
-                                fileInput.dispatchEvent(event);
-                            }
-                        });
-
-                        // Description validation
-                        const description = document.getElementById("description");
-                        const warning = document.getElementById("desc-warning");
-
-                        description.addEventListener("input", () => {
-                            if (description.value.trim().length < 10) {
-                                warning.style.display = "block";
-                            } else {
-                                warning.style.display = "none";
-                            }
-                        });
+                        } else {
+                            fileInfo.classList.add('hidden');
+                            previewButton.classList.add('hidden');
+                        }
                     });
 
-                    // File preview function
-                    function previewFile() {
-                        const fileInput = document.getElementById('uploaded_file');
-                        const modal = document.getElementById('filePreviewModal');
-                        const preview = document.getElementById('filePreviewContent');
-                        const downloadLink = document.getElementById('fileDownloadLink');
+                    // Drag and drop functionality
+                    const uploadArea = document.querySelector('.file-upload-area');
 
-                        if (!fileInput.files.length) {
-                            alert('Please select a file first.');
-                            return;
+                    uploadArea.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                        uploadArea.classList.add('drag-over');
+                    });
+
+                    uploadArea.addEventListener('dragleave', () => {
+                        uploadArea.classList.remove('drag-over');
+                    });
+
+                    uploadArea.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        uploadArea.classList.remove('drag-over');
+
+                        if (e.dataTransfer.files.length) {
+                            fileInput.files = e.dataTransfer.files;
+                            const event = new Event('change');
+                            fileInput.dispatchEvent(event);
                         }
+                    });
 
-                        const file = fileInput.files[0];
-                        const url = URL.createObjectURL(file);
+                    // Description validation
+                    const description = document.getElementById("description");
+                    const warning = document.getElementById("desc-warning");
 
-                        // Show loading state
-                        preview.innerHTML = `
-            <div class="flex items-center justify-center min-h-full py-6">
-                <div class="text-center">
-                    <svg class="animate-spin h-6 w-6 text-blue-500 mx-auto" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <p class="mt-2 text-gray-500 text-sm">Loading file...</p>
-                </div>
-            </div>
-        `;
-                        modal.classList.remove('hidden');
+                    description.addEventListener("input", () => {
+                        if (description.value.trim().length < 10) {
+                            warning.style.display = "block";
+                        } else {
+                            warning.style.display = "none";
+                        }
+                    });
+                });
 
-                        // Simulate fetch with File API
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            const blob = new Blob([e.target.result], { type: file.type || 'application/octet-stream' });
-                            const contentType = file.type || 'application/octet-stream';
+                // File preview function
+                function previewFile() {
+                    const fileInput = document.getElementById('uploaded_file');
+                    const modal = document.getElementById('filePreviewModal');
+                    const preview = document.getElementById('filePreviewContent');
+                    const downloadLink = document.getElementById('fileDownloadLink');
 
-                            downloadLink.href = url;
-                            downloadLink.classList.remove('hidden');
+                    if (!fileInput.files.length) {
+                        alert('Please select a file first.');
+                        return;
+                    }
 
-                            if (contentType === 'application/pdf') {
-                                preview.innerHTML = `<iframe src="${url}#zoom=auto" style="width:100%; height:100%; max-height:100%;" frameborder="0" title="File Preview" aria-label="PDF file preview"></iframe>`;
-                            } else if (contentType.startsWith('image/')) {
-                                preview.innerHTML = `<img src="${url}" alt="Uploaded File" class="w-full h-full object-contain" aria-label="Image preview" />`;
-                            } else {
-                                preview.innerHTML = `
-                    <div class="text-center py-6 text-red-500 text-sm">
-                        Preview not available for this file type. Please download to view.
+                    const file = fileInput.files[0];
+                    const url = URL.createObjectURL(file);
+
+                    // Show loading state
+                    preview.innerHTML = `
+                    <div class="flex items-center justify-center min-h-full py-6">
+                        <div class="text-center">
+                            <svg class="animate-spin h-6 w-6 text-blue-500 mx-auto" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <p class="mt-2 text-gray-500 text-sm">Loading file...</p>
+                        </div>
                     </div>
                 `;
-                                downloadLink.classList.remove('hidden');
-                            }
-                        };
-                        reader.onerror = function() {
+                    modal.classList.remove('hidden');
+
+                    // Simulate fetch with File API
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const blob = new Blob([e.target.result], { type: file.type || 'application/octet-stream' });
+                        const contentType = file.type || 'application/octet-stream';
+
+                        downloadLink.href = url;
+                        downloadLink.classList.remove('hidden');
+
+                        if (contentType === 'application/pdf') {
+                            preview.innerHTML = `<iframe src="${url}#zoom=auto" style="width:100%; height:100%; max-height:100%;" frameborder="0" title="File Preview" aria-label="PDF file preview"></iframe>`;
+                        } else if (contentType.startsWith('image/')) {
+                            preview.innerHTML = `<img src="${url}" alt="Uploaded File" class="w-full h-full object-contain" aria-label="Image preview" />`;
+                        } else {
                             preview.innerHTML = `
-                <div class="text-center py-6 text-red-500 text-sm">
-                    Error loading file.
-                </div>
-            `;
+                            <div class="text-center py-6 text-red-500 text-sm">
+                                Preview not available for this file type. Please download to view.
+                            </div>
+                        `;
                             downloadLink.classList.remove('hidden');
-                        };
-                        reader.readAsArrayBuffer(file);
-
-                        // Add click event to close modal when clicking outside
-                        modal.addEventListener('click', (e) => {
-                            if (e.target === modal) {
-                                closeModal('filePreviewModal');
-                            }
-                        }, { once: true });
-                    }
-
-                    // Close modal function
-                    function closeModal(modalId) {
-                        const modal = document.getElementById(modalId);
-                        const preview = document.getElementById('filePreviewContent');
-                        modal.classList.add('hidden');
-                        if (preview) {
-                            const iframes = preview.getElementsByTagName('iframe');
-                            const images = preview.getElementsByTagName('img');
-                            for (let iframe of iframes) {
-                                URL.revokeObjectURL(iframe.src);
-                            }
-                            for (let img of images) {
-                                URL.revokeObjectURL(img.src);
-                            }
-                            preview.innerHTML = '';
                         }
+                    };
+                    reader.onerror = function() {
+                        preview.innerHTML = `
+                        <div class="text-center py-6 text-red-500 text-sm">
+                            Error loading file.
+                        </div>
+                    `;
+                        downloadLink.classList.remove('hidden');
+                    };
+                    reader.readAsArrayBuffer(file);
+
+                    // Add click event to close modal when clicking outside
+                    modal.addEventListener('click', (e) => {
+                        if (e.target === modal) {
+                            closeModal('filePreviewModal');
+                        }
+                    }, { once: true });
+                }
+
+                // Close modal function
+                function closeModal(modalId) {
+                    const modal = document.getElementById(modalId);
+                    const preview = document.getElementById('filePreviewContent');
+                    modal.classList.add('hidden');
+                    if (preview) {
+                        const iframes = preview.getElementsByTagName('iframe');
+                        const images = preview.getElementsByTagName('img');
+                        for (let iframe of iframes) {
+                            URL.revokeObjectURL(iframe.src);
+                        }
+                        for (let img of images) {
+                            URL.revokeObjectURL(img.src);
+                        }
+                        preview.innerHTML = '';
                     }
-                </script>
+                }
+
+                // Submit another document (reset form)
+                function submitAnother() {
+                    document.getElementById('submissionConfirmationModal').classList.add('hidden');
+                    document.getElementById('submissionForm').reset();
+                    document.getElementById('file_info').classList.add('hidden');
+                    document.getElementById('preview_button').classList.add('hidden');
+                    document.getElementById('other_type_container').classList.add('hidden');
+                    document.getElementById('other_type').removeAttribute('required');
+                    document.getElementById('other_type').value = '';
+                    document.getElementById('desc-warning').style.display = 'none';
+                }
+
+                // Go to dashboard
+                function goToDashboard() {
+                    window.location.href = 'http://localhost/SportsOfficeAIM/view/userView.php?page=Dashboard';
+                }
+            </script>
 
 
 

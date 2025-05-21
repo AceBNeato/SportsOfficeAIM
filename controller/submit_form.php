@@ -9,7 +9,9 @@ $dbname = "SportOfficeDB";
 // Database connection
 $conn = new mysqli($host, $username, $password, $dbname);
 if ($conn->connect_error) {
-    die(json_encode(['success' => false, 'errors' => ["Database connection failed"]]));
+    $_SESSION['errors'] = ["Database connection failed"];
+    header("Location: http://localhost/SportsOfficeAIM/view/userView.php?page=Submissions");
+    exit;
 }
 
 $errors = [];
@@ -92,7 +94,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $errors[] = "Failed to read uploaded file";
         }
 
-        $file_name = uniqid('doc_', true) . 'controller' . $file_ext;
+        $file_name = uniqid('doc_', true) . '.' . $file_ext;
         $file_size = $file['size'];
     } else {
         $errors[] = "File upload is required";
@@ -160,6 +162,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $conn->commit();
             $success = true;
 
+            // Set session variables for success, modal, and SweetAlert
+            $_SESSION['message'] = "Your document has been submitted successfully!";
+            $_SESSION['show_success_alert'] = true;
+            $_SESSION['show_submission_modal'] = true;
+            header("Location: http://localhost/SportsOfficeAIM/view/userView.php?page=Submissions");
+            exit;
+
         } catch (Exception $e) {
             $conn->rollback();
             $errors[] = $e->getMessage();
@@ -167,12 +176,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-// Return JSON response
-header('Content-Type: application/json');
-echo json_encode([
-    'success' => $success,
-    'errors' => $errors,
-    'submission_id' => $submission_id,
-    'message' => $success ? "Your document has been submitted successfully!" : ""
-]);
-exit;
+// Redirect with errors if any
+if (!empty($errors)) {
+    $_SESSION['errors'] = $errors;
+    header("Location: http://localhost/SportsOfficeAIM/view/userView.php?page=Submissions");
+    exit;
+}
+?>
