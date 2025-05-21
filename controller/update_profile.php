@@ -34,6 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $address = trim($_POST['address'] ?? '');
     $sport = trim($_POST['sport'] ?? '');
     $campus = trim($_POST['campus'] ?? '');
+    $year_section = trim($_POST['year_section'] ?? ''); // Sanitize year_section
     $password = $_POST['password'] ?? '';
     $confirm_password = $_POST['confirm_password'] ?? '';
 
@@ -46,6 +47,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $errors[] = "Valid email is required.";
+    }
+
+    // Validate year_section (optional, max 100 characters)
+    if (!empty($year_section) && strlen($year_section) > 100) {
+        $errors[] = "Year and section must be 100 characters or less.";
     }
 
     // Password change validation
@@ -98,6 +104,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $params[] = $campus;
                 $types .= 's';
                 $changes_made[] = 'campus';
+            }
+
+            // Handle year_section (allow empty string to become NULL)
+            if ($year_section !== ($_SESSION['user']['year_section'] ?? '')) {
+                $query_parts[] = "year_section = ?";
+                $params[] = $year_section ?: null; // Convert empty string to NULL
+                $types .= 's';
+                $changes_made[] = 'year and section';
             }
 
             // Check email availability
@@ -199,6 +213,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['user']['address'] = $address;
                 $_SESSION['user']['sport'] = $sport;
                 $_SESSION['user']['campus'] = $campus;
+                $_SESSION['user']['year_section'] = $year_section ?: null; // Store as NULL if empty
 
                 $_SESSION['profile_update_success'] = true;
                 $_SESSION['profile_message'] = "Profile updated successfully.";

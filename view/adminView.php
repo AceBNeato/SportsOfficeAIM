@@ -601,17 +601,7 @@ $action = $_GET['action'] ?? '';
 
 
 
-            <?php
-            session_start();
-// Generate CSRF token
-            if (!isset($_SESSION['csrf_token'])) {
-                $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-            }
 
-// Start debug logging
-            $debugLog = fopen('../debug.log', 'a') or die("Can't open debug.log");
-            fwrite($debugLog, "Debug started at " . date('Y-m-d H:i:s') . " PST\n");
-            ?>
 
         <?php elseif ($currentPage === 'Achievement'): ?>
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" style="padding-top: 1rem;">

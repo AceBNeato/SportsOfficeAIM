@@ -29,7 +29,8 @@ $sql = "CREATE TABLE IF NOT EXISTS users (
     password VARCHAR(255) NOT NULL,
     status ENUM('undergraduate', 'alumni') DEFAULT 'undergraduate',
     sport VARCHAR(100),
-    campus VARCHAR(100)
+    campus VARCHAR(100),
+    year_section VARCHAR(100) NULL
 )";
 if (!$conn->query($sql)) {
     die("Error creating users table: " . $conn->error);
@@ -84,7 +85,6 @@ if (!$conn->query($sql)) {
 }
 
 // 8. Create account_approvals table
-// In database_setup.php
 $sql = "CREATE TABLE IF NOT EXISTS account_approvals (
     id INT AUTO_INCREMENT PRIMARY KEY,
     student_id VARCHAR(50) NOT NULL,
@@ -93,6 +93,7 @@ $sql = "CREATE TABLE IF NOT EXISTS account_approvals (
     status ENUM('undergraduate', 'alumni') DEFAULT 'undergraduate',
     sport VARCHAR(100),
     campus VARCHAR(100),
+    year_section VARCHAR(100) NULL,
     file_name VARCHAR(255) NOT NULL,
     file_data LONGBLOB NOT NULL,
     file_type VARCHAR(50) NOT NULL,
@@ -108,6 +109,8 @@ if (!$conn->query($sql)) {
     die("Error creating account_approvals table: " . $conn->error);
 }
 
+
+
 // 9. Create notifications table
 $sql = "CREATE TABLE IF NOT EXISTS notifications (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -121,6 +124,7 @@ if (!$conn->query($sql)) {
     die("Error creating notifications table: " . $conn->error);
 }
 
+// 10. Create achievements table
 $sql = "CREATE TABLE IF NOT EXISTS achievements (
     achievement_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -146,10 +150,7 @@ if (!$conn->query($sql)) {
     error_log("Achievements table created or already exists");
 }
 
-
-
-
-
+// 11. Insert sample admin
 $fullName = "Gian Glen Vincent Garcia";
 $address = "Tagum City";
 $sampleEmail = "admin@usep.edu.ph";
