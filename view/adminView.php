@@ -110,8 +110,7 @@ $action = $_GET['action'] ?? '';
     <link rel="stylesheet" href="../public/CSS/adminStyle.css" />
     <script src="../public/JAVASCRIPT/adminScript.js" defer></script>
     <script src="../public/JAVASCRIPT/evalScipt.js" defer ></script>
-
-    <link rel="icon" href="../public/image/Usep.png" sizes="any" />
+    <link rel="icon" href="Usep.png" sizes="any" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
 
 </head>
