@@ -41,6 +41,42 @@
         .drop-zone:hover {
             border-color: #0056b3;
         }
+        /* Loading Modal Styles */
+        .loading-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .loading-modal.show {
+            display: flex;
+        }
+        .loading-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -72,7 +108,7 @@
                     <option value="alumni">Alumni</option>
                 </select>
                 <select name="sport">
-                    <option value="" disabled selected>Select Sport (Optional)</option>
+                    <option value="" disabled selected>Select Sport</option>
                     <option value="Athletics">Athletics</option>
                     <option value="Badminton">Badminton</option>
                     <option value="Basketball">Basketball</option>
@@ -84,9 +120,10 @@
                     <option value="Taekwondo">Taekwondo</option>
                     <option value="Tennis">Tennis</option>
                     <option value="Volleyball">Volleyball</option>
+                    <option value="ESports">Wrestling</option>
                 </select>
                 <select name="campus">
-                    <option value="" disabled selected>Select Campus (Optional)</option>
+                    <option value="" disabled selected>Select Campus</option>
                     <option value="Tagum">Tagum</option>
                     <option value="Mabini">Mabini</option>
                 </select>
@@ -99,10 +136,18 @@
                 </div>
 
                 <input type="hidden" name="page" value="signup">
-                <button type="submit">SIGN UP</button>
+                <button type="submit" onclick="showLoadingModal()">SIGN UP</button>
             </form>
             <p class="signup-link">Already have an account? <a href="loginView.php">Log In</a></p>
         </div>
+    </div>
+</div>
+
+<!-- Loading Modal -->
+<div class="loading-modal" id="loadingModal">
+    <div class="loading-content">
+        <div class="loading-spinner"></div>
+        <p>Please wait, submitting your information...</p>
     </div>
 </div>
 
@@ -110,6 +155,17 @@
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('document');
     const fileNameDisplay = document.getElementById('fileName');
+    const loadingModal = document.getElementById('loadingModal');
+
+    // Show loading modal
+    function showLoadingModal() {
+        loadingModal.classList.add('show');
+    }
+
+    // Hide loading modal (optional, can be called based on form submission result)
+    function hideLoadingModal() {
+        loadingModal.classList.remove('show');
+    }
 
     dropZone.addEventListener('click', () => fileInput.click());
 
@@ -140,6 +196,20 @@
         }
     });
 
+    // Handle form submission with validation
+    function validateStudentAthleteForm(event) {
+        event.preventDefault();
+        showLoadingModal();
+        // Assuming validateStudentAthleteForm performs validation
+        // If validation passes, submit the form
+        if (true) { // Replace with actual validation logic from validateStudentAthlete.js
+            event.target.submit();
+        } else {
+            hideLoadingModal();
+            return false;
+        }
+    }
+
     // Handle SweetAlert2 display based on query parameters
     window.onload = function() {
         const urlParams = new URLSearchParams(window.location.search);
@@ -169,6 +239,8 @@
                 window.history.replaceState({}, document.title, window.location.pathname);
             });
         }
+        // Ensure loading modal is hidden on page load
+        hideLoadingModal();
     };
 </script>
 

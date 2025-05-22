@@ -10,7 +10,7 @@ $dbname = "SportOfficeDB";
 $conn = new mysqli($host, $username, $password, $dbname);
 if ($conn->connect_error) {
     $_SESSION['errors'] = ["Database connection failed"];
-    header("Location: http://localhost/SportsOfficeAIM/view/userView.php?page=Submissions");
+    header("Location: ../view/userView.php?page=Submissions");
     exit;
 }
 
@@ -166,7 +166,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['message'] = "Your document has been submitted successfully!";
             $_SESSION['show_success_alert'] = true;
             $_SESSION['show_submission_modal'] = true;
-            header("Location: http://localhost/SportsOfficeAIM/view/userView.php?page=Submissions");
+            header("Location: ../view/userView.php?page=Submissions");
             exit;
 
         } catch (Exception $e) {
@@ -179,7 +179,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 // Redirect with errors if any
 if (!empty($errors)) {
     $_SESSION['errors'] = $errors;
-    header("Location: http://localhost/SportsOfficeAIM/view/userView.php?page=Submissions");
+    header("Location: ../view/userView.php?page=Submissions");
     exit;
 }
 ?>

@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($approvalId <= 0) {
         error_log("Invalid approval ID: $approvalId");
-        header("Location: ../view/adminView.php?status=error&action=invalid");
+        header("Location: ../view/adminView.php?page=Account%20Approvals&status=error&action=approve");
         exit;
     }
 
@@ -85,7 +85,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     if (!$imageInserted) {
                         error_log("Failed to insert default profile image for user ID: $newUserId");
-                        // Optionally, handle this error (e.g., proceed anyway or rollback)
                     }
                 } else {
                     error_log("Default profile image not found at: $defaultImagePath");
@@ -100,26 +99,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($updated) {
                     // Send approval email
                     if (sendApprovalEmail($request['email'], $request['full_name'], $request['student_id'])) {
-                        header("Location: ../view/adminView.php?status=success&action=approve");
+                        header("Location: ../view/adminView.php?page=Account%20Approvals&status=success&action=approve");
                     } else {
                         error_log("Failed to send approval email for user: {$request['email']}");
-                        header("Location: ../view/adminView.php?status=error&action=approve");
+                        header("Location: ../view/adminView.php?page=Account%20Approvals&status=error&action=approve");
                     }
                 } else {
                     error_log("Failed to update account_approvals for approval ID: $approvalId");
-                    header("Location: ../view/adminView.php?status=error&action=approve");
+                    header("Location: ../view/adminView.php?page=Account%20Approvals&status=error&action=approve");
                 }
             } else {
                 error_log("Failed to insert user for approval ID: $approvalId");
-                header("Location: ../view/adminView.php?status=error&action=approve");
+                header("Location: ../view/adminView.php?page=Account%20Approvals&status=error&action=approve");
             }
         }
     } else {
         error_log("No request found for approval ID: $approvalId");
-        header("Location: ../view/adminView.php?status=error&action=invalid");
+        header("Location: ../view/adminView.php?page=Account%20Approvals&status=error&action=approve");
     }
 } else {
-    header("Location: ../view/adminView.php?status=error&action=invalid");
+    header("Location: ../view/adminView.php?page=Account%20Approvals&status=error&action=approve");
 }
 
 $conn->close();

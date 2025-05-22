@@ -1,4 +1,4 @@
-    <?php
+<?php
     // Start the session if not already started
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
@@ -60,14 +60,16 @@
     <meta charset="UTF-8">
     <title>User Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="icon" href="Usep.png"/>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/boxicons/css/boxicons.min.css" rel="stylesheet">
     <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
     <link rel="stylesheet" href="../public/CSS/userStyle.css">
     <script src="../public/JAVASCRIPT/userScript.js" defer></script>
-    <link rel="icon" href="../public/image/Usep.png" sizes="any">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 </head>
+
 
 <body class="flex h-screen w-full relative bg-gray-100">
 
@@ -709,7 +711,7 @@
                                             <input type="text" id="year_section" name="year_section"
                                                    value="<?php echo htmlspecialchars($_SESSION['user']['year_section'] ?? ''); ?>"
                                                    class="w-full px-3 py-2 md:px-4 md:py-2.5 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                                   placeholder="e.g., BSIT 3-A (Optional)">
+                                                   placeholder="Ex: 1IT-BSIT">
                                         </div>
 
 
@@ -2343,773 +2345,498 @@
 
 
 
-                <?php elseif ($currentPage === 'Track'): ?>
-                    <!-- Track content -->
-                    <div class="p-6 bg-gray-100 min-h-screen">
-                        <div class="space-y-4">
-                            <?php
-                            // Database connection (use secure credentials in production, e.g., environment variables)
-                            $host = "localhost";
-                            $username = "root";
-                            $password = "";
-                            $dbname = "SportOfficeDB";
+        <?php elseif ($currentPage === 'Track'): ?>
+        <!-- Fixed Header -->
+        <div class="fixed top-0 left-0 right-0 bg-white shadow-md z-50 px-4 sm:px-6 lg:px-8 py-4">
+            <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <h3 class="text-xl sm:text-2xl font-bold text-gray-900">Your Submissions</h3>
+                <div class="relative w-full sm:w-auto">
+                    <select id="statusFilter" class="appearance-none bg-white border border-gray-300 rounded-lg py-2.5 px-4 pr-10 text-sm text-gray-800 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 w-full sm:w-48 transition-all duration-200">
+                        <option value="all">All Statuses</option>
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                    <svg class="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
 
-                            // Connect to MySQL server
-                            $conn = new mysqli($host, $username, $password, $dbname);
-                            if ($conn->connect_error) {
-                                die("Connection failed: " . $conn->connect_error);
-                            }
+        <!-- Track Content -->
+        <div class="pt-20 sm:pt-24 lg:pt-28 px-4 sm:px-6 lg:px-8 bg-gray-100 min-h-screen">
+            <div class="max-w-7xl mx-auto">
+                <?php
+                // Database connection using environment variables
+                $host = getenv('DB_HOST') ?: 'localhost';
+                $username = getenv('DB_USER') ?: 'root';
+                $password = getenv('DB_PASS') ?: '';
+                $dbname = getenv('DB_NAME') ?: 'SportOfficeDB';
 
-                            // Fetch submissions for the logged-in user
-                            $user_id = $_SESSION['user']['id'];
-                            $stmt = $conn->prepare("
-            SELECT id, document_type, submission_date, status, description, file_name, other_type 
-            FROM submissions 
-            WHERE user_id = ? 
-            ORDER BY submission_date DESC
-        ");
-                            $stmt->bind_param("i", $user_id);
-                            $stmt->execute();
-                            $result = $stmt->get_result();
+                try {
+                    $conn = new mysqli($host, $username, $password, $dbname);
+                    if ($conn->connect_error) {
+                        throw new Exception("Connection failed: " . mysqli_escape_string($conn, $conn->connect_error));
+                    }
+                    $conn->set_charset("utf8mb4");
+                } catch (Exception $e) {
+                    echo '<div class="text-red-600 text-center py-8 text-lg font-semibold bg-white rounded-xl shadow-md">Database error: ' . htmlspecialchars($e->getMessage()) . '</div>';
+                    exit;
+                }
 
-                            // Fetch user profile image
-                            $profile_image_data = null;
-                            $profile_image_type = null;
-                            $profile_stmt = $conn->prepare("SELECT image, image_type FROM user_images WHERE user_id = ? ORDER BY uploaded_at DESC LIMIT 1");
-                            $profile_stmt->bind_param("i", $user_id);
-                            $profile_stmt->execute();
-                            $profile_result = $profile_stmt->get_result();
-                            if ($profile_result->num_rows > 0) {
-                                $profile_row = $profile_result->fetch_assoc();
-                                $profile_image_data = $profile_row['image'];
-                                $profile_image_type = $profile_row['image_type'];
-                            }
-                            $profile_stmt->close();
+                // Secure user ID handling
+                $user_id = isset($_SESSION['user']['id']) ? filter_var($_SESSION['user']['id'], FILTER_VALIDATE_INT) : 0;
+                if ($user_id === false || $user_id === 0) {
+                    echo '<div class="text-red-600 text-center py-8 text-lg font-semibold bg-white rounded-xl shadow-md">Invalid user session.</div>';
+                    exit;
+                }
 
-                            if ($result->num_rows > 0) {
-                                while ($doc = $result->fetch_assoc()) {
-                                    // Format the submission date with fallback
-                                    $submission_date = $doc['submission_date'] ? date("m-d-Y", strtotime($doc['submission_date'])) : 'N/A';
+                // Fetch submissions
+                try {
+                    $stmt = $conn->prepare("
+                SELECT id, document_type, submission_date, status, description, file_name, other_type 
+                FROM submissions 
+                WHERE user_id = ? 
+                ORDER BY submission_date DESC
+            ");
+                    $stmt->bind_param("i", $user_id);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+                } catch (Exception $e) {
+                    echo '<div class="text-red-600 text-center py-8 text-lg font-semibold bg-white rounded-xl shadow-md">Query error: ' . htmlspecialchars($e->getMessage()) . '</div>';
+                    exit;
+                }
 
-                                    // Map status to Tailwind CSS classes
-                                    $status_class = match ($doc['status']) {
-                                        'pending' => 'bg-yellow-100 text-yellow-800',
-                                        'approved' => 'bg-green-100 text-green-800',
-                                        'rejected' => 'bg-red-100 text-red-800',
-                                        default => 'bg-gray-100 text-gray-800'
-                                    };
+                // Fetch user profile image
+                $profile_image_data = null;
+                $profile_image_type = null;
+                try {
+                    $profile_stmt = $conn->prepare("SELECT image, image_type FROM user_images WHERE user_id = ? ORDER BY uploaded_at DESC LIMIT 1");
+                    $profile_stmt->bind_param("i", $user_id);
+                    $profile_stmt->execute();
+                    $profile_result = $profile_stmt->get_result();
+                    if ($profile_result->num_rows > 0) {
+                        $profile_row = $profile_result->fetch_assoc();
+                        $profile_image_data = $profile_row['image'];
+                        $profile_image_type = $profile_row['image_type'];
+                    }
+                    $profile_stmt->close();
+                } catch (Exception $e) {
+                    error_log("Profile image query error: " . $e->getMessage());
+                }
 
-                                    // Adjust status display text
-                                    $status_display = match ($doc['status']) {
-                                        'pending' => 'Not been Approved',
-                                        'approved' => 'Approved',
-                                        'rejected' => 'Rejected',
-                                        default => $doc['status']
-                                    };
-                                    ?>
-                                    <div class="flex items-center bg-white rounded-xl shadow-md p-5 hover:shadow-lg transition-shadow">
-                                        <!-- File Icon -->
-                                        <div class="mr-5">
-                                            <svg class="h-12 w-12 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
-                                                <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 14H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
-                                            </svg>
-                                        </div>
-                                        <!-- Document Details -->
-                                        <div class="flex-1">
-                                            <p class="text-base font-semibold text-gray-900">Document Type: <?php echo htmlspecialchars($doc['document_type']); ?></p>
-                                            <p class="text-sm text-gray-600">Date of Submission: <?php echo htmlspecialchars($submission_date); ?></p>
-                                        </div>
-                                        <!-- Status -->
-                                        <div class="ml-5">
-                        <span class="inline-block px-4 py-1.5 text-sm font-semibold rounded-full <?php echo $status_class; ?>">
-                            <?php echo htmlspecialchars($status_display); ?>
-                        </span>
-                                        </div>
-                                        <!-- Action Buttons -->
-                                        <div class="ml-5 flex space-x-3">
-                                            <!-- View Button -->
-                                            <button onclick="openDocumentModal('<?php echo htmlspecialchars($doc['document_type']); ?>', '<?php echo htmlspecialchars($submission_date); ?>', '<?php echo htmlspecialchars($status_display); ?>', '<?php echo htmlspecialchars($doc['description']); ?>', '<?php echo htmlspecialchars($doc['file_name']); ?>', '<?php echo $doc['id']; ?>', '<?php echo htmlspecialchars($doc['status']); ?>')" class="text-gray-500 hover:text-gray-700 transition-colors" aria-label="View document <?php echo htmlspecialchars($doc['document_type']); ?>">
-                                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                                </svg>
-                                            </button>
-                                            <!-- Edit Button -->
-                                            <button onclick="openEditModal('<?php echo $doc['id']; ?>', '<?php echo htmlspecialchars($doc['document_type']); ?>', '<?php echo htmlspecialchars($doc['other_type']); ?>', '<?php echo htmlspecialchars($doc['description']); ?>', '<?php echo htmlspecialchars($doc['file_name']); ?>', '<?php echo $doc['status']; ?>', '<?php echo htmlspecialchars($submission_date); ?>', null)" class="text-gray-500 hover:text-blue-500 transition-colors" aria-label="Edit document <?php echo htmlspecialchars($doc['document_type']); ?>">
-                                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                                </svg>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <?php
-                                }
-                            } else {
-                                echo '<p class="text-gray-500 text-center py-6 text-lg">No submissions found.</p>';
-                            }
+                // Status display mapping
+                function getStatusDisplay($status) {
+                    $map = [
+                        'pending' => ['display' => 'Pending Review', 'class' => 'bg-yellow-100 text-yellow-800'],
+                        'approved' => ['display' => 'Approved', 'class' => 'bg-green-100 text-green-800'],
+                        'rejected' => ['display' => 'Rejected', 'class' => 'bg-red-100 text-red-800'],
+                    ];
+                    return $map[$status] ?? ['display' => $status, 'class' => 'bg-gray-100 text-gray-800'];
+                }
 
-                            // Clean up
-                            $stmt->close();
-                            $conn->close();
+                if ($result->num_rows > 0) { ?>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <?php while ($doc = $result->fetch_assoc()) {
+                            $submission_date = $doc['submission_date'] ? date("m-d-Y", strtotime($doc['submission_date'])) : 'N/A';
+                            $status_info = getStatusDisplay($doc['status']);
                             ?>
-                        </div>
-                    </div>
-
-                    <!-- Edit Submission Modal -->
-                    <div id="editSubmissionModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden">
-                        <div class="bg-white rounded-2xl shadow-2xl p-4 w-full max-w-lg border border-gray-200 mx-4">
-                            <!-- Header -->
-                            <div class="relative mb-4">
-                                <h2 class="text-lg font-semibold text-gray-800">Edit Submission</h2>
-                                <p class="text-xs text-gray-500 mt-1">Update your document details</p>
-                                <button onclick="closeModal('editSubmissionModal')" class="absolute top-0 right-0 text-gray-400 hover:text-gray-600 transition-colors">
-                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                    </svg>
-                                </button>
-                            </div>
-
-                            <!-- Profile Info -->
-                            <div class="flex items-center gap-2 mb-4 px-3 py-2 bg-gray-50 rounded-lg border border-gray-100">
-                                <div class="w-8 h-8 flex-shrink-0 overflow-hidden rounded-full border border-gray-300">
-                                    <?php if ($profile_image_data && $profile_image_type): ?>
-                                        <img src="data:<?php echo htmlspecialchars($profile_image_type); ?>;base64,<?php echo base64_encode($profile_image_data); ?>"
-                                             alt="Profile" class="w-full h-full object-cover">
-                                    <?php else: ?>
-                                        <svg class="w-5 h-5 text-gray-400 mx-auto my-1.5" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                            <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-200">
+                                <div class="flex justify-between items-start mb-4">
+                                    <h4 class="text-lg font-semibold text-gray-900 truncate"><?php echo htmlspecialchars($doc['document_type']); ?></h4>
+                                    <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full <?php echo htmlspecialchars($status_info['class']); ?>">
+                                <?php echo htmlspecialchars($status_info['display']); ?>
+                            </span>
+                                </div>
+                                <p class="text-sm text-gray-600 mb-2"><span class="font-medium">Submitted:</span> <?php echo htmlspecialchars($submission_date); ?></p>
+                                <p class="text-sm text-gray-600 line-clamp-2 mb-4"><?php echo htmlspecialchars($doc['description']); ?></p>
+                                <div class="flex justify-end gap-3">
+                                    <button onclick="openDocumentModal('<?php echo htmlspecialchars(json_encode($doc['document_type'])); ?>', '<?php echo htmlspecialchars(json_encode($submission_date)); ?>', '<?php echo htmlspecialchars(json_encode($status_info['display'])); ?>', '<?php echo htmlspecialchars(json_encode($doc['description'])); ?>', '<?php echo htmlspecialchars(json_encode($doc['file_name'])); ?>', '<?php echo htmlspecialchars(json_encode($doc['id'])); ?>', '<?php echo htmlspecialchars(json_encode($doc['status'])); ?>')"
+                                            class="text-gray-600 hover:text-blue-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                            aria-label="View document <?php echo htmlspecialchars($doc['document_type']); ?>">
+                                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                         </svg>
+                                    </button>
+                                    <?php if ($doc['status'] !== 'approved'): ?>
+                                        <button onclick="openEditModal('<?php echo htmlspecialchars(json_encode($doc['id'])); ?>', '<?php echo htmlspecialchars(json_encode($doc['document_type'])); ?>', '<?php echo htmlspecialchars(json_encode($doc['other_type'])); ?>', '<?php echo htmlspecialchars(json_encode($doc['description'])); ?>', '<?php echo htmlspecialchars(json_encode($doc['file_name'])); ?>', '<?php echo htmlspecialchars(json_encode($doc['status'])); ?>', '<?php echo htmlspecialchars(json_encode($submission_date)); ?>')"
+                                                class="text-gray-600 hover:text-blue-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                                aria-label="Edit document <?php echo htmlspecialchars($doc['document_type']); ?>">
+                                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                            </svg>
+                                        </button>
                                     <?php endif; ?>
                                 </div>
-                                <div class="min-w-0 flex-1">
-                                    <p class="text-xs font-medium text-gray-800 truncate"><?php echo htmlspecialchars($_SESSION['user']['full_name']); ?></p>
-                                    <p class="text-xs text-gray-500 truncate">ID: <?php echo htmlspecialchars($_SESSION['user']['student_id']); ?></p>
-                                </div>
                             </div>
-
-                            <!-- Form -->
-                            <form id="editSubmissionForm" action="../controller/update_submission.php" method="POST" enctype="multipart/form-data">
-                                <input type="hidden" name="submission_id" id="edit_submission_id">
-
-                                <!-- Document Info -->
-                                <div class="flex justify-between items-center mb-3 gap-3">
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-xs font-medium text-gray-500 whitespace-nowrap">Document Type:</span>
-                                        <p id="edit_document_type_display" class="text-xs font-medium text-gray-800 truncate"></p>
-                                    </div>
-                                    <div id="edit_status_display" class="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600 whitespace-nowrap"></div>
-                                </div>
-
-                                <div class="w-full max-w-xs mx-auto">
-                                    <label for="edit_description" class="text-sm font-medium text-gray-700 block text-center">Description</label>
-                                    <span id="edit_desc_warning" class="text-xs text-red-500 hidden block text-center">Minimum 10 characters</span>
-                                    <textarea id="edit_description" name="description" rows="4"
-                                              class="w-full p-3 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none"
-                                              style="min-height: 80px; overflow-y: auto;"
-                                              required></textarea>
-                                </div>
-
-                                <!-- File Upload -->
-                                <div class="w-full max-w-xs mx-auto mt-3">
-                                    <label for="uploaded_file" class="text-sm font-medium text-gray-700 block text-center">Upload New File (Optional)</label>
-                                    <div class="file-upload-area border border-gray-300 rounded-md p-4 text-center">
-                                        <input type="file" id="uploaded_file" name="uploaded_file" class="hidden" accept=".pdf,.doc,.docx,.jpg,.png">
-                                        <label for="uploaded_file" class="file-upload-label cursor-pointer">
-                                            <div class="upload-icon-container mx-auto w-12 h-12 text-gray-500">
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" class="w-full h-full">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-                                                </svg>
-                                            </div>
-                                            <span class="upload-instruction block text-sm text-gray-600">Click to upload or drag and drop</span>
-                                            <span class="upload-requirements block text-xs text-gray-500">PDF, DOC, DOCX, JPG, PNG (Max 5MB)</span>
-                                        </label>
-                                        <div id="file_info" class="file-info hidden mt-2">
-                                            <span class="file-info-label text-sm text-gray-600">Selected file:</span> <span id="file_name" class="text-sm text-gray-800"></span>
-                                        </div>
-                                        <span id="edit_file_warning" class="text-xs text-red-500 hidden block mt-2">Please select a valid file</span>
-                                    </div>
-                                </div>
-                                <div class="w-full max-w-xs mx-auto mt-3">
-                                    <!-- Action Buttons -->
-                                    <div id="edit_action_buttons" class="flex flex-wrap gap-2 mt-2 justify-center"></div>
-                                </div>
-                                <!-- Footer Info -->
-                                <div class="flex justify-center items-center border-t border-gray-200 pt-3 w-full">
-                                    <p class="text-xs text-gray-500 text-center">
-                                        <span>Submitted: </span>
-                                        <span id="edit_submission_date" class="font-medium text-gray-600"></span>
-                                    </p>
-                                </div>
-
-                                <!-- Submit Buttons (Swapped Positions) -->
-                                <div class="flex justify-center gap-2 mt-3">
-                                    <button type="button" id="resubmitButton"
-                                            class="w-full max-w-[120px] py-2 bg-green-500 text-white rounded-md text-xs font-semibold hover:bg-green-600 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 disabled:bg-gray-400 disabled:cursor-not-allowed">
-                                        Resubmit
-                                    </button>
-                                    <button type="submit" id="edit_submit_button"
-                                            class="w-full max-w-[120px] py-2 bg-blue-600 text-white rounded-md text-xs font-semibold hover:bg-blue-700 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 disabled:bg-gray-400 disabled:cursor-not-allowed">
-                                        Save Changes
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
+                        <?php } ?>
                     </div>
+                    <?php
+                } else {
+                    echo '<div class="text-gray-600 text-center py-8 text-lg font-semibold bg-white rounded-xl shadow-md">No submissions found.</div>';
+                }
 
-                    <!-- File View Modal -->
-                    <div id="fileViewModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden" role="dialog" aria-labelledby="file-view-title">
-                        <div class="modal-content bg-white rounded-2xl shadow-2xl p-6 w-full max-w-3xl border border-gray-200 mx-4 flex flex-col">
-                            <div class="modal-header relative mb-4">
-                                <h2 id="file-view-title" class="text-lg font-semibold text-gray-800">View File</h2>
-                                <button onclick="closeModal('fileViewModal')" class="modal-close-btn absolute top-0 right-0 text-gray-400 hover:text-gray-600 transition-colors" aria-label="Close modal">
-                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                    </svg>
-                                </button>
-                            </div>
-                            <div id="fileViewPreview" class="w-full flex-1 overflow-auto bg-gray-50">
-                                <!-- Content will be injected here -->
-                            </div>
-                            <div class="modal-footer mt-4 flex justify-center gap-3 bg-gray-100 p-4 rounded-b-2xl">
-                                <a id="fileDownloadLink" href="#" class="action-btn bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg flex items-center gap-2 transition-colors duration-200 focus:outline-none hidden">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                                    </svg>
-                                    Download
-                                </a>
-                                <button onclick="closeModal('fileViewModal')" class="action-btn bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg flex items-center gap-2 transition-colors duration-200 focus:outline-none">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                    </svg>
-                                    Close
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                // Clean up
+                $stmt->close();
+                $conn->close();
 
-                    <!-- JavaScript for Modal and Form Handling -->
-                    <script>
-                        function openEditModal(submissionId, documentType, otherType, description, fileName, status, submissionDate, approvalDate = null) {
-                            // Populate the modal form with existing data
-                            const modal = document.getElementById('editSubmissionModal');
-                            const form = document.getElementById('editSubmissionForm');
-                            const submissionIdInput = document.getElementById('edit_submission_id');
-                            const documentTypeDisplay = document.getElementById('edit_document_type_display');
-                            const descriptionInput = document.getElementById('edit_description');
-                            const submissionDateDisplay = document.getElementById('edit_submission_date');
-                            const statusDisplay = document.getElementById('edit_status_display');
-                            const fileInput = document.getElementById('uploaded_file');
-                            const fileInfo = document.getElementById('file_info');
-                            const fileNameSpan = document.getElementById('file_name');
-                            const fileWarning = document.getElementById('edit_file_warning');
-                            const actionButtons = document.getElementById('edit_action_buttons');
-                            const submitButton = document.getElementById('edit_submit_button');
-                            const resubmitButton = document.getElementById('resubmitButton');
-
-                            // Set form values
-                            submissionIdInput.value = submissionId;
-                            documentTypeDisplay.textContent = documentType === 'Others' && otherType ? otherType : documentType;
-                            descriptionInput.value = description;
-                            submissionDateDisplay.textContent = submissionDate;
-
-                            // Reset file input
-                            fileInput.value = '';
-                            fileInfo.classList.add('hidden');
-                            fileNameSpan.textContent = fileName || 'No file uploaded';
-                            fileWarning.classList.add('hidden');
-                            if (fileName) {
-                                fileInfo.classList.remove('hidden');
-                            }
-
-                            // Set status display
-                            let statusHtml = '';
-                            let actionButtonsHtml = '';
-                            const escapedFileName = fileName ? fileName.replace(/'/g, "\\'") : '';
-
-                            // Common "View File" button
-                            const viewFileButton = fileName ? `
-            <button type="button" onclick="openFileViewModal('${submissionId}', '${escapedFileName}')"
-                    class="px-2 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 shadow-sm transition-colors"
-                    aria-label="View file for submission">View File</button>
-        ` : '';
-
-                            // Status-specific handling
-                            if (status === 'pending') {
-                                statusHtml = `<p class="text-sm font-medium text-yellow-800 bg-yellow-100 px-4 py-2 rounded-full inline-block">Not been Approved</p>`;
-                                actionButtonsHtml = `
-                <button type="button" onclick="deleteSubmission(${submissionId || 0})"
-                        class="px-2 py-1 bg-gray-200 text-gray-700 rounded text-sm hover:bg-gray-300 shadow-sm transition-colors">Delete</button>
-                ${viewFileButton}
-            `;
-                                resubmitButton.classList.add('hidden');
-                            } else if (status === 'approved') {
-                                statusHtml = `<p class="text-sm font-medium text-green-800 bg-green-100 px-4 py-2 rounded-full inline-block">Approved</p>`;
-                                actionButtonsHtml = `
-                <button type="button" onclick="deleteSubmission(${submissionId || 0})"
-                        class="px-2 py-1 bg-gray-200 text-gray-700 rounded text-sm hover:bg-gray-300 shadow-sm transition-colors">Delete</button>
-                <a href="../controller/download_submission.php?id=${submissionId || 0}"
-                   class="px-2 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600 shadow-sm transition-colors"
-                   aria-label="Download file">Download</a>
-                ${viewFileButton}
-            `;
-                                resubmitButton.classList.add('hidden');
-                            } else if (status === 'rejected') {
-                                statusHtml = `<p class="text-sm font-medium text-red-800 bg-red-100 px-4 py-2 rounded-full inline-block">Rejected</p>`;
-                                actionButtonsHtml = `
-                <button type="button" onclick="deleteSubmission(${submissionId || 0})"
-                        class="px-2 py-1 bg-gray-200 text-gray-700 rounded text-sm hover:bg-gray-300 shadow-sm transition-colors">Delete</button>
-                ${viewFileButton}
-            `;
-                                resubmitButton.classList.remove('hidden');
-                            }
-
-                            statusDisplay.innerHTML = statusHtml;
-                            actionButtons.innerHTML = actionButtonsHtml;
-
-                            // Show modal
-                            modal.classList.remove('hidden');
-                            setTimeout(() => modal.classList.add('opacity-100'), 50);
-
-                            // Client-side validation: Description
-                            const descWarning = document.getElementById('edit_desc_warning');
-                            descriptionInput.addEventListener('input', () => {
-                                descWarning.classList.toggle('hidden', descriptionInput.value.trim().length >= 10);
-                            });
-
-                            // Client-side validation: File
-                            fileInput.addEventListener('change', () => {
-                                const file = fileInput.files[0];
-                                fileInfo.classList.add('hidden');
-                                fileNameSpan.textContent = fileName || 'No file uploaded';
-                                fileWarning.classList.add('hidden');
-
-                                if (file) {
-                                    const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'image/jpeg', 'image/png'];
-                                    const maxSize = 5 * 1024 * 1024; // 5MB
-                                    if (!validTypes.includes(file.type)) {
-                                        fileWarning.textContent = 'Invalid file type. Please select PDF, DOC, DOCX, JPG, or PNG.';
-                                        fileWarning.classList.remove('hidden');
-                                        fileInput.value = '';
-                                    } else if (file.size > maxSize) {
-                                        fileWarning.textContent = 'File too large. Maximum size is 5MB.';
-                                        fileWarning.classList.remove('hidden');
-                                        fileInput.value = '';
-                                    } else {
-                                        fileInfo.classList.remove('hidden');
-                                        fileNameSpan.textContent = file.name;
-                                    }
-                                }
-                            });
-
-                            // Handle Resubmit for rejected submissions
-                            if (status === 'rejected') {
-                                resubmitButton.addEventListener('click', async () => {
-                                    if (!confirm('Are you sure you want to resubmit this document?')) return;
-
-                                    // Validate description
-                                    if (descriptionInput.value.trim().length < 10) {
-                                        descWarning.classList.remove('hidden');
-                                        return;
-                                    }
-
-                                    // Disable buttons
-                                    submitButton.disabled = true;
-                                    resubmitButton.disabled = true;
-                                    resubmitButton.textContent = 'Resubmitting...';
-
-                                    try {
-                                        // Resubmit
-                                        const resubmitResponse = await fetch('../controller/return_submission.php', {
-                                            method: 'POST',
-                                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                                            body: `id=${encodeURIComponent(submissionId)}`
-                                        });
-                                        const resubmitResult = await resubmitResponse.json();
-
-                                        if (resubmitResult.success) {
-                                            alert('Submission resubmitted successfully!');
-                                            closeModal('editSubmissionModal');
-                                            location.reload(); // Refresh to show updated status
-                                        } else {
-                                            throw new Error(resubmitResult.message);
-                                        }
-                                    } catch (error) {
-                                        alert('Error: ' + error.message);
-                                    } finally {
-                                        submitButton.disabled = false;
-                                        resubmitButton.disabled = false;
-                                        resubmitButton.textContent = 'Resubmit';
-                                    }
-                                });
-                            }
-                        }
-
-                        function openFileViewModal(submissionId, fileName) {
-                            // Prevent modal stacking by closing other modals
-                            const existingModals = document.querySelectorAll('.fixed.inset-0');
-                            existingModals.forEach(modal => {
-                                if (modal.id !== 'fileViewModal') modal.remove();
-                            });
-
-                            const modal = document.getElementById('fileViewModal');
-                            const preview = document.getElementById('fileViewPreview');
-                            const downloadLink = document.getElementById('fileDownloadLink');
-
-                            // Set download link to original file
-                            downloadLink.href = `../controller/download_submission.php?id=${encodeURIComponent(submissionId)}&download=true`;
-                            downloadLink.classList.remove('hidden');
-
-                            // Show loading state
-                            preview.innerHTML = `
-            <div class="flex items-center justify-center min-h-full py-6">
-                <div class="text-center">
-                    <svg class="animate-spin h-6 w-6 text-blue-500 mx-auto" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <p class="mt-2 text-gray-500 text-sm">Loading file...</p>
-                </div>
+                // Prepare user data for JavaScript
+                $user_data = [
+                    'full_name' => htmlspecialchars($_SESSION['user']['full_name'] ?? 'Unknown'),
+                    'student_id' => htmlspecialchars($_SESSION['user']['student_id'] ?? 'N/A')
+                ];
+                ?>
+                <script>
+                    const userData = <?php echo json_encode($user_data); ?>;
+                </script>
             </div>
-        `;
-                            modal.classList.remove('hidden');
-                            setTimeout(() => modal.classList.add('opacity-100'), 50);
 
-                            // Fetch the file
-                            fetch(`../controller/download_submission.php?id=${encodeURIComponent(submissionId)}`)
-                                .then(response => {
-                                    if (!response.ok) throw new Error(`Failed to load file: ${response.statusText}`);
-                                    return response.blob();
-                                })
-                                .then(blob => {
-                                    const url = URL.createObjectURL(blob);
-                                    const contentType = blob.type || 'application/octet-stream';
-                                    const fileExtension = fileName.split('.').pop().toLowerCase();
-
-                                    if (contentType === 'application/pdf' || fileExtension === 'pdf') {
-                                        preview.innerHTML = `<iframe src="${url}#zoom=auto" style="width:100%; height:100%; max-height:100%;" frameborder="0" title="File Preview" aria-label="PDF file preview"></iframe>`;
-                                    } else if (contentType.startsWith('image/') || ['jpg', 'jpeg', 'png'].includes(fileExtension)) {
-                                        preview.innerHTML = `<img src="${url}" alt="Uploaded File" class="w-full h-full object-contain" aria-label="Image preview" />`;
-                                    } else {
-                                        preview.innerHTML = `
-                        <div class="text-center py-6 text-red-500 text-sm">
-                            Preview not available for this file type (.${fileExtension}). Please download the original file.
-                        </div>
-                    `;
-                                        downloadLink.classList.remove('hidden');
-                                    }
-                                })
-                                .catch(error => {
-                                    preview.innerHTML = `
-                    <div class="text-center py-6 text-red-500 text-sm">
-                        Error loading file: ${error.message}. Please download the original file.
-                    </div>
-                `;
-                                    downloadLink.classList.remove('hidden');
-                                });
-
-                            // Add click event to close modal when clicking outside
-                            modal.addEventListener('click', (e) => {
-                                if (e.target === modal) {
-                                    closeModal('fileViewModal');
-                                }
-                            }, { once: true });
-                        }
-
-                        function openDocumentModal(type, date, status, description, fileName, submissionId, rawStatus) {
-                            document.querySelectorAll('.fixed.inset-0').forEach(modal => modal.remove());
-
-                            const modal = document.createElement('div');
-                            modal.className = 'fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50 px-4';
-                            modal.setAttribute('role', 'dialog');
-                            modal.setAttribute('aria-labelledby', 'modal-title');
-
-                            const escapedDescription = description.replace(/</g, '<').replace(/>/g, '>');
-                            let filePreviewSection = fileName ? `
-            <div id="documentPreview" class="w-full h-96 mt-4 rounded-lg overflow-hidden bg-gray-50 relative">
-                <div class="absolute inset-0 flex items-center justify-center">
-                    <svg class="animate-spin h-6 w-6 text-blue-500" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <p class="ml-2 text-sm text-gray-500">Loading...</p>
-                </div>
-            </div>
-        ` : '<p class="text-sm text-gray-600 mt-4">No file available.</p>';
-
-                            // Add file upload section if status is pending
-                            let fileUploadSection = rawStatus === 'pending' ? `
-            <div class="w-full max-w-xs mx-auto mt-3">
-                <label for="modal_uploaded_file" class="text-sm font-medium text-gray-700 block text-center">Upload New File (Optional)</label>
-                <div class="file-upload-area border border-gray-300 rounded-md p-4 text-center">
-                    <input type="file" id="modal_uploaded_file" name="uploaded_file" class="hidden" accept=".pdf,.doc,.docx,.jpg,.png">
-                    <label for="modal_uploaded_file" class="file-upload-label cursor-pointer">
-                        <div class="upload-icon-container mx-auto w-12 h-12 text-gray-500">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" class="w-full h-full">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-                            </svg>
-                        </div>
-                        <span class="upload-instruction block text-sm text-gray-600">Click to upload or drag and drop</span>
-                        <span class="upload-requirements block text-xs text-gray-500">PDF, DOC, DOCX, JPG, PNG (Max 5MB)</span>
-                    </label>
-                    <div id="modal_file_info" class="file-info hidden mt-2">
-                        <span class="file-info-label text-sm text-gray-600">Selected file:</span> <span id="modal_file_name" class="text-sm text-gray-800">${fileName || 'No file uploaded'}</span>
-                    </div>
-                    <span id="modal_file_warning" class="text-xs text-red-500 hidden block mt-2">Please select a valid file</span>
-                </div>
-            </div>
-        ` : '';
-
-                            modal.innerHTML = `
-            <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-2xl">
-                <!-- Header -->
-                <div class="flex items-center justify-between mb-4 border-b pb-3">
-                    <div class="flex items-center space-x-4">
-                        <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-                            <span class="text-gray-600 text-lg">👤</span>
-                        </div>
-                        <div>
-                            <h2 class="text-lg font-semibold text-gray-900">Gian</h2>
-                            <p class="text-sm text-gray-500">ID: 2023-00410</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-3">
-                        <span class="px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full">${status}</span>
-                        <button onclick="this.closest('.fixed.inset-0').remove()" class="text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded p-1" aria-label="Close">
-                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            <!-- Edit Submission Modal -->
+            <div id="editSubmissionModal" class="fixed inset-0 z-60 flex items-center justify-center bg-black bg-opacity-70 transition-opacity duration-300 hidden" role="dialog" aria-labelledby="edit-modal-title">
+                <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-lg mx-4 sm:p-8 transform transition-all duration-300 scale-100" aria-modal="true">
+                    <div class="relative mb-6">
+                        <h2 id="edit-modal-title" class="text-2xl font-bold text-gray-900">Edit Submission</h2>
+                        <p class="text-sm text-gray-600 mt-1">Update your document details below</p>
+                        <button onclick="closeModal('editSubmissionModal')" class="absolute top-0 right-0 text-gray-500 hover:text-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500" aria-label="Close modal">
+                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
                         </button>
                     </div>
-                </div>
 
-                <!-- Document Details -->
-                <div class="grid grid-cols-2 gap-4 mb-6">
-                    <div>
-                        <p class="text-sm font-medium text-gray-700">Document Type</p>
-                        <p class="text-sm text-gray-600">${type}</p>
+                    <div class="flex items-center gap-4 mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <div class="w-12 h-12 rounded-full border-2 border-gray-300 overflow-hidden">
+                            <?php if ($profile_image_data && $profile_image_type): ?>
+                                <img src="data:<?php echo htmlspecialchars($profile_image_type); ?>;base64,<?php echo base64_encode($profile_image_data); ?>"
+                                     alt="Profile" class="w-full h-full object-cover">
+                            <?php else: ?>
+                                <svg class="w-8 h-8 text-gray-400 mx-auto my-2" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                </svg>
+                            <?php endif; ?>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-base font-semibold text-gray-900 truncate"><?php echo htmlspecialchars($_SESSION['user']['full_name'] ?? 'Unknown'); ?></p>
+                            <p class="text-sm text-gray-600 truncate">ID: <?php echo htmlspecialchars($_SESSION['user']['student_id'] ?? 'N/A'); ?></p>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-sm font-medium text-gray-700">Submission Date</p>
-                        <p class="text-sm text-gray-600">${date}</p>
-                    </div>
-                    <div class="col-span-2">
-                        <p class="text-sm font-medium text-gray-700">Description</p>
-                        <p class="text-sm text-gray-600 break-words">${escapedDescription}</p>
-                    </div>
-                </div>
 
-                <!-- File Preview -->
-                <div class="mt-6">
-                    <h3 class="text-sm font-medium text-gray-700 mb-3">File Preview</h3>
-                    ${filePreviewSection}
-                </div>
+                    <form id="editSubmissionForm" action="../controller/update_submission.php" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="submission_id" id="edit_submission_id">
+                        <div class="flex justify-between items-center mb-6 gap-4">
+                            <div class="flex items-center gap-3">
+                                <span class="text-sm font-medium text-gray-700">Document Type:</span>
+                                <p id="edit_document_type_display" class="text-sm font-semibold text-gray-900 truncate"></p>
+                            </div>
+                            <div id="edit_status_display" class="text-xs px-3 py-1.5 rounded-full bg-gray-100 text-gray-800 font-semibold"></div>
+                        </div>
 
-                <!-- File Upload (for pending status) -->
-                ${fileUploadSection}
+                        <div class="mb-6">
+                            <label for="edit_description" class="text-sm font-medium text-gray-700 block mb-1.5">Description</label>
+                            <span id="edit_desc_warning" class="text-xs text-red-600 hidden mb-2 block">Minimum 10 characters</span>
+                            <textarea id="edit_description" name="description" rows="4"
+                                      class="w-full p-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all resize-none bg-white shadow-sm"
+                                      style="min-height: 120px;" required></textarea>
+                        </div>
 
-                <!-- Footer -->
-                <div class="mt-6 flex justify-end gap-2">
-                    ${rawStatus === 'pending' ? `
-                        <button onclick="updateFileFromModal(${submissionId})" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">Update File</button>
-                    ` : ''}
-                    <button onclick="this.closest('.fixed.inset-0').remove()" class="px-4 py-2 bg-gray-500 text-white rounded-lg text-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors">Close</button>
+                        <div class="mb-6">
+                            <label for="uploaded_file" class="text-sm font-medium text-gray-700 block mb-1.5">Upload New File (Optional)</label>
+                            <div class="file-upload-area border border-gray-300 rounded-lg p-6 bg-white hover:bg-gray-50 transition-colors duration-200 shadow-sm">
+                                <input type="file" id="uploaded_file" name="uploaded_file" class="hidden" accept=".pdf,.doc,.docx,.jpg,.png">
+                                <label for="uploaded_file" class="file-upload-label cursor-pointer block text-center">
+                                    <div class="upload-icon-container mx-auto w-12 h-12 text-gray-600">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" class="w-full h-full">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                                        </svg>
+                                    </div>
+                                    <span class="upload-instruction block text-sm font-medium text-gray-700 mt-2">Click to upload or drag and drop</span>
+                                    <span class="upload-requirements block text-xs text-gray-500 mt-1">PDF, DOC, DOCX, JPG, PNG (Max 5MB)</span>
+                                </label>
+                                <div id="file_info" class="file-info hidden mt-3 text-center">
+                                    <span class="file-info-label text-sm text-gray-600">Selected file:</span>
+                                    <span id="file_name" class="text-sm font-medium text-gray-900"></span>
+                                </div>
+                                <span id="edit_file_warning" class="text-xs text-red-600 hidden block mt-2">Please select a valid file</span>
+                            </div>
+                        </div>
+
+                        <div id="edit_action_buttons" class="flex flex-wrap gap-3 mb-6 justify-center"></div>
+
+                        <div class="flex justify-center items-center border-t border-gray-200 pt-4">
+                            <p class="text-sm text-gray-600">
+                                <span>Submitted: </span>
+                                <span id="edit_submission_date" class="font-medium text-gray-800"></span>
+                            </p>
+                        </div>
+
+                        <div id="form_error_message" class="text-center text-sm text-red-600 mb-4 hidden"></div>
+
+                        <div class="flex justify-center gap-4 mt-6">
+                            <button type="button" id="resubmitButton"
+                                    class="py-2.5 px-6 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg text-sm font-semibold hover:from-green-700 hover:to-green-800 transition-all duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed hidden">
+                                Resubmit
+                            </button>
+                            <button type="submit" id="edit_submit_button"
+                                    class="py-2.5 px-6 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg text-sm font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                                Save Changes
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
-        `;
 
-                            if (fileName) {
-                                const fileUrl = `../controller/download_submission.php?id=${encodeURIComponent(submissionId)}`;
-                                const timeoutId = setTimeout(() => {
-                                    const preview = document.getElementById('documentPreview');
-                                    preview.innerHTML = `<div class="text-center py-4 text-red-500 text-sm">Timeout loading file. <a href="${fileUrl}&download=true" class="text-blue-600 underline">Download</a></div>`;
-                                }, 10000);
+            <!-- File View Modal -->
+            <div id="fileViewModal" class="fixed inset-0 z-60 flex items-center justify-center bg-black bg-opacity-70 transition-opacity duration-300 hidden" role="dialog" aria-labelledby="file-view-title">
+                <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-4xl mx-4 sm:p-8 transform transition-all duration-300 scale-100">
+                    <div class="relative mb-6">
+                        <h2 id="file-view-title" class="text-2xl font-bold text-gray-900">View Submission</h2>
+                        <button onclick="closeModal('fileViewModal')" class="absolute top-0 right-0 text-gray-500 hover:text-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500" aria-label="Close modal">
+                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="p-4 border-b mb-4">
+                        <h3 id="modal_document_type" class="text-lg font-semibold text-gray-900 mb-2"></h3>
+                        <p class="text-sm text-gray-600 mb-2"><span class="font-medium">Status:</span> <span id="modal_status"></span></p>
+                        <p class="text-sm text-gray-600 mb-2"><span class="font-medium">Submitted:</span> <span id="modal_submission_date"></span></p>
+                        <p class="text-sm text-gray-600 mb-4"><span class="font-medium">Description:</span> <span id="modal_description"></span></p>
+                    </div>
+                    <div id="fileViewPreview" class="w-full overflow-auto bg-gray-50 rounded-lg p-4 min-h-[300px]">
+                        <div id="previewContent" class="w-full h-full flex items-center justify-center">
+                            <!-- Preview will be injected here -->
+                        </div>
+                    </div>
+                    <div class="mt-6 flex justify-center gap-4">
+                        <a id="fileDownloadLink" href="#" download class="py-2.5 px-5 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg flex items-center gap-2 transition-colors duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                            </svg>
+                            Download
+                        </a>
+                        <button onclick="closeModal('fileViewModal')" class="py-2.5 px-5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg flex items-center gap-2 transition-colors duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
 
-                                fetch(fileUrl)
-                                    .then(response => {
-                                        if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                                        return response.blob();
-                                    })
-                                    .then(blob => {
-                                        clearTimeout(timeoutId);
-                                        const url = URL.createObjectURL(blob);
-                                        const ext = fileName.split('.').pop().toLowerCase();
-                                        const preview = document.getElementById('documentPreview');
-                                        preview.innerHTML = (blob.type === 'application/pdf' || ext === 'pdf')
-                                            ? `<iframe src="${url}#zoom=auto" class="w-full h-full" title="PDF Preview"></iframe>`
-                                            : (blob.type.startsWith('image/') || ['jpg', 'jpeg', 'png'].includes(ext))
-                                                ? `<img src="${url}" alt="File" class="w-full h-full object-contain">`
-                                                : `<div class="text-center py-4 text-red-500 text-sm">Unsupported type (${ext}). <a href="${fileUrl}&download=true" class="text-blue-600 underline">Download</a></div>`;
-                                    })
-                                    .catch(error => {
-                                        clearTimeout(timeoutId);
-                                        document.getElementById('documentPreview').innerHTML = `<div class="text-center py-4 text-red-500 text-sm">${error.message}. <a href="${fileUrl}&download=true" class="text-blue-600 underline">Download</a></div>`;
-                                    });
-                            }
+            <!-- Inline CSS -->
+            <style>
+                /* Fixed header */
+                .fixed {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    z-index: 50;
+                }
 
-                            // File upload validation for modal (if pending)
-                            if (rawStatus === 'pending') {
-                                const fileInput = modal.querySelector('#modal_uploaded_file');
-                                const fileInfo = modal.querySelector('#modal_file_info');
-                                const fileNameSpan = modal.querySelector('#modal_file_name');
-                                const fileWarning = modal.querySelector('#modal_file_warning');
+                /* Card grid */
+                .grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                    gap: 1.5rem;
+                }
 
-                                fileInput.addEventListener('change', () => {
-                                    const file = fileInput.files[0];
-                                    fileInfo.classList.add('hidden');
-                                    fileNameSpan.textContent = fileName || 'No file uploaded';
-                                    fileWarning.classList.add('hidden');
+                /* Line clamp for description */
+                .line-clamp-2 {
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                }
 
-                                    if (file) {
-                                        const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'image/jpeg', 'image/png'];
-                                        const maxSize = 5 * 1024 * 1024; // 5MB
-                                        if (!validTypes.includes(file.type)) {
-                                            fileWarning.textContent = 'Invalid file type. Please select PDF, DOC, DOCX, JPG, or PNG.';
-                                            fileWarning.classList.remove('hidden');
-                                            fileInput.value = '';
-                                        } else if (file.size > maxSize) {
-                                            fileWarning.textContent = 'File too large. Maximum size is 5MB.';
-                                            fileWarning.classList.remove('hidden');
-                                            fileInput.value = '';
-                                        } else {
-                                            fileInfo.classList.remove('hidden');
-                                            fileNameSpan.textContent = file.name;
-                                        }
-                                    }
-                                });
-                            }
+                /* Responsive adjustments */
+                @media (max-width: 640px) {
+                    .grid {
+                        grid-template-columns: 1fr;
+                    }
+                }
+            </style>
 
-                            modal.addEventListener('click', e => e.target === modal && modal.remove());
-                            document.body.appendChild(modal);
+            <!-- JavaScript -->
+            <script>
+                function closeModal(modalId) {
+                    document.getElementById(modalId).classList.add('hidden');
+                    const previewContent = document.getElementById('previewContent');
+                    if (previewContent) {
+                        previewContent.innerHTML = '';
+                    }
+                    const errorMessage = document.getElementById('form_error_message');
+                    if (errorMessage) {
+                        errorMessage.classList.add('hidden');
+                        errorMessage.textContent = '';
+                    }
+                }
+
+                function openEditModal(id, documentType, otherType, description, fileName, status, submissionDate) {
+                    const modal = document.getElementById('editSubmissionModal');
+                    document.getElementById('edit_submission_id').value = id;
+                    document.getElementById('edit_document_type_display').textContent = documentType;
+                    document.getElementById('edit_description').value = description;
+                    document.getElementById('edit_status_display').textContent = status;
+                    document.getElementById('edit_submission_date').textContent = submissionDate;
+                    const statusClasses = {
+                        'pending': 'bg-yellow-100 text-yellow-800',
+                        'approved': 'bg-green-100 text-green-800',
+                        'rejected': 'bg-red-100 text-red-800'
+                    };
+                    document.getElementById('edit_status_display').className = `text-xs px-3 py-1.5 rounded-full font-semibold ${statusClasses[status.toLowerCase()] || 'bg-gray-100 text-gray-800'}`;
+                    modal.classList.remove('hidden');
+                }
+
+                function openDocumentModal(documentType, submissionDate, status, description, fileName, id, statusRaw) {
+                    const modal = document.getElementById('fileViewModal');
+                    const previewContent = document.getElementById('previewContent');
+                    const downloadLink = document.getElementById('fileDownloadLink');
+                    document.getElementById('modal_document_type').textContent = documentType;
+                    document.getElementById('modal_status').textContent = status;
+                    document.getElementById('modal_submission_date').textContent = submissionDate;
+                    document.getElementById('modal_description').textContent = description;
+                    const extension = fileName.split('.').pop().toLowerCase();
+                    const fileUrl = `../controller/download_submission.php?id=${encodeURIComponent(id)}`;
+                    const downloadUrl = `../controller/download_submission.php?id=${encodeURIComponent(id)}&download=true`;
+                    if (['jpg', 'jpeg', 'png'].includes(extension)) {
+                        previewContent.innerHTML = `
+                    <img src="${fileUrl}" alt="File preview" class="max-w-full max-h-[500px] object-contain" onerror="this.src='';this.parentElement.innerHTML='<p class=\\'text-gray-600\\'>Unable to load image preview</p>'">
+                `;
+                    } else if (extension === 'pdf') {
+                        previewContent.innerHTML = `
+                    <object data="${fileUrl}" type="application/pdf" class="w-full h-[500px]">
+                        <p class="text-gray-600">PDF preview not supported. <a href="${downloadUrl}" class="text-blue-600 hover:underline">Download the PDF</a> to view it.</p>
+                    </object>
+                `;
+                    } else {
+                        previewContent.innerHTML = `
+                    <p class="text-gray-600">Preview not available for this file type. Use the download button to access the file.</p>
+                `;
+                    }
+                    downloadLink.href = downloadUrl;
+                    downloadLink.setAttribute('download', fileName);
+                    downloadLink.classList.remove('hidden');
+                    modal.classList.remove('hidden');
+                }
+
+                document.getElementById('uploaded_file').addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    const fileInfo = document.getElementById('file_info');
+                    const fileName = document.getElementById('file_name');
+                    const warning = document.getElementById('edit_file_warning');
+                    if (file) {
+                        const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'image/jpeg', 'image/png'];
+                        if (!validTypes.includes(file.type)) {
+                            warning.textContent = 'Invalid file type. Only PDF, DOC, DOCX, JPG, PNG are allowed.';
+                            warning.classList.remove('hidden');
+                            this.value = '';
+                            return;
                         }
-
-                        function updateFileFromModal(submissionId) {
-                            const fileInput = document.getElementById('modal_uploaded_file');
-                            const fileWarning = document.getElementById('modal_file_warning');
-                            const updateButton = document.querySelector('.bg-blue-600');
-
-                            if (!fileInput.files.length) {
-                                fileWarning.textContent = 'Please select a file to update.';
-                                fileWarning.classList.remove('hidden');
-                                return;
-                            }
-
-                            const formData = new FormData();
-                            formData.append('submission_id', submissionId);
-                            formData.append('uploaded_file', fileInput.files[0]);
-
-                            updateButton.disabled = true;
-                            updateButton.textContent = 'Updating...';
-
-                            fetch('../controller/update_submission.php', {
-                                method: 'POST',
-                                body: formData
-                            })
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.success) {
-                                        alert('File updated successfully!');
-                                        location.reload();
-                                    } else {
-                                        alert('Error: ' + data.message);
-                                    }
-                                })
-                                .catch(error => {
-                                    alert('An error occurred while updating the file.');
-                                })
-                                .finally(() => {
-                                    updateButton.disabled = false;
-                                    updateButton.textContent = 'Update File';
-                                });
+                        if (file.size > 5 * 1024 * 1024) {
+                            warning.textContent = 'File size exceeds 5MB';
+                            warning.classList.remove('hidden');
+                            this.value = '';
+                            return;
                         }
+                        warning.classList.add('hidden');
+                        fileInfo.classList.remove('hidden');
+                        fileName.textContent = file.name;
+                    } else {
+                        fileInfo.classList.add('hidden');
+                    }
+                });
 
-                        function closeModal(modalId) {
-                            const modal = document.getElementById(modalId);
-                            const preview = modal?.querySelector('#fileViewPreview') || modal?.querySelector('#documentPreview');
-                            if (modal) {
-                                modal.classList.remove('opacity-100');
-                                setTimeout(() => {
-                                    modal.classList.add('hidden');
-                                    if (preview) {
-                                        const iframes = preview.getElementsByTagName('iframe');
-                                        const images = preview.getElementsByTagName('img');
-                                        for (let iframe of iframes) {
-                                            URL.revokeObjectURL(iframe.src);
-                                        }
-                                        for (let img of images) {
-                                            URL.revokeObjectURL(img.src);
-                                        }
-                                        preview.innerHTML = '';
-                                    }
-                                }, 300);
-                            }
-                        }
+                document.getElementById('statusFilter').addEventListener('change', function(e) {
+                    const cards = document.querySelectorAll('.grid > div');
+                    const filter = e.target.value.toLowerCase();
+                    cards.forEach(card => {
+                        const status = card.querySelector('span').textContent.toLowerCase().replace(' review', '');
+                        card.style.display = (filter === 'all' || status === filter) ? '' : 'none';
+                    });
+                });
 
-                        function deleteSubmission(submissionId) {
-                            if (confirm('Are you sure you want to delete this submission?')) {
-                                fetch('../controller/delete_submission.php', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                                    body: `id=${encodeURIComponent(submissionId)}`
-                                })
-                                    .then(response => response.json())
-                                    .then(data => {
-                                        if (data.success) {
-                                            alert('Submission deleted successfully!');
-                                            location.reload();
-                                        } else {
-                                            alert('Error deleting submission: ' + data.message);
-                                        }
-                                    })
-                                    .catch(error => {
-                                        console.error('Error:', error);
-                                        alert('An error occurred while deleting the submission.');
-                                    });
-                            }
-                        }
-
-                        document.getElementById('editSubmissionForm').addEventListener('submit', async (e) => {
-                            e.preventDefault();
-                            const form = e.target;
-                            const formData = new FormData(form);
-                            const descWarning = document.getElementById('edit_desc_warning');
-                            const submitButton = document.getElementById('edit_submit_button');
-                            const resubmitButton = document.getElementById('resubmitButton');
-
-                            // Validate description
-                            const description = formData.get('description');
-                            if (description.length < 10) {
-                                descWarning.classList.remove('hidden');
-                                return;
-                            }
-
-                            // Disable button
-                            submitButton.disabled = true;
-                            resubmitButton.disabled = true;
-                            submitButton.textContent = 'Saving...';
-
-                            try {
-                                const response = await fetch(form.action, {
-                                    method: 'POST',
-                                    body: formData
-                                });
-                                const result = await response.json();
-
-                                if (result.success) {
-                                    alert('Submission updated successfully!');
-                                    closeModal('editSubmissionModal');
-                                    location.reload(); // Refresh to show updated data
-                                } else {
-                                    alert('Error: ' + result.message);
-                                }
-                            } catch (error) {
-                                alert('An error occurred while updating the submission.');
-                            } finally {
+                document.getElementById('editSubmissionForm').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const description = document.getElementById('edit_description').value;
+                    const warning = document.getElementById('edit_desc_warning');
+                    const errorMessage = document.getElementById('form_error_message');
+                    const submitButton = document.getElementById('edit_submit_button');
+                    if (description.length < 10) {
+                        warning.classList.remove('hidden');
+                        errorMessage.classList.add('hidden');
+                        return;
+                    }
+                    warning.classList.add('hidden');
+                    submitButton.disabled = true;
+                    submitButton.textContent = 'Saving...';
+                    const formData = new FormData(this);
+                    fetch('../controller/update_submission.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                window.location.href = '../SportsOfficeAIM/view/userView.php?page=Track';
+                            } else {
+                                errorMessage.textContent = data.message || 'An error occurred';
+                                errorMessage.classList.remove('hidden');
                                 submitButton.disabled = false;
-                                resubmitButton.disabled = false;
                                 submitButton.textContent = 'Save Changes';
                             }
+                        })
+                        .catch(error => {
+                            errorMessage.textContent = 'Network error: Unable to update submission';
+                            errorMessage.classList.remove('hidden');
+                            submitButton.disabled = false;
+                            submitButton.textContent = 'Save Changes';
+                            console.error('Fetch error:', error);
                         });
-                    </script>
+                });
+            </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 <?php else: ?>
                     <p class="text-center">This is the <?php echo htmlspecialchars($currentPage); ?> content area.</p>
                 <?php endif; ?>
