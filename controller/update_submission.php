@@ -25,8 +25,9 @@ if ($conn->connect_error) {
 
 $submission_id = isset($_POST['submission_id']) ? (int)$_POST['submission_id'] : 0;
 $description = isset($_POST['description']) ? trim($_POST['description']) : '';
+$is_resubmission = isset($_POST['is_resubmission']) ? (int)$_POST['is_resubmission'] : 0;
 
-file_put_contents('debug.log', "Input Data: submission_id=$submission_id, description='$description'\n", FILE_APPEND);
+file_put_contents('debug.log', "Input Data: submission_id=$submission_id, description='$description', is_resubmission=$is_resubmission\n", FILE_APPEND);
 
 if ($submission_id <= 0 || empty($description)) {
     echo json_encode(['success' => false, 'message' => "Invalid input: submission_id=$submission_id, description='$description'"]);
@@ -40,7 +41,7 @@ if (strlen($description) < 10) {
 
 // Verify ownership
 $user_id = $_SESSION['user']['id'];
-$stmt = $conn->prepare("SELECT user_id FROM submissions WHERE id = ?");
+$stmt = $conn->prepare("SELECT user_id, status FROM submissions WHERE id = ?");
 if (!$stmt) {
     file_put_contents('debug.log', "Prepare Error: " . $conn->error . "\n", FILE_APPEND);
     echo json_encode(['success' => false, 'message' => 'SQL Prepare Error: ' . $conn->error]);
@@ -55,7 +56,24 @@ if ($result->num_rows === 0 || $row['user_id'] != $user_id) {
     echo json_encode(['success' => false, 'message' => "Unauthorized access to submission: session_user_id=$user_id, db_user_id=" . ($row['user_id'] ?? 'null')]);
     exit;
 }
+$current_status = $row['status'];
 $stmt->close();
+
+// Handle document type for resubmissions
+$document_type = null;
+$other_type = null;
+if ($is_resubmission) {
+    if (isset($_POST['document_type']) && $_POST['document_type'] === 'other' && isset($_POST['other_type'])) {
+        $other_type = trim($_POST['other_type']);
+        if (empty($other_type)) {
+            echo json_encode(['success' => false, 'message' => 'Please specify the document type']);
+            exit;
+        }
+        $document_type = 'Other';
+    } else {
+        $document_type = 'Standard Document';
+    }
+}
 
 // Handle file upload if present
 $file_data = null;
@@ -89,24 +107,53 @@ if (isset($_FILES['uploaded_file']) && $_FILES['uploaded_file']['error'] === UPL
     $file_size = $file['size'];
 }
 
-// Update submission
-if ($file_data !== null) {
-    $stmt = $conn->prepare("UPDATE submissions SET description = ?, file_data = ?, file_name = ?, file_size = ? WHERE id = ?");
-    if (!$stmt) {
-        file_put_contents('debug.log', "Prepare Error (File Update): " . $conn->error . "\n", FILE_APPEND);
-        echo json_encode(['success' => false, 'message' => 'SQL Prepare Error (File Update): ' . $conn->error]);
-        exit;
+// Prepare the SQL query based on what needs to be updated
+$sql = "UPDATE submissions SET description = ?, status = ?, submission_date = NOW()";
+$params = [$description];
+$types = "s";
+
+// For resubmissions, change status to pending and update document type if needed
+if ($is_resubmission) {
+    $new_status = 'pending';
+    $params[] = $new_status;
+    $types .= "s";
+
+    if ($document_type !== null) {
+        $sql .= ", document_type = ?";
+        $params[] = $document_type;
+        $types .= "s";
     }
-    $stmt->bind_param("sssis", $description, $file_data, $file_name, $file_size, $submission_id);
+
+    if ($other_type !== null) {
+        $sql .= ", other_type = ?";
+        $params[] = $other_type;
+        $types .= "s";
+    }
 } else {
-    $stmt = $conn->prepare("UPDATE submissions SET description = ? WHERE id = ?");
-    if (!$stmt) {
-        file_put_contents('debug.log', "Prepare Error (No File): " . $conn->error . "\n", FILE_APPEND);
-        echo json_encode(['success' => false, 'message' => 'SQL Prepare Error (No File): ' . $conn->error]);
-        exit;
-    }
-    $stmt->bind_param("si", $description, $submission_id);
+    // Regular update - keep current status
+    $params[] = $current_status;
+    $types .= "s";
 }
+
+// Add file data if present
+if ($file_data !== null) {
+    $sql .= ", file_data = ?, file_name = ?, file_size = ?";
+    array_push($params, $file_data, $file_name, $file_size);
+    $types .= "ssi";
+}
+
+$sql .= " WHERE id = ?";
+$params[] = $submission_id;
+$types .= "i";
+
+$stmt = $conn->prepare($sql);
+if (!$stmt) {
+    file_put_contents('debug.log', "Prepare Error: " . $conn->error . "\n", FILE_APPEND);
+    echo json_encode(['success' => false, 'message' => 'SQL Prepare Error: ' . $conn->error]);
+    exit;
+}
+
+$stmt->bind_param($types, ...$params);
 
 if (!$stmt->execute()) {
     file_put_contents('debug.log', "Execute Error: " . $stmt->error . "\n", FILE_APPEND);
@@ -114,8 +161,18 @@ if (!$stmt->execute()) {
     exit;
 }
 
-file_put_contents('debug.log', "Update Successful: submission_id=$submission_id\n", FILE_APPEND);
-echo json_encode(['success' => true, 'message' => 'Submission updated successfully']);
+
+// At the end of the file, before the json_encode response:
+if ($is_resubmission) {
+    $_SESSION['submission_success'] = 'Document resubmitted successfully!';
+} else {
+    $_SESSION['submission_success'] = 'Changes saved successfully!';
+}
+
+file_put_contents('debug.log', "Update Successful: submission_id=$submission_id, is_resubmission=$is_resubmission\n", FILE_APPEND);
+echo json_encode(['success' => true, 'message' => $_SESSION['submission_success']]);
+
+
 
 $stmt->close();
 $conn->close();

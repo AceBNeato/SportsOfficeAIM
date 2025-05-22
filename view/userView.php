@@ -67,7 +67,6 @@
     <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
     <link rel="stylesheet" href="../public/CSS/userStyle.css">
     <script src="../public/JAVASCRIPT/userScript.js" defer></script>
-    <script src="../public/JAVASCRIPT/track.js" defer></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 </head>
 
@@ -554,7 +553,41 @@
                             }, 1000);
                         });
 
-                        fetchNotifications();
+                        function fetchNotifications() {
+                            fetch('../controller/notifications.php')
+                                .then(response => {
+                                    if (!response.ok) {
+                                        throw new Error('Network response was not ok');
+                                    }
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    if (data.notifications && data.notifications.length > 0) {
+                                        // Add new notifications to the array
+                                        data.notifications.forEach(notification => {
+                                            if (!notifications.some(n => n.id === notification.id)) {
+                                                notifications.push(notification); // Use push instead of unshift
+                                            }
+                                        });
+                                        // Sort notifications by timestamp in descending order (newest first)
+                                        notifications.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                                        // Limit to 50 notifications, removing the oldest
+                                        if (notifications.length > 50) {
+                                            const removed = notifications.splice(50);
+                                            removed.forEach(notif => {
+                                                if (timestampUpdaters[notif.timestamp]) {
+                                                    clearInterval(timestampUpdaters[notif.timestamp]);
+                                                    delete timestampUpdaters[notif.timestamp];
+                                                }
+                                            });
+                                        }
+                                        localStorage.setItem('notifications', JSON.stringify(notifications));
+                                        displayNotifications();
+                                        markNotificationsAsRead();
+                                    }
+                                })
+                                .catch(error => console.error('Error fetching notifications:', error));
+                        }
                         displayNotifications();
 
                         window.addEventListener('beforeunload', function() {
@@ -2206,10 +2239,42 @@
 
 
 
-
-
         <?php elseif ($currentPage === 'Track'): ?>
-        <!-- Track content -->
+            <!-- Success Message Display -->
+            <div id="successMessage" class="fixed top-4 right-4 z-50 transition-all duration-300 transform translate-x-full">
+                <?php if (isset($_SESSION['submission_success'])): ?>
+                    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-lg shadow-lg max-w-sm">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            <p class="font-medium"><?php echo htmlspecialchars($_SESSION['submission_success']); ?></p>
+                            <button onclick="document.getElementById('successMessage').classList.add('translate-x-full')" class="ml-auto text-green-700 hover:text-green-900">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <?php unset($_SESSION['submission_success']); ?>
+                <?php endif; ?>
+            </div>
+
+            <script>
+                // Show success message if it exists
+                document.addEventListener('DOMContentLoaded', function() {
+                    const successMessage = document.getElementById('successMessage');
+                    if (successMessage.innerHTML.trim() !== '') {
+                        setTimeout(() => {
+                            successMessage.classList.remove('translate-x-full');
+                            setTimeout(() => {
+                                successMessage.classList.add('translate-x-full');
+                            }, 5000);
+                        }, 300);
+                    }
+                });
+            </script>
+
         <div class="p-4 sm:p-6 lg:p-8 bg-gray-100 min-h-screen">
             <div class="space-y-8 max-w-7xl mx-auto">
                 <?php
@@ -2240,11 +2305,11 @@
                 // Fetch submissions
                 try {
                     $stmt = $conn->prepare("
-                SELECT id, document_type, submission_date, status, description, file_name, other_type 
-                FROM submissions 
-                WHERE user_id = ? 
-                ORDER BY submission_date DESC
-            ");
+                    SELECT id, document_type, submission_date, status, description, file_name, other_type 
+                    FROM submissions 
+                    WHERE user_id = ? 
+                    ORDER BY submission_date DESC
+                ");
                     $stmt->bind_param("i", $user_id);
                     $stmt->execute();
                     $result = $stmt->get_result();
@@ -2268,7 +2333,6 @@
                     }
                     $profile_stmt->close();
                 } catch (Exception $e) {
-                    // Log error but don't fail the page
                     error_log("Profile image query error: " . $e->getMessage());
                 }
 
@@ -2319,9 +2383,9 @@
                                         <td class="px-4 sm:px-6 py-4 text-sm font-medium text-gray-900 sm:truncate" data-label="Document Type"><?php echo htmlspecialchars($doc['document_type']); ?></td>
                                         <td class="px-4 sm:px-6 py-4 text-sm text-gray-600" data-label="Submission Date"><?php echo htmlspecialchars($submission_date); ?></td>
                                         <td class="px-4 sm:px-6 py-4" data-label="Status">
-                                    <span class="inline-flex px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-full <?php echo htmlspecialchars($status_info['class']); ?>" data-status="<?php echo htmlspecialchars($doc['status']); ?>" aria-label="Status: <?php echo htmlspecialchars($status_info['display']); ?>">
-                                        <?php echo htmlspecialchars($status_info['display']); ?>
-                                    </span>
+                                        <span class="inline-flex px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-full <?php echo htmlspecialchars($status_info['class']); ?>" data-status="<?php echo htmlspecialchars($doc['status']); ?>" aria-label="Status: <?php echo htmlspecialchars($status_info['display']); ?>">
+                                            <?php echo htmlspecialchars($status_info['display']); ?>
+                                        </span>
                                         </td>
                                         <td class="px-4 sm:px-6 py-4 text-sm font-medium" data-label="Actions">
                                             <div class="flex space-x-4">
@@ -2348,8 +2412,7 @@
                             </table>
                         </div>
                     </div>
-                    <?php
-                } else {
+                <?php } else {
                     echo '<p class="text-gray-600 text-center py-8 text-lg font-semibold bg-white rounded-xl shadow-md">No submissions found.</p>';
                 }
 
@@ -2368,9 +2431,11 @@
                 </script>
             </div>
 
+
+
             <!-- Edit Submission Modal -->
             <div id="editSubmissionModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 transition-opacity duration-300 hidden" role="dialog" aria-labelledby="edit-modal-title">
-                <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-lg mx-4 sm:p-8 transform transition-all duration-300 scale-100" aria-modal="true">
+                <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-5xl mx-4 sm:p-8 transform transition-all duration-300 scale-100" aria-modal="true">
                     <div class="relative mb-6">
                         <h2 id="edit-modal-title" class="text-2xl font-bold text-gray-900">Edit Submission</h2>
                         <p class="text-sm text-gray-600 mt-1">Update your document details below</p>
@@ -2381,90 +2446,202 @@
                         </button>
                     </div>
 
-                    <div class="flex items-center gap-4 mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                        <div class="w-12 h-12 rounded-full border-2 border-gray-300 overflow-hidden">
-                            <?php if ($profile_image_data && $profile_image_type): ?>
-                                <img src="data:<?php echo htmlspecialchars($profile_image_type); ?>;base64,<?php echo base64_encode($profile_image_data); ?>"
-                                     alt="Profile" class="w-full h-full object-cover">
-                            <?php else: ?>
-                                <svg class="w-8 h-8 text-gray-400 mx-auto my-2" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                                </svg>
-                            <?php endif; ?>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-base font-semibold text-gray-900 truncate"><?php echo htmlspecialchars($_SESSION['user']['full_name'] ?? 'Unknown'); ?></p>
-                            <p class="text-sm text-gray-600 truncate">ID: <?php echo htmlspecialchars($_SESSION['user']['student_id'] ?? 'N/A'); ?></p>
-                        </div>
-                    </div>
-
                     <form id="editSubmissionForm" action="../controller/update_submission.php" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="submission_id" id="edit_submission_id">
-                        <div class="flex justify-between items-center mb-6 gap-4">
-                            <div class="flex items-center gap-3">
-                                <span class="text-sm font-medium text-gray-700">Document Type:</span>
-                                <p id="edit_document_type_display" class="text-sm font-semibold text-gray-900 truncate"></p>
-                            </div>
-                            <div id="edit_status_display" class="text-xs px-3 py-1.5 rounded-full bg-gray-100 text-gray-800 font-semibold"></div>
-                        </div>
-
-                        <div class="mb-6">
-                            <label for="edit_description" class="text-sm font-medium text-gray-700 block mb-1.5">Description</label>
-                            <span id="edit_desc_warning" class="text-xs text-red-600 hidden mb-2 block">Minimum 10 characters</span>
-                            <textarea id="edit_description" name="description" rows="4"
-                                      class="w-full p-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all resize-none bg-white shadow-sm"
-                                      style="min-height: 120px;" required></textarea>
-                        </div>
-
-                        <div class="mb-6">
-                            <label for="uploaded_file" class="text-sm font-medium text-gray-700 block mb-1.5">Upload New File (Optional)</label>
-                            <div class="file-upload-area border border-gray-300 rounded-lg p-6 bg-white hover:bg-gray-50 transition-colors duration-200 shadow-sm">
-                                <input type="file" id="uploaded_file" name="uploaded_file" class="hidden" accept=".pdf,.doc,.docx,.jpg,.png">
-                                <label for="uploaded_file" class="file-upload-label cursor-pointer block text-center">
-                                    <div class="upload-icon-container mx-auto w-12 h-12 text-gray-600">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" class="w-full h-full">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-                                        </svg>
+                        <input type="hidden" name="is_resubmission" id="is_resubmission" value="0">
+                        <div class="flex flex-col xl:flex-row gap-10">
+                            <div class="left-side w-full xl:w-[55%]">
+                                <!-- Profile Info -->
+                                <div class="flex items-center gap-4 mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                    <div class="w-14 h-14 rounded-full border-2 border-gray-300 overflow-hidden">
+                                        <?php if ($profile_image_data && $profile_image_type): ?>
+                                            <img src="data:<?php echo htmlspecialchars($profile_image_type); ?>;base64,<?php echo base64_encode($profile_image_data); ?>"
+                                                 alt="Profile" class="w-full h-full object-cover">
+                                        <?php else: ?>
+                                            <svg class="w-9 h-9 text-gray-400 mx-auto my-2" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                            </svg>
+                                        <?php endif; ?>
                                     </div>
-                                    <span class="upload-instruction block text-sm font-medium text-gray-700 mt-2">Click to upload or drag and drop</span>
-                                    <span class="upload-requirements block text-xs text-gray-500 mt-1">PDF, DOC, DOCX, JPG, PNG (Max 5MB)</span>
-                                </label>
-                                <div id="file_info" class="file-info hidden mt-3 text-center">
-                                    <span class="file-info-label text-sm text-gray-600">Selected file:</span>
-                                    <span id="file_name" class="text-sm font-medium text-gray-900"></span>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-lg font-semibold text-gray-900 truncate"><?php echo htmlspecialchars($_SESSION['user']['full_name'] ?? 'Unknown'); ?></p>
+                                        <p class="text-sm text-gray-600 truncate">ID: <?php echo htmlspecialchars($_SESSION['user']['student_id'] ?? 'N/A'); ?></p>
+                                    </div>
                                 </div>
-                                <span id="edit_file_warning" class="text-xs text-red-600 hidden block mt-2">Please select a valid file</span>
+
+                                <!-- Document Type Section - Only shown for rejected documents -->
+                                <div id="documentTypeSection" class="mb-6 hidden">
+                                    <label class="text-base font-medium text-gray-700 block mb-2">Document Type</label>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <input type="radio" id="document_type_standard" name="document_type" value="standard" class="peer hidden" checked>
+                                            <label for="document_type_standard" class="block p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 peer-checked:border-blue-600 peer-checked:bg-blue-50 transition-all">
+                                                <span class="block text-sm font-medium text-gray-900">Standard Document</span>
+                                                <span class="block text-xs text-gray-500 mt-1">(Medical, Academic, etc.)</span>
+                                            </label>
+                                        </div>
+                                        <div>
+                                            <input type="radio" id="document_type_other" name="document_type" value="other" class="peer hidden">
+                                            <label for="document_type_other" class="block p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 peer-checked:border-blue-600 peer-checked:bg-blue-50 transition-all">
+                                                <span class="block text-sm font-medium text-gray-900">Other Document</span>
+                                                <span class="block text-xs text-gray-500 mt-1">(Specify your own type)</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div id="otherTypeContainer" class="mt-4 hidden">
+                                        <label for="other_type" class="text-sm font-medium text-gray-700 block mb-1.5">Specify Document Type</label>
+                                        <input type="text" id="other_type" name="other_type" class="w-full p-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all bg-white shadow-sm">
+                                    </div>
+                                </div>
+
+                                <!-- Document Type Display - Shown for non-rejected documents -->
+                                <div id="documentTypeDisplay" class="flex justify-between items-center mb-6 gap-4">
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-base font-medium text-gray-700">Document Type:</span>
+                                        <p id="edit_document_type_display" class="text-base font-semibold text-gray-900 truncate"></p>
+                                    </div>
+                                    <div id="edit_status_display" class="text-sm px-3 py-1.5 rounded-full bg-gray-100 text-gray-800 font-semibold"></div>
+                                </div>
+
+                                <!-- Description -->
+                                <div class="mb-6">
+                                    <label for="edit_description" class="text-base font-medium text-gray-700 block mb-2">Description</label>
+                                    <span id="edit_desc_warning" class="text-sm text-red-600 hidden mb-2 block">Minimum 10 characters</span>
+                                    <textarea id="edit_description" name="description" rows="6"
+                                              class="w-full p-4 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all resize-none bg-white shadow-sm"
+                                              style="min-height: 180px;" required></textarea>
+                                </div>
+                            </div>
+                            <div class="right-side w-full xl:w-[45%]">
+                                <!-- File Upload -->
+                                <div class="mb-8">
+                                    <label for="uploaded_file" class="text-base font-medium text-gray-700 block mb-2">Upload New File (Optional)</label>
+                                    <div class="file-upload-area border-2 border-gray-300 rounded-xl p-8 bg-white hover:bg-gray-50 transition-colors duration-200 shadow-sm">
+                                        <input type="file" id="uploaded_file" name="uploaded_file" class="hidden" accept=".pdf,.doc,.docx,.jpg,.png">
+                                        <label for="uploaded_file" class="file-upload-label cursor-pointer block text-center">
+                                            <div class="upload-icon-container mx-auto w-14 h-14 text-gray-600">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" class="w-full h-full">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                                                </svg>
+                                            </div>
+                                            <span class="upload-instruction block text-base font-medium text-gray-700 mt-3">Click to upload or drag and drop</span>
+                                            <span class="upload-requirements block text-sm text-gray-500 mt-2">PDF, DOC, DOCX, JPG, PNG (Max 5MB)</span>
+                                        </label>
+                                        <div id="file_info" class="file-info hidden mt-4 text-center">
+                                            <span class="file-info-label text-base text-gray-600">Selected file:</span>
+                                            <span id="file_name" class="text-base font-medium text-gray-900"></span>
+                                        </div>
+                                        <span id="edit_file_warning" class="text-sm text-red-600 hidden block mt-3">Please select a valid file</span>
+                                    </div>
+                                </div>
+                                <!-- Submission Date -->
+                                <div class="border-t-2 border-gray-200 pt-6">
+                                    <p class="text-base text-gray-600 text-center sm:text-left">
+                                        <span>Submitted: </span>
+                                        <span id="edit_submission_date" class="font-medium text-gray-800"></span>
+                                    </p>
+                                </div>
+                                <!-- Action Buttons -->
+                                <div class="flex flex-col gap-4 mt-10">
+                                    <div class="flex justify-center gap-4">
+                                        <button type="submit" id="edit_submit_button"
+                                                class="py-3 px-10 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg text-base font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                                            Save Changes
+                                        </button>
+                                        <button type="button" id="resubmit_button"
+                                                class="py-3 px-10 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg text-base font-semibold hover:from-green-700 hover:to-green-800 transition-all duration-200 shadow-lg focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 hidden">
+                                            Resubmit Document
+                                        </button>
+                                    </div>
+
+                                </div>
                             </div>
                         </div>
-
-                        <div id="edit_action_buttons" class="flex flex-wrap gap-3 mb-6 justify-center"></div>
-
-                        <div class="flex justify-center items-center border-t border-gray-200 pt-4">
-                            <p class="text-sm text-gray-600">
-                                <span>Submitted: </span>
-                                <span id="edit_submission_date" class="font-medium text-gray-800"></span>
-                            </p>
-                        </div>
-
-                        <div id="form_error_message" class="text-center text-sm text-red-600 mb-4 hidden"></div>
-
-                        <div class="flex justify-center gap-4 mt-6">
-                            <button type="button" id="resubmitButton"
-                                    class="py-2.5 px-6 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg text-sm font-semibold hover:from-green-700 hover:to-green-800 transition-all duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed hidden">
-                                Resubmit
-                            </button>
-                            <button type="submit" id="edit_submit_button"
-                                    class="py-2.5 px-6 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg text-sm font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed">
-                                Save Changes
-                            </button>
-                        </div>
+                        <!-- Error Message -->
+                        <div id="form_error_message" class="text-center text-base text-red-600 mb-6 hidden"></div>
                     </form>
                 </div>
             </div>
 
-            <!-- File View Modal -->
+            <script>
+                // Document type radio button toggle
+                document.querySelectorAll('input[name="document_type"]').forEach(radio => {
+                    radio.addEventListener('change', function() {
+                        document.getElementById('otherTypeContainer').classList.toggle('hidden', this.value !== 'other');
+                    });
+                });
+
+                // Update the openEditModal function to handle resubmission
+                function openEditModal(id, documentType, otherType, description, fileName, status, submissionDate) {
+                    const modal = document.getElementById('editSubmissionModal');
+                    const isRejected = status.toLowerCase() === 'rejected';
+
+                    try {
+                        document.getElementById('edit_submission_id').value = JSON.parse(id);
+                        document.getElementById('edit_description').value = JSON.parse(description);
+                        document.getElementById('edit_submission_date').textContent = JSON.parse(submissionDate);
+
+                        // Handle document type display
+                        const docType = JSON.parse(documentType);
+                        const otherTypeValue = JSON.parse(otherType);
+                        const statusValue = JSON.parse(status);
+
+                        if (isRejected) {
+                            // Show document type selection for rejected documents
+                            document.getElementById('documentTypeSection').classList.remove('hidden');
+                            document.getElementById('documentTypeDisplay').classList.add('hidden');
+
+                            // Set initial values
+                            if (otherTypeValue && otherTypeValue !== '') {
+                                document.getElementById('document_type_other').checked = true;
+                                document.getElementById('otherTypeContainer').classList.remove('hidden');
+                                document.getElementById('other_type').value = otherTypeValue;
+                            } else {
+                                document.getElementById('document_type_standard').checked = true;
+                                document.getElementById('otherTypeContainer').classList.add('hidden');
+                            }
+                        } else {
+                            // Show document type display for non-rejected documents
+                            document.getElementById('documentTypeSection').classList.add('hidden');
+                            document.getElementById('documentTypeDisplay').classList.remove('hidden');
+                            document.getElementById('edit_document_type_display').textContent = docType;
+                        }
+
+                        // Set status display
+                        const statusClasses = {
+                            'pending': 'bg-yellow-100 text-yellow-800',
+                            'approved': 'bg-green-100 text-green-800',
+                            'rejected': 'bg-red-100 text-red-800'
+                        };
+                        const statusDisplay = document.getElementById('edit_status_display');
+                        statusDisplay.textContent = statusValue;
+                        statusDisplay.className = `text-sm px-3 py-1.5 rounded-full font-semibold ${statusClasses[statusValue.toLowerCase()] || 'bg-gray-100 text-gray-800'}`;
+
+                        // Show/hide resubmit button
+                        document.getElementById('resubmit_button').classList.toggle('hidden', !isRejected);
+                        document.getElementById('is_resubmission').value = '0';
+
+                    } catch (e) {
+                        console.error('Error parsing JSON data for edit modal:', e);
+                    }
+
+                    // Set up resubmit button handler
+                    document.getElementById('resubmit_button').onclick = function() {
+                        document.getElementById('is_resubmission').value = '1';
+                        document.getElementById('editSubmissionForm').submit();
+                    };
+
+                    modal.classList.remove('hidden');
+                }
+            </script>
+
+
+
+
+
+            <!-- View Submission Modal -->
             <div id="fileViewModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 transition-opacity duration-300 hidden" role="dialog" aria-labelledby="file-view-title">
-                <div class="modal-content bg-white rounded-2xl shadow-xl p-6 w-full max-w-4xl mx-4 flex flex-col sm:p-8 transform transition-all duration-300 scale-100">
+                <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-4xl mx-4 flex flex-col sm:p-8 max-h-[90vh] min-h-[60vh] overflow-y-auto transform transition-all duration-300 scale-100" aria-modal="true">
                     <div class="modal-header relative mb-4">
                         <h2 id="file-view-title" class="text-2xl font-bold text-gray-900">View Submission</h2>
                         <button onclick="closeModal('fileViewModal')" class="modal-close-btn absolute top-0 right-0 text-gray-500 hover:text-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500" aria-label="Close modal">
@@ -2473,15 +2650,21 @@
                             </svg>
                         </button>
                     </div>
-                    <div class="p-4 border-b mb-4">
-                        <h3 id="modal_document_type" class="text-lg font-semibold text-gray-900 mb-2"></h3>
-                        <p class="text-sm text-gray-600 mb-2"><span class="font-medium">Status:</span> <span id="modal_status"></span></p>
-                        <p class="text-sm text-gray-600 mb-2"><span class="font-medium">Submitted:</span> <span id="modal_submission_date"></span></p>
-                        <p class="text-sm text-gray-600 mb-4"><span class="font-medium">Description:</span> <span id="modal_description"></span></p>
-                    </div>
-                    <div id="fileViewPreview" class="w-full flex-1 overflow-auto bg-gray-50 rounded-lg p-4 min-h-[300px]">
-                        <div id="previewContent" class="w-full h-full flex items-center justify-center">
-                            <!-- Preview will be injected here -->
+                    <div class="flex flex-col sm:flex-row gap-6 flex-1">
+                        <div class="w-full sm:w-1/2 flex flex-col">
+                            <div class="p-4 flex-1">
+                                <h3 id="modal_document_type" class="text-lg font-semibold text-gray-900 mb-2"></h3>
+                                <p class="text-sm text-gray-600 mb-2"><span class="font-medium">Status:</span> <span id="modal_status"></span></p>
+                                <p class="text-sm text-gray-600 mb-2"><span class="font-medium">Submitted:</span> <span id="modal_submission_date"></span></p>
+                                <p class="text-sm text-gray-600 mb-4"><span class="font-medium">Description:</span> <span id="modal_description" class="block mt-1 max-h-[200px] overflow-y-auto"></span></p>
+                            </div>
+                        </div>
+                        <div class="w-full sm:w-1/2 flex flex-col">
+                            <div id="fileViewPreview" class="w-full flex-1 min-h-[300px] bg-gray-50 rounded-lg p-4 overflow-auto" aria-label="File preview area">
+                                <div id="previewContent" class="w-full h-full flex items-center justify-center">
+                                    <!-- Preview will be injected here -->
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer mt-4 flex justify-center gap-4 bg-gray-100 p-4 rounded-b-lg">
@@ -2562,19 +2745,22 @@
 
                 function openEditModal(id, documentType, otherType, description, fileName, status, submissionDate) {
                     const modal = document.getElementById('editSubmissionModal');
-                    document.getElementById('edit_submission_id').value = id;
-                    document.getElementById('edit_document_type_display').textContent = documentType;
-                    document.getElementById('edit_description').value = description;
-                    document.getElementById('edit_status_display').textContent = status;
-                    document.getElementById('edit_submission_date').textContent = submissionDate;
+                    try {
+                        document.getElementById('edit_submission_id').value = JSON.parse(id);
+                        document.getElementById('edit_document_type_display').textContent = JSON.parse(documentType);
+                        document.getElementById('edit_description').value = JSON.parse(description);
+                        document.getElementById('edit_status_display').textContent = JSON.parse(status);
+                        document.getElementById('edit_submission_date').textContent = JSON.parse(submissionDate);
 
-                    const statusClasses = {
-                        'pending': 'bg-yellow-100 text-yellow-800',
-                        'approved': 'bg-green-100 text-green-800',
-                        'rejected': 'bg-red-100 text-red-800'
-                    };
-                    document.getElementById('edit_status_display').className = `text-xs px-3 py-1.5 rounded-full font-semibold ${statusClasses[status.toLowerCase()] || 'bg-gray-100 text-gray-800'}`;
-
+                        const statusClasses = {
+                            'pending': 'bg-yellow-100 text-yellow-800',
+                            'approved': 'bg-green-100 text-green-800',
+                            'rejected': 'bg-red-100 text-red-800'
+                        };
+                        document.getElementById('edit_status_display').className = `text-xs px-3 py-1.5 rounded-full font-semibold ${statusClasses[JSON.parse(status).toLowerCase()] || 'bg-gray-100 text-gray-800'}`;
+                    } catch (e) {
+                        console.error('Error parsing JSON data for edit modal:', e);
+                    }
                     modal.classList.remove('hidden');
                 }
 
@@ -2582,6 +2768,21 @@
                     const modal = document.getElementById('fileViewModal');
                     const previewContent = document.getElementById('previewContent');
                     const downloadLink = document.getElementById('fileDownloadLink');
+
+                    // Parse JSON-encoded strings
+                    try {
+                        documentType = JSON.parse(documentType);
+                        submissionDate = JSON.parse(submissionDate);
+                        status = JSON.parse(status);
+                        description = JSON.parse(description);
+                        fileName = JSON.parse(fileName);
+                        id = JSON.parse(id);
+                        statusRaw = JSON.parse(statusRaw);
+                    } catch (e) {
+                        console.error('Error parsing JSON data:', e);
+                        previewContent.innerHTML = '<p class="text-red-600">Error loading document data</p>';
+                        return;
+                    }
 
                     // Update modal metadata
                     document.getElementById('modal_document_type').textContent = documentType;
@@ -2597,18 +2798,22 @@
                     // Generate preview based on file type
                     if (['jpg', 'jpeg', 'png'].includes(extension)) {
                         previewContent.innerHTML = `
-                    <img src="${fileUrl}" alt="File preview" class="max-w-full max-h-[500px] object-contain" onerror="this.src='';this.parentElement.innerHTML='<p class=\\'text-gray-600\\'>Unable to load image preview</p>'">
-                `;
+                        <img src="${fileUrl}" alt="File preview" class="max-w-full max-h-[500px] object-contain" onerror="this.src='';this.parentElement.innerHTML='<p class=\\'text-gray-600\\'>Unable to load image preview</p>'">
+                    `;
                     } else if (extension === 'pdf') {
                         previewContent.innerHTML = `
-                    <object data="${fileUrl}" type="application/pdf" class="w-full h-[500px]">
-                        <p class="text-gray-600">PDF preview not supported. <a href="${downloadUrl}" class="text-blue-600 hover:underline">Download the PDF</a> to view it.</p>
-                    </object>
-                `;
+                        <object data="${fileUrl}" type="application/pdf" class="w-full h-[500px]" onerror="this.parentElement.innerHTML='<p class=\\'text-gray-600\\'>Unable to load PDF preview. <a href=\\'${downloadUrl}\\' class=\\'text-blue-600 hover:underline\\'>Download the PDF</a> to view it.</p>'">
+                            <p class="text-gray-600">PDF preview not supported. <a href="${downloadUrl}" class="text-blue-600 hover:underline">Download the PDF</a> to view it.</p>
+                        </object>
+                    `;
+                    } else if (['doc', 'docx'].includes(extension)) {
+                        previewContent.innerHTML = `
+                        <p class="text-gray-600">Preview not available for Word documents. <a href="${downloadUrl}" class="text-blue-600 hover:underline">Download the file</a> to view it.</p>
+                    `;
                     } else {
                         previewContent.innerHTML = `
-                    <p class="text-gray-600">Preview not available for this file type. Use the download button to access the file.</p>
-                `;
+                        <p class="text-gray-600">Preview not available for this file type. Use the download button to access the file.</p>
+                    `;
                     }
 
                     // Set download link
@@ -2694,10 +2899,8 @@
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
-                                // Redirect to Track page on success
                                 window.location.href = '../SportsOfficeAIM/view/userView.php?page=Track';
                             } else {
-                                // Display error message
                                 errorMessage.textContent = data.message || 'An error occurred';
                                 errorMessage.classList.remove('hidden');
                                 submitButton.disabled = false;
@@ -2705,7 +2908,6 @@
                             }
                         })
                         .catch(error => {
-                            // Handle network or other errors
                             errorMessage.textContent = 'Network error: Unable to update submission';
                             errorMessage.classList.remove('hidden');
                             submitButton.disabled = false;
@@ -2714,22 +2916,13 @@
                         });
                 });
             </script>
+        </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
+    
+    
+    
+    
 
 
 
