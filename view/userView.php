@@ -1302,7 +1302,7 @@
                                     <h2 class="text-xl font-bold">Edit Achievement</h2>
                                     <button id="closeEditModal" class="text-gray-500 hover:text-gray-700">×</button>
                                 </div>
-                                <form method="POST" enctype="multipart/form-data" action="../controller/handleAchievements.php" id="editAchievementForm" class="space-y-4">
+                                <form method="POST" enctype="multipart/form-data" action="../controller/handleAchievement.php" id="editAchievementForm" class="space-y-4">
                                     <input type="hidden" name="achievement_id" id="edit_achievement_id">
                                     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                                     <input type="hidden" name="existing_documents" id="edit_existing_documents">
