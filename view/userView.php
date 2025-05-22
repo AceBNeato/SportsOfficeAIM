@@ -2199,25 +2199,23 @@ tr    <?php
 
 
 
-
         <?php elseif ($currentPage === 'Track'): ?>
         <!-- Track content -->
-        <div class="p-6 bg-gray-50 min-h-screen">
-            <div class="space-y-6">
+        <div class="p-4 sm:p-6 lg:p-8 bg-gray-100 min-h-screen">
+            <div class="space-y-8 max-w-7xl mx-auto">
                 <?php
-                // Database connection (use secure credentials in production, e.g., environment variables)
+                // Database connection (unchanged, but consider using environment variables for security)
                 $host = "localhost";
                 $username = "root";
                 $password = "";
                 $dbname = "SportOfficeDB";
 
-                // Connect to MySQL server
                 $conn = new mysqli($host, $username, $password, $dbname);
                 if ($conn->connect_error) {
                     die("Connection failed: " . mysqli_escape_string($conn, $conn->connect_error));
                 }
 
-                // Fetch submissions for the logged-in user
+                // Fetch submissions for the logged-in user (unchanged)
                 $user_id = isset($_SESSION['user']['id']) ? (int)$_SESSION['user']['id'] : 0;
                 $stmt = $conn->prepare("
             SELECT id, document_type, submission_date, status, description, file_name, other_type 
@@ -2229,7 +2227,7 @@ tr    <?php
                 $stmt->execute();
                 $result = $stmt->get_result();
 
-                // Fetch user profile image
+                // Fetch user profile image (unchanged)
                 $profile_image_data = null;
                 $profile_image_type = null;
                 $profile_stmt = $conn->prepare("SELECT image, image_type FROM user_images WHERE user_id = ? ORDER BY uploaded_at DESC LIMIT 1");
@@ -2243,75 +2241,92 @@ tr    <?php
                 }
                 $profile_stmt->close();
 
-                // Function to map status to display text and Tailwind classes
+                // Function to map status to display text and Tailwind classes (updated colors for better contrast)
                 function getStatusDisplay($status) {
                     $map = [
-                        'pending' => ['display' => 'Not been Approved', 'class' => 'bg-yellow-50 text-yellow-700'],
-                        'approved' => ['display' => 'Approved', 'class' => 'bg-green-50 text-green-700'],
-                        'rejected' => ['display' => 'Rejected', 'class' => 'bg-red-50 text-red-700'],
+                        'pending' => ['display' => 'Pending Review', 'class' => 'bg-yellow-100 text-yellow-800'],
+                        'approved' => ['display' => 'Approved', 'class' => 'bg-green-100 text-green-800'],
+                        'rejected' => ['display' => 'Rejected', 'class' => 'bg-red-100 text-red-800'],
                     ];
-                    return $map[$status] ?? ['display' => $status, 'class' => 'bg-gray-50 text-gray-700'];
+                    return $map[$status] ?? ['display' => $status, 'class' => 'bg-gray-100 text-gray-800'];
                 }
 
-                if ($result->num_rows > 0) {
-                    ?>
-                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                        <table class="min-w-full divide-y divide-gray-200" role="grid" aria-label="Submissions table">
-                            <thead class="bg-gray-50">
-                            <tr>
-                                <th scope="col" class="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">Document Type</th>
-                                <th scope="col" class="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">Submission Date</th>
-                                <th scope="col" class="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">Status</th>
-                                <th scope="col" class="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
-                            </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-100">
-                            <?php while ($doc = $result->fetch_assoc()) {
-                                $submission_date = $doc['submission_date'] ? date("m-d-Y", strtotime($doc['submission_date'])) : 'N/A';
-                                $status_info = getStatusDisplay($doc['status']);
-                                ?>
-                                <tr class="hover:bg-gray-50 transition-colors duration-150" role="row">
-                                    <td class="px-6 py-4 text-sm font-medium text-gray-900" data-label="Document Type"><?php echo htmlspecialchars($doc['document_type']); ?></td>
-                                    <td class="px-6 py-4 text-sm text-gray-600" data-label="Submission Date"><?php echo htmlspecialchars($submission_date); ?></td>
-                                    <td class="px-6 py-4" data-label="Status">
-                                    <span class="inline-flex px-4 py-1.5 text-sm font-semibold rounded-full <?php echo $status_info['class']; ?>" aria-label="Status: <?php echo htmlspecialchars($status_info['display']); ?>">
-                                        <?php echo htmlspecialchars($status_info['display']); ?>
-                                    </span>
-                                    </td>
-                                    <td class="px-6 py-4 text-sm font-medium" data-label="Actions">
-                                        <div class="flex space-x-3">
-                                            <button onclick="openDocumentModal('<?php echo htmlspecialchars($doc['document_type']); ?>', '<?php echo htmlspecialchars($submission_date); ?>', '<?php echo htmlspecialchars($status_info['display']); ?>', '<?php echo htmlspecialchars($doc['description']); ?>', '<?php echo htmlspecialchars($doc['file_name']); ?>', '<?php echo $doc['id']; ?>', '<?php echo htmlspecialchars($doc['status']); ?>')"
-                                                    class="text-gray-600 hover:text-blue-600 transition-colors" aria-label="View document <?php echo htmlspecialchars($doc['document_type']); ?>">
-                                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                                </svg>
-                                            </button>
-                                            <?php if ($doc['status'] !== 'approved'): ?>
-                                                <button onclick="openEditModal('<?php echo $doc['id']; ?>', '<?php echo htmlspecialchars($doc['document_type']); ?>', '<?php echo htmlspecialchars($doc['other_type']); ?>', '<?php echo htmlspecialchars($doc['description']); ?>', '<?php echo htmlspecialchars($doc['file_name']); ?>', '<?php echo $doc['status']; ?>', '<?php echo htmlspecialchars($submission_date); ?>', null)"
-                                                        class="text-gray-600 hover:text-blue-600 transition-colors" aria-label="Edit document <?php echo htmlspecialchars($doc['document_type']); ?>">
+                if ($result->num_rows > 0) { ?>
+                    <div class="bg-white rounded-xl shadow-md p-4 sm:p-6">
+                        <!-- Improved heading and filter layout -->
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                            <h3 class="text-xl sm:text-2xl font-bold text-gray-900">Your Submissions</h3>
+                            <div class="relative w-full sm:w-auto">
+                                <select id="statusFilter" class="appearance-none bg-white border border-gray-300 rounded-lg py-2.5 px-4 pr-10 text-sm text-gray-800 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 w-full sm:w-48 transition-all duration-200">
+                                    <option value="all">All Statuses</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="approved">Approved</option>
+                                    <option value="rejected">Rejected</option>
+                                </select>
+                                <svg class="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <!-- Responsive table with improved styling -->
+                        <div class="overflow-x-auto rounded-xl border border-gray-200">
+                            <table class="min-w-full divide-y divide-gray-200" role="grid" aria-label="Submissions table">
+                                <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-4 sm:px-6 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-800 uppercase tracking-wider">Document Type</th>
+                                    <th scope="col" class="px-4 sm:px-6 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-800 uppercase tracking-wider">Submission Date</th>
+                                    <th scope="col" class="px-4 sm:px-6 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-800 uppercase tracking-wider">Status</th>
+                                    <th scope="col" class="px-4 sm:px-6 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-800 uppercase tracking-wider">Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100 bg-white">
+                                <?php while ($doc = $result->fetch_assoc()) {
+                                    $submission_date = $doc['submission_date'] ? date("m-d-Y", strtotime($doc['submission_date'])) : 'N/A';
+                                    $status_info = getStatusDisplay($doc['status']);
+                                    ?>
+                                    <tr class="hover:bg-gray-50 transition-colors duration-200" role="row">
+                                        <td class="px-4 sm:px-6 py-4 text-sm font-medium text-gray-900 sm:truncate" data-label="Document Type"><?php echo htmlspecialchars($doc['document_type']); ?></td>
+                                        <td class="px-4 sm:px-6 py-4 text-sm text-gray-600" data-label="Submission Date"><?php echo htmlspecialchars($submission_date); ?></td>
+                                        <td class="px-4 sm:px-6 py-4" data-label="Status">
+                                <span class="inline-flex px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-full <?php echo $status_info['class']; ?>" aria-label="Status: <?php echo htmlspecialchars($status_info['display']); ?>">
+                                    <?php echo htmlspecialchars($status_info['display']); ?>
+                                </span>
+                                        </td>
+                                        <td class="px-4 sm:px-6 py-4 text-sm font-medium" data-label="Actions">
+                                            <div class="flex space-x-4">
+                                                <button onclick="openDocumentModal('<?php echo htmlspecialchars($doc['document_type']); ?>', '<?php echo htmlspecialchars($submission_date); ?>', '<?php echo htmlspecialchars($status_info['display']); ?>', '<?php echo htmlspecialchars($doc['description']); ?>', '<?php echo htmlspecialchars($doc['file_name']); ?>', '<?php echo $doc['id']; ?>', '<?php echo htmlspecialchars($doc['status']); ?>')"
+                                                        class="text-gray-600 hover:text-blue-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" aria-label="View document <?php echo htmlspecialchars($doc['document_type']); ?>">
                                                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                                     </svg>
                                                 </button>
-                                            <?php endif; ?>
-                                        </div>
-                                    </td>
-                                </tr>
-                            <?php } ?>
-                            </tbody>
-                        </table>
+                                                <?php if ($doc['status'] !== 'approved'): ?>
+                                                    <button onclick="openEditModal('<?php echo $doc['id']; ?>', '<?php echo htmlspecialchars($doc['document_type']); ?>', '<?php echo htmlspecialchars($doc['other_type']); ?>', '<?php echo htmlspecialchars($doc['description']); ?>', '<?php echo htmlspecialchars($doc['file_name']); ?>', '<?php echo $doc['status']; ?>', '<?php echo htmlspecialchars($submission_date); ?>', null)"
+                                                            class="text-gray-600 hover:text-blue-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" aria-label="Edit document <?php echo htmlspecialchars($doc['document_type']); ?>">
+                                                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                        </svg>
+                                                    </button>
+                                                <?php endif; ?>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php } ?>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     <?php
                 } else {
-                    echo '<p class="text-gray-500 text-center py-6 text-lg font-medium">No submissions found.</p>';
+                    echo '<p class="text-gray-600 text-center py-8 text-lg font-semibold bg-white rounded-xl shadow-md">No submissions found.</p>';
                 }
 
-                // Clean up
+                // Clean up (unchanged)
                 $stmt->close();
                 $conn->close();
 
-                // Prepare user data for JavaScript (encoded to prevent XSS)
+                // Prepare user data for JavaScript (unchanged)
                 $user_data = [
                     'full_name' => htmlspecialchars($_SESSION['user']['full_name'] ?? 'Unknown'),
                     'student_id' => htmlspecialchars($_SESSION['user']['student_id'] ?? 'N/A')
@@ -2320,90 +2335,90 @@ tr    <?php
             </div>
 
             <!-- Edit Submission Modal -->
-            <div id="editSubmissionModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 transition-opacity duration-300 hidden" role="dialog" aria-labelledby="edit-modal-title">
-                <div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-md mx-4 sm:p-8 transform transition-all duration-300 scale-95" aria-modal="true">
+            <div id="editSubmissionModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 transition-opacity duration-300 hidden" role="dialog" aria-labelledby="edit-modal-title">
+                <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-lg mx-4 sm:p-8 transform transition-all duration-300 scale-100" aria-modal="true">
                     <div class="relative mb-6">
-                        <h2 id="edit-modal-title" class="text-xl font-bold text-gray-900">Edit Submission</h2>
-                        <p class="text-sm text-gray-500 mt-1">Update your document details</p>
-                        <button onclick="closeModal('editSubmissionModal')" class="absolute top-0 right-0 text-gray-500 hover:text-gray-700 transition-colors" aria-label="Close modal">
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <h2 id="edit-modal-title" class="text-2xl font-bold text-gray-900">Edit Submission</h2>
+                        <p class="text-sm text-gray-600 mt-1">Update your document details below</p>
+                        <button onclick="closeModal('editSubmissionModal')" class="absolute top-0 right-0 text-gray-500 hover:text-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500" aria-label="Close modal">
+                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
                         </button>
                     </div>
 
-                    <div class="flex items-center gap-3 mb-6 p-3 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200">
-                        <div class="w-10 h-10 rounded-full border-2 border-gray-300 overflow-hidden">
+                    <div class="flex items-center gap-4 mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <div class="w-12 h-12 rounded-full border-2 border-gray-300 overflow-hidden">
                             <?php if ($profile_image_data && $profile_image_type): ?>
                                 <img src="data:<?php echo htmlspecialchars($profile_image_type); ?>;base64,<?php echo base64_encode($profile_image_data); ?>"
                                      alt="Profile" class="w-full h-full object-cover">
                             <?php else: ?>
-                                <svg class="w-6 h-6 text-gray-400 mx-auto my-2" fill="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-8 h-8 text-gray-400 mx-auto my-2" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                                 </svg>
                             <?php endif; ?>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-semibold text-gray-800 truncate"><?php echo htmlspecialchars($_SESSION['user']['full_name'] ?? 'Unknown'); ?></p>
-                            <p class="text-xs text-gray-500 truncate">ID: <?php echo htmlspecialchars($_SESSION['user']['student_id'] ?? 'N/A'); ?></p>
+                            <p class="text-base font-semibold text-gray-900 truncate"><?php echo htmlspecialchars($_SESSION['user']['full_name'] ?? 'Unknown'); ?></p>
+                            <p class="text-sm text-gray-600 truncate">ID: <?php echo htmlspecialchars($_SESSION['user']['student_id'] ?? 'N/A'); ?></p>
                         </div>
                     </div>
 
                     <form id="editSubmissionForm" action="../controller/update_submission.php" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="submission_id" id="edit_submission_id">
-                        <div class="flex justify-between items-center mb-4 gap-4">
-                            <div class="flex items-center gap-2">
-                                <span class="text-sm font-medium text-gray-600">Document Type:</span>
-                                <p id="edit_document_type_display" class="text-sm font-semibold text-gray-800 truncate"></p>
+                        <div class="flex justify-between items-center mb-6 gap-4">
+                            <div class="flex items-center gap-3">
+                                <span class="text-sm font-medium text-gray-700">Document Type:</span>
+                                <p id="edit_document_type_display" class="text-sm font-semibold text-gray-900 truncate"></p>
                             </div>
-                            <div id="edit_status_display" class="text-xs px-3 py-1.5 rounded-full bg-gray-100 text-gray-700"></div>
+                            <div id="edit_status_display" class="text-xs px-3 py-1.5 rounded-full bg-gray-100 text-gray-800 font-semibold"></div>
                         </div>
 
-                        <div class="mb-4">
-                            <label for="edit_description" class="text-sm font-medium text-gray-700 block mb-1">Description</label>
-                            <span id="edit_desc_warning" class="text-xs text-red-500 hidden mb-1 block">Minimum 10 characters</span>
+                        <div class="mb-6">
+                            <label for="edit_description" class="text-sm font-medium text-gray-700 block mb-1.5">Description</label>
+                            <span id="edit_desc_warning" class="text-xs text-red-600 hidden mb-2 block">Minimum 10 characters</span>
                             <textarea id="edit_description" name="description" rows="4"
-                                      class="w-full p-3 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none bg-gray-50"
-                                      style="min-height: 100px;" required></textarea>
+                                      class="w-full p-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-all resize-none bg-white shadow-sm"
+                                      style="min-height: 120px;" required></textarea>
                         </div>
 
-                        <div class="mb-4">
-                            <label for="uploaded_file" class="text-sm font-medium text-gray-700 block mb-1">Upload New File (Optional)</label>
-                            <div class="file-upload-area border border-gray-200 rounded-xl p-4 bg-gray-50 hover:bg-gray-100 transition-colors">
+                        <div class="mb-6">
+                            <label for="uploaded_file" class="text-sm font-medium text-gray-700 block mb-1.5">Upload New File (Optional)</label>
+                            <div class="file-upload-area border border-gray-300 rounded-lg p-6 bg-white hover:bg-gray-50 transition-colors duration-200 shadow-sm">
                                 <input type="file" id="uploaded_file" name="uploaded_file" class="hidden" accept=".pdf,.doc,.docx,.jpg,.png">
                                 <label for="uploaded_file" class="file-upload-label cursor-pointer block text-center">
-                                    <div class="upload-icon-container mx-auto w-12 h-12 text-gray-500">
+                                    <div class="upload-icon-container mx-auto w-12 h-12 text-gray-600">
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" class="w-full h-full">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                                         </svg>
                                     </div>
-                                    <span class="upload-instruction block text-sm font-medium text-gray-600">Click to upload or drag and drop</span>
-                                    <span class="upload-requirements block text-xs text-gray-500">PDF, DOC, DOCX, JPG, PNG (Max 5MB)</span>
+                                    <span class="upload-instruction block text-sm font-medium text-gray-700 mt-2">Click to upload or drag and drop</span>
+                                    <span class="upload-requirements block text-xs text-gray-500 mt-1">PDF, DOC, DOCX, JPG, PNG (Max 5MB)</span>
                                 </label>
-                                <div id="file_info" class="file-info hidden mt-2 text-center">
+                                <div id="file_info" class="file-info hidden mt-3 text-center">
                                     <span class="file-info-label text-sm text-gray-600">Selected file:</span>
-                                    <span id="file_name" class="text-sm font-medium text-gray-800"></span>
+                                    <span id="file_name" class="text-sm font-medium text-gray-900"></span>
                                 </div>
-                                <span id="edit_file_warning" class="text-xs text-red-500 hidden block mt-2">Please select a valid file</span>
+                                <span id="edit_file_warning" class="text-xs text-red-600 hidden block mt-2">Please select a valid file</span>
                             </div>
                         </div>
 
-                        <div id="edit_action_buttons" class="flex flex-wrap gap-2 mb-4 justify-center"></div>
+                        <div id="edit_action_buttons" class="flex flex-wrap gap-3 mb-6 justify-center"></div>
 
                         <div class="flex justify-center items-center border-t border-gray-200 pt-4">
-                            <p class="text-xs text-gray-500">
+                            <p class="text-sm text-gray-600">
                                 <span>Submitted: </span>
-                                <span id="edit_submission_date" class="font-medium text-gray-600"></span>
+                                <span id="edit_submission_date" class="font-medium text-gray-800"></span>
                             </p>
                         </div>
 
-                        <div class="flex justify-center gap-3 mt-4">
+                        <div class="flex justify-center gap-4 mt-6">
                             <button type="button" id="resubmitButton"
-                                    class="py-2 px-6 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl text-sm font-semibold hover:from-green-600 hover:to-green-700 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed hidden">
+                                    class="py-2.5 px-6 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg text-sm font-semibold hover:from-green-700 hover:to-green-800 transition-all duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed hidden">
                                 Resubmit
                             </button>
                             <button type="submit" id="edit_submit_button"
-                                    class="py-2 px-6 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl text-sm font-semibold hover:from-blue-700 hover:to-blue-800 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                                    class="py-2.5 px-6 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg text-sm font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed">
                                 Save Changes
                             </button>
                         </div>
@@ -2412,28 +2427,28 @@ tr    <?php
             </div>
 
             <!-- File View Modal -->
-            <div id="fileViewModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 transition-opacity duration-300 hidden" role="dialog" aria-labelledby="file-view-title">
-                <div class="modal-content bg-white rounded-3xl shadow-2xl p-6 w-full max-w-3xl mx-4 flex flex-col sm:p-8 transform transition-all duration-300 scale-95">
+            <div id="fileViewModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 transition-opacity duration-300 hidden" role="dialog" aria-labelledby="file-view-title">
+                <div class="modal-content bg-white rounded-2xl shadow-xl p-6 w-full max-w-4xl mx-4 flex flex-col sm:p-8 transform transition-all duration-300 scale-100">
                     <div class="modal-header relative mb-4">
-                        <h2 id="file-view-title" class="text-xl font-bold text-gray-800">View File</h2>
-                        <button onclick="closeModal('fileViewModal')" class="modal-close-btn absolute top-0 right-0 text-gray-500 hover:text-gray-700 transition-colors" aria-label="Close modal">
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <h2 id="file-view-title" class="text-2xl font-bold text-gray-900">View File</h2>
+                        <button onclick="closeModal('fileViewModal')" class="modal-close-btn absolute top-0 right-0 text-gray-500 hover:text-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500" aria-label="Close modal">
+                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
                         </button>
                     </div>
-                    <div id="fileViewPreview" class="w-full flex-1 overflow-auto bg-gray-50 rounded-lg">
+                    <div id="fileViewPreview" class="w-full flex-1 overflow-auto bg-gray-50 rounded-lg p-4">
                         <!-- Content will be injected here -->
                     </div>
-                    <div class="modal-footer mt-4 flex justify-center gap-3 bg-gray-100 p-4 rounded-b-2xl">
-                        <a id="fileDownloadLink" href="#" class="action-btn bg-gradient-to-r from-red-600 to-red-700 text-white py-2 px-4 rounded-xl flex items-center gap-2 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 hidden">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="modal-footer mt-4 flex justify-center gap-4 bg-gray-100 p-4 rounded-b-lg">
+                        <a id="fileDownloadLink" href="#" class="action-btn bg-gradient-to-r from-red-600 to-red-700 text-white py-2.5 px-5 rounded-lg flex items-center gap-2 transition-colors duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 hidden">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                             </svg>
                             Download
                         </a>
-                        <button onclick="closeModal('fileViewModal')" class="action-btn bg-gradient-to-r from-blue-600 to-blue-700 text-white py-2 px-4 rounded-xl flex items-center gap-2 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <button onclick="closeModal('fileViewModal')" class="action-btn bg-gradient-to-r from-blue-600 to-blue-700 text-white py-2.5 px-5 rounded-lg flex items-center gap-2 transition-colors duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
                             Close
@@ -2442,13 +2457,44 @@ tr    <?php
                 </div>
             </div>
 
-            <!-- JavaScript -->
+            <!-- JavaScript (unchanged, assuming track.js handles modal interactions) -->
             <script src="../public/JAVASCRIPT/track.js"></script>
 
-
-
-
-
+            <!-- Inline CSS for responsive table (mobile stacking) -->
+            <style>
+                @media (max-width: 640px) {
+                    table {
+                        display: block;
+                    }
+                    thead {
+                        display: none;
+                    }
+                    tr {
+                        display: block;
+                        margin-bottom: 1rem;
+                        border: 1px solid #e5e7eb;
+                        border-radius: 0.5rem;
+                        padding: 1rem;
+                    }
+                    td {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        padding: 0.5rem 1rem;
+                        border-bottom: 1px solid #e5e7eb;
+                    }
+                    td:last-child {
+                        border-bottom: none;
+                    }
+                    td:before {
+                        content: attr(data-label);
+                        font-weight: 600;
+                        color: #374151;
+                        width: 40%;
+                        flex-shrink: 0;
+                    }
+                }
+            </style>
 
 
 
