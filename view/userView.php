@@ -67,6 +67,7 @@
     <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
     <link rel="stylesheet" href="../public/CSS/userStyle.css">
     <script src="../public/JAVASCRIPT/userScript.js" defer></script>
+    <script src="../public/JAVASCRIPT/track.js" defer></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 </head>
 
@@ -2205,28 +2206,12 @@
 
 
 
-        <?php elseif ($currentPage === 'Track'): ?>
-        <!-- Fixed Header -->
-        <div class="fixed top-0 left-0 right-0 bg-white shadow-md z-50 px-4 sm:px-6 lg:px-8 py-4">
-            <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <h3 class="text-xl sm:text-2xl font-bold text-gray-900">Your Submissions</h3>
-                <div class="relative w-full sm:w-auto">
-                    <select id="statusFilter" class="appearance-none bg-white border border-gray-300 rounded-lg py-2.5 px-4 pr-10 text-sm text-gray-800 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 w-full sm:w-48 transition-all duration-200">
-                        <option value="all">All Statuses</option>
-                        <option value="pending">Pending</option>
-                        <option value="approved">Approved</option>
-                        <option value="rejected">Rejected</option>
-                    </select>
-                    <svg class="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                    </svg>
-                </div>
-            </div>
-        </div>
 
-        <!-- Track Content -->
-        <div class="pt-20 sm:pt-24 lg:pt-28 px-4 sm:px-6 lg:px-8 bg-gray-100 min-h-screen">
-            <div class="max-w-7xl mx-auto">
+
+        <?php elseif ($currentPage === 'Track'): ?>
+        <!-- Track content -->
+        <div class="p-4 sm:p-6 lg:p-8 bg-gray-100 min-h-screen">
+            <div class="space-y-8 max-w-7xl mx-auto">
                 <?php
                 // Database connection using environment variables
                 $host = getenv('DB_HOST') ?: 'localhost';
@@ -2241,14 +2226,14 @@
                     }
                     $conn->set_charset("utf8mb4");
                 } catch (Exception $e) {
-                    echo '<div class="text-red-600 text-center py-8 text-lg font-semibold bg-white rounded-xl shadow-md">Database error: ' . htmlspecialchars($e->getMessage()) . '</div>';
+                    echo '<p class="text-red-600 text-center py-8 text-lg font-semibold bg-white rounded-xl shadow-md">Database error: ' . htmlspecialchars($e->getMessage()) . '</p>';
                     exit;
                 }
 
                 // Secure user ID handling
                 $user_id = isset($_SESSION['user']['id']) ? filter_var($_SESSION['user']['id'], FILTER_VALIDATE_INT) : 0;
                 if ($user_id === false || $user_id === 0) {
-                    echo '<div class="text-red-600 text-center py-8 text-lg font-semibold bg-white rounded-xl shadow-md">Invalid user session.</div>';
+                    echo '<p class="text-red-600 text-center py-8 text-lg font-semibold bg-white rounded-xl shadow-md">Invalid user session.</p>';
                     exit;
                 }
 
@@ -2264,7 +2249,7 @@
                     $stmt->execute();
                     $result = $stmt->get_result();
                 } catch (Exception $e) {
-                    echo '<div class="text-red-600 text-center py-8 text-lg font-semibold bg-white rounded-xl shadow-md">Query error: ' . htmlspecialchars($e->getMessage()) . '</div>';
+                    echo '<p class="text-red-600 text-center py-8 text-lg font-semibold bg-white rounded-xl shadow-md">Query error: ' . htmlspecialchars($e->getMessage()) . '</p>';
                     exit;
                 }
 
@@ -2283,6 +2268,7 @@
                     }
                     $profile_stmt->close();
                 } catch (Exception $e) {
+                    // Log error but don't fail the page
                     error_log("Profile image query error: " . $e->getMessage());
                 }
 
@@ -2297,45 +2283,74 @@
                 }
 
                 if ($result->num_rows > 0) { ?>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <?php while ($doc = $result->fetch_assoc()) {
-                            $submission_date = $doc['submission_date'] ? date("m-d-Y", strtotime($doc['submission_date'])) : 'N/A';
-                            $status_info = getStatusDisplay($doc['status']);
-                            ?>
-                            <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-200">
-                                <div class="flex justify-between items-start mb-4">
-                                    <h4 class="text-lg font-semibold text-gray-900 truncate"><?php echo htmlspecialchars($doc['document_type']); ?></h4>
-                                    <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full <?php echo htmlspecialchars($status_info['class']); ?>">
-                                <?php echo htmlspecialchars($status_info['display']); ?>
-                            </span>
-                                </div>
-                                <p class="text-sm text-gray-600 mb-2"><span class="font-medium">Submitted:</span> <?php echo htmlspecialchars($submission_date); ?></p>
-                                <p class="text-sm text-gray-600 line-clamp-2 mb-4"><?php echo htmlspecialchars($doc['description']); ?></p>
-                                <div class="flex justify-end gap-3">
-                                    <button onclick="openDocumentModal('<?php echo htmlspecialchars(json_encode($doc['document_type'])); ?>', '<?php echo htmlspecialchars(json_encode($submission_date)); ?>', '<?php echo htmlspecialchars(json_encode($status_info['display'])); ?>', '<?php echo htmlspecialchars(json_encode($doc['description'])); ?>', '<?php echo htmlspecialchars(json_encode($doc['file_name'])); ?>', '<?php echo htmlspecialchars(json_encode($doc['id'])); ?>', '<?php echo htmlspecialchars(json_encode($doc['status'])); ?>')"
-                                            class="text-gray-600 hover:text-blue-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                                            aria-label="View document <?php echo htmlspecialchars($doc['document_type']); ?>">
-                                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                        </svg>
-                                    </button>
-                                    <?php if ($doc['status'] !== 'approved'): ?>
-                                        <button onclick="openEditModal('<?php echo htmlspecialchars(json_encode($doc['id'])); ?>', '<?php echo htmlspecialchars(json_encode($doc['document_type'])); ?>', '<?php echo htmlspecialchars(json_encode($doc['other_type'])); ?>', '<?php echo htmlspecialchars(json_encode($doc['description'])); ?>', '<?php echo htmlspecialchars(json_encode($doc['file_name'])); ?>', '<?php echo htmlspecialchars(json_encode($doc['status'])); ?>', '<?php echo htmlspecialchars(json_encode($submission_date)); ?>')"
-                                                class="text-gray-600 hover:text-blue-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                                                aria-label="Edit document <?php echo htmlspecialchars($doc['document_type']); ?>">
-                                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                            </svg>
-                                        </button>
-                                    <?php endif; ?>
-                                </div>
+                    <div class="bg-white rounded-xl shadow-md p-4 sm:p-6">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                            <h3 class="text-xl sm:text-2xl font-bold text-gray-900">Your Submissions</h3>
+                            <div class="relative w-full sm:w-auto">
+                                <select id="statusFilter" class="appearance-none bg-white border border-gray-300 rounded-lg py-2.5 px-4 pr-10 text-sm text-gray-800 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 w-full sm:w-48 transition-all duration-200">
+                                    <option value="all">All Statuses</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="approved">Approved</option>
+                                    <option value="rejected">Rejected</option>
+                                </select>
+                                <svg class="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                </svg>
                             </div>
-                        <?php } ?>
+                        </div>
+                        <div class="overflow-x-auto rounded-xl border border-gray-200">
+                            <!-- Add aria-live region for accessibility -->
+                            <div id="filterStatus" class="sr-only" aria-live="polite"></div>
+                            <table class="min-w-full divide-y divide-gray-200" role="grid" aria-label="Submissions table">
+                                <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-4 sm:px-6 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-800 uppercase tracking-wider">Document Type</th>
+                                    <th scope="col" class="px-4 sm:px-6 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-800 uppercase tracking-wider">Submission Date</th>
+                                    <th scope="col" class="px-4 sm:px-6 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-800 uppercase tracking-wider">Status</th>
+                                    <th scope="col" class="px-4 sm:px-6 py-3.5 text-left text-xs sm:text-sm font-semibold text-gray-800 uppercase tracking-wider">Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100 bg-white">
+                                <?php while ($doc = $result->fetch_assoc()) {
+                                    $submission_date = $doc['submission_date'] ? date("m-d-Y", strtotime($doc['submission_date'])) : 'N/A';
+                                    $status_info = getStatusDisplay($doc['status']);
+                                    ?>
+                                    <tr class="hover:bg-gray-50 transition-colors duration-200" role="row">
+                                        <td class="px-4 sm:px-6 py-4 text-sm font-medium text-gray-900 sm:truncate" data-label="Document Type"><?php echo htmlspecialchars($doc['document_type']); ?></td>
+                                        <td class="px-4 sm:px-6 py-4 text-sm text-gray-600" data-label="Submission Date"><?php echo htmlspecialchars($submission_date); ?></td>
+                                        <td class="px-4 sm:px-6 py-4" data-label="Status">
+                                    <span class="inline-flex px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-full <?php echo htmlspecialchars($status_info['class']); ?>" data-status="<?php echo htmlspecialchars($doc['status']); ?>" aria-label="Status: <?php echo htmlspecialchars($status_info['display']); ?>">
+                                        <?php echo htmlspecialchars($status_info['display']); ?>
+                                    </span>
+                                        </td>
+                                        <td class="px-4 sm:px-6 py-4 text-sm font-medium" data-label="Actions">
+                                            <div class="flex space-x-4">
+                                                <button onclick="openDocumentModal('<?php echo htmlspecialchars(json_encode($doc['document_type'])); ?>', '<?php echo htmlspecialchars(json_encode($submission_date)); ?>', '<?php echo htmlspecialchars(json_encode($status_info['display'])); ?>', '<?php echo htmlspecialchars(json_encode($doc['description'])); ?>', '<?php echo htmlspecialchars(json_encode($doc['file_name'])); ?>', '<?php echo htmlspecialchars(json_encode($doc['id'])); ?>', '<?php echo htmlspecialchars(json_encode($doc['status'])); ?>')"
+                                                        class="text-gray-600 hover:text-blue-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" aria-label="View document <?php echo htmlspecialchars($doc['document_type']); ?>">
+                                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                                    </svg>
+                                                </button>
+                                                <?php if ($doc['status'] !== 'approved'): ?>
+                                                    <button onclick="openEditModal('<?php echo htmlspecialchars(json_encode($doc['id'])); ?>', '<?php echo htmlspecialchars(json_encode($doc['document_type'])); ?>', '<?php echo htmlspecialchars(json_encode($doc['other_type'])); ?>', '<?php echo htmlspecialchars(json_encode($doc['description'])); ?>', '<?php echo htmlspecialchars(json_encode($doc['file_name'])); ?>', '<?php echo htmlspecialchars(json_encode($doc['status'])); ?>', '<?php echo htmlspecialchars(json_encode($submission_date)); ?>')"
+                                                            class="text-gray-600 hover:text-blue-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" aria-label="Edit document <?php echo htmlspecialchars($doc['document_type']); ?>">
+                                                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                        </svg>
+                                                    </button>
+                                                <?php endif; ?>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php } ?>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     <?php
                 } else {
-                    echo '<div class="text-gray-600 text-center py-8 text-lg font-semibold bg-white rounded-xl shadow-md">No submissions found.</div>';
+                    echo '<p class="text-gray-600 text-center py-8 text-lg font-semibold bg-white rounded-xl shadow-md">No submissions found.</p>';
                 }
 
                 // Clean up
@@ -2354,7 +2369,7 @@
             </div>
 
             <!-- Edit Submission Modal -->
-            <div id="editSubmissionModal" class="fixed inset-0 z-60 flex items-center justify-center bg-black bg-opacity-70 transition-opacity duration-300 hidden" role="dialog" aria-labelledby="edit-modal-title">
+            <div id="editSubmissionModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 transition-opacity duration-300 hidden" role="dialog" aria-labelledby="edit-modal-title">
                 <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-lg mx-4 sm:p-8 transform transition-all duration-300 scale-100" aria-modal="true">
                     <div class="relative mb-6">
                         <h2 id="edit-modal-title" class="text-2xl font-bold text-gray-900">Edit Submission</h2>
@@ -2448,11 +2463,11 @@
             </div>
 
             <!-- File View Modal -->
-            <div id="fileViewModal" class="fixed inset-0 z-60 flex items-center justify-center bg-black bg-opacity-70 transition-opacity duration-300 hidden" role="dialog" aria-labelledby="file-view-title">
-                <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-4xl mx-4 sm:p-8 transform transition-all duration-300 scale-100">
-                    <div class="relative mb-6">
+            <div id="fileViewModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 transition-opacity duration-300 hidden" role="dialog" aria-labelledby="file-view-title">
+                <div class="modal-content bg-white rounded-2xl shadow-xl p-6 w-full max-w-4xl mx-4 flex flex-col sm:p-8 transform transition-all duration-300 scale-100">
+                    <div class="modal-header relative mb-4">
                         <h2 id="file-view-title" class="text-2xl font-bold text-gray-900">View Submission</h2>
-                        <button onclick="closeModal('fileViewModal')" class="absolute top-0 right-0 text-gray-500 hover:text-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500" aria-label="Close modal">
+                        <button onclick="closeModal('fileViewModal')" class="modal-close-btn absolute top-0 right-0 text-gray-500 hover:text-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500" aria-label="Close modal">
                             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
@@ -2464,19 +2479,19 @@
                         <p class="text-sm text-gray-600 mb-2"><span class="font-medium">Submitted:</span> <span id="modal_submission_date"></span></p>
                         <p class="text-sm text-gray-600 mb-4"><span class="font-medium">Description:</span> <span id="modal_description"></span></p>
                     </div>
-                    <div id="fileViewPreview" class="w-full overflow-auto bg-gray-50 rounded-lg p-4 min-h-[300px]">
+                    <div id="fileViewPreview" class="w-full flex-1 overflow-auto bg-gray-50 rounded-lg p-4 min-h-[300px]">
                         <div id="previewContent" class="w-full h-full flex items-center justify-center">
                             <!-- Preview will be injected here -->
                         </div>
                     </div>
-                    <div class="mt-6 flex justify-center gap-4">
-                        <a id="fileDownloadLink" href="#" download class="py-2.5 px-5 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg flex items-center gap-2 transition-colors duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2">
+                    <div class="modal-footer mt-4 flex justify-center gap-4 bg-gray-100 p-4 rounded-b-lg">
+                        <a id="fileDownloadLink" href="#" download class="action-btn bg-gradient-to-r from-red-600 to-red-700 text-white py-2.5 px-5 rounded-lg flex items-center gap-2 transition-colors duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                             </svg>
                             Download
                         </a>
-                        <button onclick="closeModal('fileViewModal')" class="py-2.5 px-5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg flex items-center gap-2 transition-colors duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2">
+                        <button onclick="closeModal('fileViewModal')" class="action-btn bg-gradient-to-r from-blue-600 to-blue-700 text-white py-2.5 px-5 rounded-lg flex items-center gap-2 transition-colors duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
@@ -2486,36 +2501,44 @@
                 </div>
             </div>
 
-            <!-- Inline CSS -->
+            <!-- Inline CSS for responsive table -->
             <style>
-                /* Fixed header */
-                .fixed {
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    z-index: 50;
-                }
-
-                /* Card grid */
-                .grid {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-                    gap: 1.5rem;
-                }
-
-                /* Line clamp for description */
-                .line-clamp-2 {
-                    display: -webkit-box;
-                    -webkit-line-clamp: 2;
-                    -webkit-box-orient: vertical;
-                    overflow: hidden;
-                }
-
-                /* Responsive adjustments */
                 @media (max-width: 640px) {
-                    .grid {
-                        grid-template-columns: 1fr;
+                    table {
+                        display: block;
+                    }
+                    thead {
+                        display: none;
+                    }
+                    tr {
+                        display: block;
+                        margin-bottom: 1rem;
+                        border: 1px solid #e5e7eb;
+                        border-radius: 0.5rem;
+                        padding: 1rem;
+                    }
+                    td {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        padding: 0.5rem 1rem;
+                        border-bottom: 1px solid #e5e7eb;
+                    }
+                    td:last-child {
+                        border-bottom: none;
+                    }
+                    td:before {
+                        content: attr(data-label);
+                        font-weight: 600;
+                        color: #374151;
+                        width: 40%;
+                        flex-shrink: 0;
+                    }
+                    .file-upload-area {
+                        position: relative;
+                    }
+                    .file-upload-label {
+                        display: block;
                     }
                 }
             </style>
@@ -2524,10 +2547,12 @@
             <script>
                 function closeModal(modalId) {
                     document.getElementById(modalId).classList.add('hidden');
+                    // Clear preview content to prevent memory issues
                     const previewContent = document.getElementById('previewContent');
                     if (previewContent) {
                         previewContent.innerHTML = '';
                     }
+                    // Clear error message
                     const errorMessage = document.getElementById('form_error_message');
                     if (errorMessage) {
                         errorMessage.classList.add('hidden');
@@ -2542,12 +2567,14 @@
                     document.getElementById('edit_description').value = description;
                     document.getElementById('edit_status_display').textContent = status;
                     document.getElementById('edit_submission_date').textContent = submissionDate;
+
                     const statusClasses = {
                         'pending': 'bg-yellow-100 text-yellow-800',
                         'approved': 'bg-green-100 text-green-800',
                         'rejected': 'bg-red-100 text-red-800'
                     };
                     document.getElementById('edit_status_display').className = `text-xs px-3 py-1.5 rounded-full font-semibold ${statusClasses[status.toLowerCase()] || 'bg-gray-100 text-gray-800'}`;
+
                     modal.classList.remove('hidden');
                 }
 
@@ -2555,13 +2582,19 @@
                     const modal = document.getElementById('fileViewModal');
                     const previewContent = document.getElementById('previewContent');
                     const downloadLink = document.getElementById('fileDownloadLink');
+
+                    // Update modal metadata
                     document.getElementById('modal_document_type').textContent = documentType;
                     document.getElementById('modal_status').textContent = status;
                     document.getElementById('modal_submission_date').textContent = submissionDate;
                     document.getElementById('modal_description').textContent = description;
+
+                    // Determine file extension
                     const extension = fileName.split('.').pop().toLowerCase();
                     const fileUrl = `../controller/download_submission.php?id=${encodeURIComponent(id)}`;
                     const downloadUrl = `../controller/download_submission.php?id=${encodeURIComponent(id)}&download=true`;
+
+                    // Generate preview based on file type
                     if (['jpg', 'jpeg', 'png'].includes(extension)) {
                         previewContent.innerHTML = `
                     <img src="${fileUrl}" alt="File preview" class="max-w-full max-h-[500px] object-contain" onerror="this.src='';this.parentElement.innerHTML='<p class=\\'text-gray-600\\'>Unable to load image preview</p>'">
@@ -2577,17 +2610,22 @@
                     <p class="text-gray-600">Preview not available for this file type. Use the download button to access the file.</p>
                 `;
                     }
+
+                    // Set download link
                     downloadLink.href = downloadUrl;
                     downloadLink.setAttribute('download', fileName);
                     downloadLink.classList.remove('hidden');
+
                     modal.classList.remove('hidden');
                 }
 
+                // File upload validation
                 document.getElementById('uploaded_file').addEventListener('change', function(e) {
                     const file = e.target.files[0];
                     const fileInfo = document.getElementById('file_info');
                     const fileName = document.getElementById('file_name');
                     const warning = document.getElementById('edit_file_warning');
+
                     if (file) {
                         const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'image/jpeg', 'image/png'];
                         if (!validTypes.includes(file.type)) {
@@ -2610,30 +2648,45 @@
                     }
                 });
 
+                // Status filter
                 document.getElementById('statusFilter').addEventListener('change', function(e) {
-                    const cards = document.querySelectorAll('.grid > div');
+                    const rows = document.querySelectorAll('tbody tr');
                     const filter = e.target.value.toLowerCase();
-                    cards.forEach(card => {
-                        const status = card.querySelector('span').textContent.toLowerCase().replace(' review', '');
-                        card.style.display = (filter === 'all' || status === filter) ? '' : 'none';
+                    const filterStatus = document.getElementById('filterStatus');
+
+                    // Update aria-live region for accessibility
+                    const statusText = filter === 'all' ? 'Showing all submissions' : `Showing ${filter} submissions`;
+                    filterStatus.textContent = statusText;
+
+                    rows.forEach(row => {
+                        const status = row.querySelector('td[data-label="Status"] span').getAttribute('data-status').toLowerCase();
+                        row.style.display = (filter === 'all' || status === filter) ? '' : 'none';
                     });
                 });
 
+                // Form submission with AJAX
                 document.getElementById('editSubmissionForm').addEventListener('submit', function(e) {
                     e.preventDefault();
+
                     const description = document.getElementById('edit_description').value;
                     const warning = document.getElementById('edit_desc_warning');
                     const errorMessage = document.getElementById('form_error_message');
                     const submitButton = document.getElementById('edit_submit_button');
+
+                    // Client-side description validation
                     if (description.length < 10) {
                         warning.classList.remove('hidden');
                         errorMessage.classList.add('hidden');
                         return;
                     }
                     warning.classList.add('hidden');
+
+                    // Disable submit button to prevent multiple submissions
                     submitButton.disabled = true;
                     submitButton.textContent = 'Saving...';
+
                     const formData = new FormData(this);
+
                     fetch('../controller/update_submission.php', {
                         method: 'POST',
                         body: formData
@@ -2641,8 +2694,10 @@
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
+                                // Redirect to Track page on success
                                 window.location.href = '../SportsOfficeAIM/view/userView.php?page=Track';
                             } else {
+                                // Display error message
                                 errorMessage.textContent = data.message || 'An error occurred';
                                 errorMessage.classList.remove('hidden');
                                 submitButton.disabled = false;
@@ -2650,6 +2705,7 @@
                             }
                         })
                         .catch(error => {
+                            // Handle network or other errors
                             errorMessage.textContent = 'Network error: Unable to update submission';
                             errorMessage.classList.remove('hidden');
                             submitButton.disabled = false;
@@ -2658,6 +2714,16 @@
                         });
                 });
             </script>
+
+
+
+
+
+
+
+
+
+
 
 
 
