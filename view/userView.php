@@ -670,7 +670,7 @@ tr    <?php
                                             <input type="text" id="year_section" name="year_section"
                                                    value="<?php echo htmlspecialchars($_SESSION['user']['year_section'] ?? ''); ?>"
                                                    class="w-full px-3 py-2 md:px-4 md:py-2.5 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                                   placeholder="e.g., BSIT 3-A (Optional)">
+                                                   placeholder="Ex: 1IT-BSIT">
                                         </div>
 
 
