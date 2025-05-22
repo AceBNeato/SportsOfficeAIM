@@ -84,6 +84,7 @@
                     <option value="Taekwondo">Taekwondo</option>
                     <option value="Tennis">Tennis</option>
                     <option value="Volleyball">Volleyball</option>
+                    <option value="ESports">Wrestling</option>
                 </select>
                 <select name="campus">
                     <option value="" disabled selected>Select Campus (Optional)</option>

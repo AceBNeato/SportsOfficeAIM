@@ -1,6 +1,5 @@
 <?php
 
-//NIGANGIANGIANGINAIGNIANG
 class Database {
     private static $instance = null;
     private $conn;
@@ -230,15 +229,16 @@ $action = $_GET['action'] ?? '';
         }
 
         // Search and fetch users function
-        function fetchUsers($searchTerm, $sport, $campus, $conn, $page = 1, $perPage = 10) {
+        function fetchUsers($searchTerm, $sport, $campus, $status, $conn, $page = 1, $perPage = 10) {
             $offset = ($page - 1) * $perPage;
             $searchTerm = trim($searchTerm);
             $sport = trim($sport);
             $campus = trim($campus);
+            $status = trim($status);
 
             // Build base query
             $query = "
-            SELECT u.id, u.student_id, u.full_name, u.address, u.sport, u.campus, ui.image, ui.image_type
+            SELECT u.id, u.student_id, u.full_name, u.address, u.sport, u.campus, u.status, ui.image, ui.image_type
             FROM users u
             LEFT JOIN user_images ui ON u.id = ui.user_id
             WHERE 1=1
@@ -265,6 +265,12 @@ $action = $_GET['action'] ?? '';
             if (!empty($campus)) {
                 $query .= " AND u.campus = ?";
                 $params[] = $campus;
+                $types .= "s";
+            }
+
+            if (!empty($status)) {
+                $query .= " AND u.status = ?";
+                $params[] = $status;
                 $types .= "s";
             }
 
@@ -313,6 +319,12 @@ $action = $_GET['action'] ?? '';
                 $countTypes .= "s";
             }
 
+            if (!empty($status)) {
+                $countQuery .= " AND status = ?";
+                $countParams[] = $status;
+                $countTypes .= "s";
+            }
+
             $countStmt = $conn->prepare($countQuery);
             if ($countStmt) {
                 if (!empty($countParams)) {
@@ -332,11 +344,12 @@ $action = $_GET['action'] ?? '';
         $searchTerm = isset($_GET['search']) ? trim($_GET['search']) : '';
         $sport = isset($_GET['sport']) ? trim($_GET['sport']) : '';
         $campus = isset($_GET['campus']) ? trim($_GET['campus']) : '';
+        $status = isset($_GET['status']) ? trim($_GET['status']) : '';
         $page = isset($_GET['page_num']) ? max(1, (int)$_GET['page_num']) : 1;
         $perPage = 10;
 
         // Fetch users
-        $result = fetchUsers($searchTerm, $sport, $campus, $conn, $page, $perPage);
+        $result = fetchUsers($searchTerm, $sport, $campus, $status, $conn, $page, $perPage);
         $users = $result['users'];
         $totalUsers = $result['total'];
         $totalPages = ceil($totalUsers / $perPage);
@@ -384,6 +397,16 @@ $action = $_GET['action'] ?? '';
                         <option value="Mabini" <?php echo $campus === 'Mabini' ? 'selected' : ''; ?>>Mabini</option>
                     </select>
                 </div>
+                <div class="flex-1 w-full">
+                    <select
+                            name="status"
+                            class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-sm bg-white"
+                    >
+                        <option value="" <?php echo empty($status) ? 'selected' : ''; ?>>Select Status (Optional)</option>
+                        <option value="undergraduate" <?php echo $status === 'undergraduate' ? 'selected' : ''; ?>>Undergraduate</option>
+                        <option value="alumni" <?php echo $status === 'alumni' ? 'selected' : ''; ?>>Alumni</option>
+                    </select>
+                </div>
                 <button
                         type="submit"
                         class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 transition-colors text-sm"
@@ -402,7 +425,8 @@ $action = $_GET['action'] ?? '';
                 <div class="col-span-2">Student Name</div>
                 <div class="col-span-2">Sport</div>
                 <div class="col-span-2">Campus</div>
-                <div class="col-span-2">Address</div>
+                <div class="col-span-1">Status</div>
+
             </div>
 
             <!-- Results -->
@@ -443,15 +467,16 @@ $action = $_GET['action'] ?? '';
                                 <span class="block sm:hidden font-medium text-gray-600 text-xs">Campus:</span>
                                 <?php echo htmlspecialchars($row['campus'] ?? 'N/A'); ?>
                             </div>
-                            <div class="col-span-1 sm:col-span-2 flex items-center">
-                                <span class="block sm:hidden font-medium text-gray-600 text-xs">Address:</span>
-                                <?php echo htmlspecialchars($row['address'] ?? 'N/A'); ?>
+                            <div class="col-span-1 sm:col-span-1 flex items-center">
+                                <span class="block sm:hidden font-medium text-gray-600 text-xs">Status:</span>
+                                <?php echo htmlspecialchars(ucfirst($row['status'] ?? 'N/A')); ?>
                             </div>
+
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
                     <div class="text-center py-8 text-gray-500 font-medium text-sm">
-                        <?php echo ($searchTerm || $sport || $campus) ? 'No students found matching your search.' : 'No students available.'; ?>
+                        <?php echo ($searchTerm || $sport || $campus || $status) ? 'No students found matching your search.' : 'No students available.'; ?>
                     </div>
                 <?php endif; ?>
             </div>
@@ -476,6 +501,17 @@ $action = $_GET['action'] ?? '';
                 </div>
             <?php endif; ?>
         </div>
+
+
+
+
+
+
+
+
+
+
+
 
         <style>
             /* Base styles */

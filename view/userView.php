@@ -2198,25 +2198,30 @@ tr    <?php
 
 
 
-
         <?php elseif ($currentPage === 'Track'): ?>
         <!-- Track content -->
         <div class="p-4 sm:p-6 lg:p-8 bg-gray-100 min-h-screen">
             <div class="space-y-8 max-w-7xl mx-auto">
                 <?php
-                // Database connection (unchanged, but consider using environment variables for security)
-                $host = "localhost";
-                $username = "root";
-                $password = "";
-                $dbname = "SportOfficeDB";
+                // Database connection using environment variables
+                $host = getenv('DB_HOST') ?: 'localhost';
+                $username = getenv('DB_USER') ?: 'root';
+                $password = getenv('DB_PASS') ?: '';
+                $dbname = getenv('DB_NAME') ?: 'SportOfficeDB';
 
                 $conn = new mysqli($host, $username, $password, $dbname);
                 if ($conn->connect_error) {
                     die("Connection failed: " . mysqli_escape_string($conn, $conn->connect_error));
                 }
 
-                // Fetch submissions for the logged-in user (unchanged)
-                $user_id = isset($_SESSION['user']['id']) ? (int)$_SESSION['user']['id'] : 0;
+                // Secure user ID handling
+                $user_id = isset($_SESSION['user']['id']) ? filter_var($_SESSION['user']['id'], FILTER_VALIDATE_INT) : 0;
+                if ($user_id === false || $user_id === 0) {
+                    echo '<p class="text-red-600 text-center py-8 text-lg font-semibold bg-white rounded-xl shadow-md">Invalid user session.</p>';
+                    exit;
+                }
+
+                // Fetch submissions
                 $stmt = $conn->prepare("
             SELECT id, document_type, submission_date, status, description, file_name, other_type 
             FROM submissions 
@@ -2227,7 +2232,7 @@ tr    <?php
                 $stmt->execute();
                 $result = $stmt->get_result();
 
-                // Fetch user profile image (unchanged)
+                // Fetch user profile image
                 $profile_image_data = null;
                 $profile_image_type = null;
                 $profile_stmt = $conn->prepare("SELECT image, image_type FROM user_images WHERE user_id = ? ORDER BY uploaded_at DESC LIMIT 1");
@@ -2241,7 +2246,7 @@ tr    <?php
                 }
                 $profile_stmt->close();
 
-                // Function to map status to display text and Tailwind classes (updated colors for better contrast)
+                // Status display mapping
                 function getStatusDisplay($status) {
                     $map = [
                         'pending' => ['display' => 'Pending Review', 'class' => 'bg-yellow-100 text-yellow-800'],
@@ -2253,7 +2258,6 @@ tr    <?php
 
                 if ($result->num_rows > 0) { ?>
                     <div class="bg-white rounded-xl shadow-md p-4 sm:p-6">
-                        <!-- Improved heading and filter layout -->
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                             <h3 class="text-xl sm:text-2xl font-bold text-gray-900">Your Submissions</h3>
                             <div class="relative w-full sm:w-auto">
@@ -2268,7 +2272,6 @@ tr    <?php
                                 </svg>
                             </div>
                         </div>
-                        <!-- Responsive table with improved styling -->
                         <div class="overflow-x-auto rounded-xl border border-gray-200">
                             <table class="min-w-full divide-y divide-gray-200" role="grid" aria-label="Submissions table">
                                 <thead class="bg-gray-50">
@@ -2288,9 +2291,9 @@ tr    <?php
                                         <td class="px-4 sm:px-6 py-4 text-sm font-medium text-gray-900 sm:truncate" data-label="Document Type"><?php echo htmlspecialchars($doc['document_type']); ?></td>
                                         <td class="px-4 sm:px-6 py-4 text-sm text-gray-600" data-label="Submission Date"><?php echo htmlspecialchars($submission_date); ?></td>
                                         <td class="px-4 sm:px-6 py-4" data-label="Status">
-                                <span class="inline-flex px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-full <?php echo $status_info['class']; ?>" aria-label="Status: <?php echo htmlspecialchars($status_info['display']); ?>">
-                                    <?php echo htmlspecialchars($status_info['display']); ?>
-                                </span>
+                                        <span class="inline-flex px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-full <?php echo $status_info['class']; ?>" aria-label="Status: <?php echo htmlspecialchars($status_info['display']); ?>">
+                                            <?php echo htmlspecialchars($status_info['display']); ?>
+                                        </span>
                                         </td>
                                         <td class="px-4 sm:px-6 py-4 text-sm font-medium" data-label="Actions">
                                             <div class="flex space-x-4">
@@ -2322,16 +2325,19 @@ tr    <?php
                     echo '<p class="text-gray-600 text-center py-8 text-lg font-semibold bg-white rounded-xl shadow-md">No submissions found.</p>';
                 }
 
-                // Clean up (unchanged)
+                // Clean up
                 $stmt->close();
                 $conn->close();
 
-                // Prepare user data for JavaScript (unchanged)
+                // Prepare user data for JavaScript
                 $user_data = [
                     'full_name' => htmlspecialchars($_SESSION['user']['full_name'] ?? 'Unknown'),
                     'student_id' => htmlspecialchars($_SESSION['user']['student_id'] ?? 'N/A')
                 ];
                 ?>
+                <script>
+                    const userData = <?php echo json_encode($user_data); ?>;
+                </script>
             </div>
 
             <!-- Edit Submission Modal -->
@@ -2457,10 +2463,7 @@ tr    <?php
                 </div>
             </div>
 
-            <!-- JavaScript (unchanged, assuming track.js handles modal interactions) -->
-            <script src="../public/JAVASCRIPT/track.js"></script>
-
-            <!-- Inline CSS for responsive table (mobile stacking) -->
+            <!-- Inline CSS for responsive table -->
             <style>
                 @media (max-width: 640px) {
                     table {
@@ -2493,11 +2496,18 @@ tr    <?php
                         width: 40%;
                         flex-shrink: 0;
                     }
+                    .file-upload-area {
+                        position: relative;
+                    }
+                    .file-upload-label {
+                        display: block;
+                    }
                 }
             </style>
 
-
-
+            <!-- JavaScript -->
+            <script src="../public/JAVASCRIPT/track.js"></script>
+      
 
 
 
