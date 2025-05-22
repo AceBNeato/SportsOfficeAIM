@@ -137,7 +137,7 @@ $sql = "CREATE TABLE IF NOT EXISTS achievements (
     community_impact VARCHAR(50),
     completeness_of_documents VARCHAR(50),
     total_points INT NOT NULL,
-    submission_date DATETIME NOT NULL,
+    submission_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     status ENUM('Pending', 'Approved', 'Rejected') DEFAULT 'Pending',
     rejection_reason TEXT,
     documents TEXT, -- To store JSON array of file paths
@@ -149,6 +149,22 @@ if (!$conn->query($sql)) {
 } else {
     error_log("Achievements table created or already exists");
 }
+
+
+$sql = "CREATE TABLE IF NOT EXISTS leaderboard (
+    user_id INT PRIMARY KEY,
+    total_points INT DEFAULT 0,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+)";
+if (!$conn->query($sql)) {
+    error_log("Error creating achievements table: " . $conn->error);
+    die("Error creating achievements leaderboard: " . $conn->error);
+} else {
+    error_log("Achievements leaderboard created or already exists");
+}
+
+
+
 
 // 11. Insert sample admin
 $fullName = "Gian Glen Vincent Garcia";

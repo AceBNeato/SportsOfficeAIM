@@ -603,493 +603,434 @@ $action = $_GET['action'] ?? '';
 
 
 
+        <?php
+        if (!isset($_SESSION['csrf_token'])) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        }
+        ?>
         <?php elseif ($currentPage === 'Achievement'): ?>
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" style="padding-top: 1rem;">
-                <div class="bg-white shadow-md rounded-lg overflow-hidden">
-                    <!-- Header -->
-                    <header class="bg-gradient-to-r from-red-600 to-orange-500 shadow-md rounded-lg p-8 mb-8" style="margin: 0;">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h1 class="text-3xl font-bold text-white">Award Recognition</h1>
-                                <p class="text-white text-base mt-1 opacity-80">One Data. One USeP.</p>
-                            </div>
-                            <img src="../public/image/Usep.png" alt="USeP Logo" class="h-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" style="padding-top: 1rem;">
+            <div class="bg-white shadow-md rounded-lg overflow-hidden">
+                <!-- Header -->
+                <header class="bg-gradient-to-r from-red-600 to-orange-500 shadow-md rounded-lg p-8 mb-8" style="margin: 0;">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h1 class="text-3xl font-bold text-white">Award Recognition</h1>
+                            <p class="text-white text-base mt-1 opacity-80">One Data. One USeP.</p>
                         </div>
-                    </header>
+                        <img src="../public/image/Usep.png" alt="USeP Logo" class="h-16">
+                    </div>
+                </header>
 
-                    <!-- Campus Leaderboard -->
-                    <section class="p-8">
-                        <h2 class="text-xl font-bold mb-4">Campus Leaderboard</h2>
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Athlete Name</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Points</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rank</th>
-                                </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                <?php
-                                $host = "localhost";
-                                $username = "root";
-                                $password = "";
-                                $dbname = "SportOfficeDB";
+                <!-- Campus Leaderboard -->
+                <section class="p-8">
+                    <h2 class="text-xl font-bold mb-4">Campus Leaderboard</h2>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Athlete Name</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Points</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rank</th>
+                            </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                            <?php
+                            $host = "localhost";
+                            $username = "root";
+                            $password = "";
+                            $dbname = "SportOfficeDB";
 
-                                $conn = new mysqli($host, $username, $password, $dbname);
-                                if ($conn->connect_error) {
-                                    echo '<tr><td colspan="3" class="px-6 py-4 text-sm text-gray-500 text-center">Database connection failed</td></tr>';
-                                } else {
-                                    $result = $conn->query("CALL GetLeaderboard()");
-                                    if ($result) {
-                                        $leaderboard = [];
-                                        while ($row = $result->fetch_assoc()) {
-                                            $leaderboard[] = $row;
-                                        }
-                                        if (count($leaderboard) > 0) {
-                                            foreach ($leaderboard as $index => $athlete) {
-                                                echo '<tr>';
-                                                echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">' . htmlspecialchars($athlete['athlete_name'] ?? 'N/A') . '</td>';
-                                                echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">' . htmlspecialchars($athlete['total_points'] ?? '0') . '</td>';
-                                                echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">' . ($index + 1) . '</td>';
-                                                echo '</tr>';
-                                            }
-                                        } else {
-                                            echo '<tr><td colspan="3" class="px-6 py-4 text-sm text-gray-500 text-center">No leaderboard data available</td></tr>';
-                                        }
-                                    } else {
-                                        echo '<tr><td colspan="3" class="px-6 py-4 text-sm text-gray-500 text-center">Failed to load leaderboard</td></tr>';
+                            $conn = new mysqli($host, $username, $password, $dbname);
+                            if ($conn->connect_error) {
+                                echo '<tr><td colspan="3" class="px-6 py-4 text-sm text-gray-500 text-center">Database connection failed</td></tr>';
+                            } else {
+                                $result = $conn->query("CALL GetLeaderboard()");
+                                if ($result) {
+                                    $leaderboard = [];
+                                    while ($row = $result->fetch_assoc()) {
+                                        $leaderboard[] = $row;
                                     }
-                                    $conn->close();
-                                }
-                                ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    </section>
-
-                    <!-- Compact Filter Section with Search Bar -->
-                    <section class="p-8 border-t border-gray-200">
-                        <h2 class="text-xl font-semibold text-gray-800 mb-4">Filter Achievements</h2>
-                        <form method="GET" action="../view/adminView.php" class="flex flex-col sm:flex-row gap-4 items-end">
-                            <input type="hidden" name="page" value="Achievement">
-                            <div class="w-full sm:w-auto">
-                                <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Search by Athlete Name</label>
-                                <input type="text" id="search" name="search" value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>" placeholder="Enter athlete name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500">
-                            </div>
-                            <div class="w-full sm:w-auto">
-                                <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                                <select id="status" name="status" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500">
-                                    <option value="">All</option>
-                                    <option value="undergraduate" <?php echo isset($_GET['status']) && $_GET['status'] === 'undergraduate' ? 'selected' : ''; ?>>Undergraduate</option>
-                                    <option value="alumni" <?php echo isset($_GET['status']) && $_GET['status'] === 'alumni' ? 'selected' : ''; ?>>Alumni</option>
-                                </select>
-                            </div>
-                            <div class="w-full sm:w-auto">
-                                <label for="sport" class="block text-sm font-medium text-gray-700 mb-1">Sport</label>
-                                <select id="sport" name="sport" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500">
-                                    <option value="">All</option>
-                                    <?php
-                                    $sports = ['Basketball', 'Volleyball', 'Football', 'Swimming', 'Track and Field', 'Tennis', 'Badminton'];
-                                    foreach ($sports as $sport) {
-                                        echo '<option value="' . htmlspecialchars($sport) . '" ' . (isset($_GET['sport']) && $_GET['sport'] === $sport ? 'selected' : '') . '>' . htmlspecialchars($sport) . '</option>';
-                                    }
-                                    ?>
-                                </select>
-                            </div>
-                            <div class="w-full sm:w-auto">
-                                <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 w-full sm:w-auto">Apply</button>
-                            </div>
-                        </form>
-                    </section>
-
-                    <!-- Achievement Evaluation Section -->
-                    <section class="p-8 border-t border-gray-200">
-                        <h2 class="text-xl font-semibold text-gray-800 mb-4">Achievement Evaluation</h2>
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Athlete Name</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Level</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Performance</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Points</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Submission Date</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
-                                </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                <?php
-                                $conn = new mysqli($host, $username, $password, $dbname);
-                                if ($conn->connect_error) {
-                                    echo '<tr><td colspan="7" class="px-6 py-4 text-sm text-gray-500 text-center">Database connection failed</td></tr>';
-                                } else {
-                                    $query = "SELECT a.achievement_id, a.athlete_name, a.level_of_competition, a.performance, a.total_points, a.submission_date, a.status, a.documents, a.rejection_reason
-                                 FROM achievements a
-                                 JOIN users u ON a.user_id = u.id
-                                 WHERE 1=1";
-                                    $params = [];
-                                    $types = "";
-
-                                    if (isset($_GET['search']) && !empty(trim($_GET['search']))) {
-                                        $query .= " AND a.athlete_name LIKE ?";
-                                        $params[] = '%' . trim($_GET['search']) . '%';
-                                        $types .= "s";
-                                    }
-                                    if (isset($_GET['status']) && in_array($_GET['status'], ['undergraduate', 'alumni'])) {
-                                        $query .= " AND u.status = ?";
-                                        $params[] = $_GET['status'];
-                                        $types .= "s";
-                                    }
-                                    if (isset($_GET['sport']) && in_array($_GET['sport'], $sports)) {
-                                        $query .= " AND u.sport = ?";
-                                        $params[] = $_GET['sport'];
-                                        $types .= "s";
-                                    }
-
-                                    $stmt = $conn->prepare($query);
-                                    if (!empty($params)) {
-                                        $stmt->bind_param($types, ...$params);
-                                    }
-                                    $stmt->execute();
-                                    $result = $stmt->get_result();
-
-                                    if ($result->num_rows > 0) {
-                                        while ($row = $result->fetch_assoc()) {
+                                    if (count($leaderboard) > 0) {
+                                        foreach ($leaderboard as $index => $athlete) {
                                             echo '<tr>';
-                                            echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">' . htmlspecialchars($row['athlete_name'] ?? 'N/A') . '</td>';
-                                            echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">' . htmlspecialchars($row['level_of_competition'] ?? 'N/A') . '</td>';
-                                            echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">' . htmlspecialchars($row['performance'] ?? 'N/A') . '</td>';
-                                            echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">' . htmlspecialchars($row['total_points'] ?? '0') . '</td>';
-                                            echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">' . htmlspecialchars($row['submission_date'] ?? 'N/A') . '</td>';
-                                            echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">' . htmlspecialchars($row['status'] ?? 'Pending') . '</td>';
-                                            echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">';
-                                            echo '<button onclick="openViewModal(' . htmlspecialchars($row['achievement_id']) . ', \'' . htmlspecialchars(json_encode($row)) . '\')" class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 mr-2">View</button>';
-                                            if ($row['status'] === 'Pending') {
-                                                echo '<button onclick="openEditModal(' . htmlspecialchars($row['achievement_id']) . ', \'' . htmlspecialchars(json_encode($row)) . '\')" class="px-3 py-1 bg-yellow-600 text-white rounded hover:bg-yellow-700 mr-2">Edit</button>';
-                                                echo '<button onclick="openApproveModal(' . htmlspecialchars($row['achievement_id']) . ')" class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 mr-2">Approve</button>';
-                                                echo '<button onclick="openRejectModal(' . htmlspecialchars($row['achievement_id']) . ')" class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700">Reject</button>';
-                                            } elseif ($row['status'] === 'Rejected') {
-                                                echo 'Rejected: ' . htmlspecialchars($row['rejection_reason'] ?? 'N/A');
-                                            } else {
-                                                echo 'Approved';
-                                            }
-                                            echo '</td>';
+                                            echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">' . htmlspecialchars($athlete['athlete_name'] ?? 'N/A') . '</td>';
+                                            echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">' . htmlspecialchars($athlete['total_points'] ?? '0') . '</td>';
+                                            echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">' . ($index + 1) . '</td>';
                                             echo '</tr>';
                                         }
                                     } else {
-                                        echo '<tr><td colspan="7" class="px-6 py-4 text-sm text-gray-500 text-center">No achievements found</td></tr>';
+                                        echo '<tr><td colspan="3" class="px-6 py-4 text-sm text-gray-500 text-center">No leaderboard data available</td></tr>';
                                     }
-                                    $stmt->close();
-                                    $conn->close();
+                                } else {
+                                    echo '<tr><td colspan="3" class="px-6 py-4 text-sm text-gray-500 text-center">Failed to load leaderboard</td></tr>';
+                                }
+                                $conn->close();
+                            }
+                            ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Compact Filter Section with Search Bar -->
+                <section class="p-8 border-t border-gray-200">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">Filter Achievements</h2>
+                    <form method="GET" action="../view/adminView.php" class="flex flex-col sm:flex-row gap-4 items-end">
+                        <input type="hidden" name="page" value="Achievement">
+                        <div class="w-full sm:w-auto">
+                            <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Search by Athlete Name</label>
+                            <input type="text" id="search" name="search" value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>" placeholder="Enter athlete name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500">
+                        </div>
+                        <div class="w-full sm:w-auto">
+                            <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                            <select id="status" name="status" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500">
+                                <option value="">All</option>
+                                <option value="undergraduate" <?php echo isset($_GET['status']) && $_GET['status'] === 'undergraduate' ? 'selected' : ''; ?>>Undergraduate</option>
+                                <option value="alumni" <?php echo isset($_GET['status']) && $_GET['status'] === 'alumni' ? 'selected' : ''; ?>>Alumni</option>
+                            </select>
+                        </div>
+                        <div class="w-full sm:w-auto">
+                            <label for="sport" class="block text-sm font-medium text-gray-700 mb-1">Sport</label>
+                            <select id="sport" name="sport" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500">
+                                <option value="">All</option>
+                                <?php
+                                $sports = ['Basketball', 'Volleyball', 'Football', 'Swimming', 'Track and Field', 'Tennis', 'Badminton'];
+                                foreach ($sports as $sport) {
+                                    echo '<option value="' . htmlspecialchars($sport) . '" ' . (isset($_GET['sport']) && $_GET['sport'] === $sport ? 'selected' : '') . '>' . htmlspecialchars($sport) . '</option>';
                                 }
                                 ?>
-                                </tbody>
-                            </table>
+                            </select>
                         </div>
-                    </section>
+                        <div class="w-full sm:w-auto">
+                            <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 w-full sm:w-auto">Apply</button>
+                        </div>
+                    </form>
+                </section>
 
-                    <!-- View Achievement Modal -->
-                    <div id="viewModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden">
-                        <div class="bg-white rounded-lg shadow p-6 w-full max-w-lg">
-                            <h2 class="text-xl font-bold mb-4">Achievement Details</h2>
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Athlete Name</label>
-                                    <p id="view_athlete_name" class="text-sm text-gray-900"></p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Level of Competition</label>
-                                    <p id="view_level" class="text-sm text-gray-900"></p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Performance</label>
-                                    <p id="view_performance" class="text-sm text-gray-900"></p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Total Points</label>
-                                    <p id="view_points" class="text-sm text-gray-900"></p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Submission Date</label>
-                                    <p id="view_submission_date" class="text-sm text-gray-900"></p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Status</label>
-                                    <p id="view_status" class="text-sm text-gray-900"></p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Documents (click to view)</label>
-                                    <div id="view_documents" class="text-sm text-gray-900"></div>
-                                </div>
-                                <div id="view_rejection_reason" class="hidden">
-                                    <label class="block text-sm font-medium text-gray-700">Rejection Reason</label>
-                                    <p id="view_rejection_text" class="text-sm text-gray-900"></p>
-                                </div>
-                            </div>
-                            <div class="flex justify-end mt-6">
-                                <button type="button" onclick="closeViewModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Close</button>
-                            </div>
-                        </div>
+                <!-- Achievement Evaluation Section -->
+                <section class="p-8 border-t border-gray-200">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">Achievement Evaluation</h2>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Athlete Name</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Level</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Performance</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Points</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Submission Date</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                            <?php
+                            $conn = new mysqli($host, $username, $password, $dbname);
+                            if ($conn->connect_error) {
+                                echo '<tr><td colspan="7" class="px-6 py-4 text-sm text-gray-500 text-center">Database connection failed</td></tr>';
+                            } else {
+                                $query = "SELECT a.achievement_id, a.athlete_name, a.level_of_competition, a.performance, a.total_points, a.submission_date, a.status, a.documents, a.rejection_reason, a.number_of_events, a.leadership_role, a.sportsmanship, a.community_impact, a.completeness_of_documents
+                                 FROM achievements a
+                                 LEFT JOIN users u ON a.user_id = u.id
+                                 WHERE 1=1";
+                                $params = [];
+                                $types = "";
+
+                                if (isset($_GET['search']) && !empty(trim($_GET['search']))) {
+                                    $query .= " AND a.athlete_name LIKE ?";
+                                    $params[] = '%' . trim($_GET['search']) . '%';
+                                    $types .= "s";
+                                }
+                                if (isset($_GET['status']) && in_array($_GET['status'], ['undergraduate', 'alumni'])) {
+                                    $query .= " AND u.status = ?";
+                                    $params[] = $_GET['status'];
+                                    $types .= "s";
+                                }
+                                if (isset($_GET['sport']) && in_array($_GET['sport'], $sports)) {
+                                    $query .= " AND u.sport = ?";
+                                    $params[] = $_GET['sport'];
+                                    $types .= "s";
+                                }
+
+                                $stmt = $conn->prepare($query);
+                                if (!empty($params)) {
+                                    $stmt->bind_param($types, ...$params);
+                                }
+                                $stmt->execute();
+                                $result = $stmt->get_result();
+
+                                if ($result->num_rows > 0) {
+                                    while ($row = $result->fetch_assoc()) {
+                                        echo '<tr>';
+                                        echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">' . htmlspecialchars($row['athlete_name'] ?? 'N/A') . '</td>';
+                                        echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">' . htmlspecialchars($row['level_of_competition'] ?? 'N/A') . '</td>';
+                                        echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">' . htmlspecialchars($row['performance'] ?? 'N/A') . '</td>';
+                                        echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">' . htmlspecialchars($row['total_points'] ?? '0') . '</td>';
+                                        echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">' . htmlspecialchars($row['submission_date'] ?? 'N/A') . '</td>';
+                                        echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">' . htmlspecialchars($row['status'] ?? 'Pending') . '</td>';
+                                        echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">';
+                                        echo '<button onclick="openViewModal(' . htmlspecialchars($row['achievement_id']) . ', \'' . htmlspecialchars(json_encode($row, JSON_HEX_QUOT | JSON_HEX_APOS)) . '\')" class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 mr-2">View</button>';
+                                        if ($row['status'] === 'Pending') {
+                                            echo '<button onclick="openApproveModal(' . htmlspecialchars($row['achievement_id']) . ')" class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 mr-2">Approve</button>';
+                                            echo '<button onclick="openRejectModal(' . htmlspecialchars($row['achievement_id']) . ')" class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700">Reject</button>';
+                                        } elseif ($row['status'] === 'Rejected') {
+                                            echo 'Rejected: ' . htmlspecialchars($row['rejection_reason'] ?? 'N/A');
+                                        } else {
+                                            echo 'Approved';
+                                        }
+                                        echo '</td>';
+                                        echo '</tr>';
+                                    }
+                                } else {
+                                    echo '<tr><td colspan="7" class="px-6 py-4 text-sm text-gray-500 text-center">No achievements found</td></tr>';
+                                }
+                                $stmt->close();
+                                $conn->close();
+                            }
+                            ?>
+                            </tbody>
+                        </table>
                     </div>
+                </section>
 
-                    <!-- Document Viewer Modal -->
-                    <div id="documentModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden">
-                        <div class="bg-white rounded-lg shadow p-6 w-full max-w-3xl">
-                            <h2 class="text-xl font-bold mb-4">Document Viewer</h2>
-                            <div id="documentContent" class="mb-4 max-h-[60vh] overflow-auto">
-                                <!-- Document content will be loaded here -->
+                <!-- View Achievement Modal -->
+                <div id="viewModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden">
+                    <div class="bg-white rounded-lg shadow p-6 w-full max-w-lg">
+                        <h2 class="text-xl font-bold mb-4">Achievement Details</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Athlete Name</label>
+                                <p id="view_athlete_name" class="text-sm text-gray-900"></p>
                             </div>
-                            <div class="flex justify-end space-x-4">
-                                <a id="downloadLink" href="#" download class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Download</a>
-                                <button type="button" onclick="closeDocumentModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Close</button>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Level of Competition</label>
+                                <p id="view_level" class="text-sm text-gray-900"></p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Performance</label>
+                                <p id="view_performance" class="text-sm text-gray-900"></p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Number of Events</label>
+                                <p id="view_number_of_events" class="text-sm text-gray-900"></p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Leadership Role</label>
+                                <p id="view_leadership_role" class="text-sm text-gray-900"></p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Sportsmanship</label>
+                                <p id="view_sportsmanship" class="text-sm text-gray-900"></p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Community Impact</label>
+                                <p id="view_community_impact" class="text-sm text-gray-900"></p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Completeness of Documents</label>
+                                <p id="view_completeness_of_documents" class="text-sm text-gray-900"></p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Total Points</label>
+                                <p id="view_points" class="text-sm text-gray-900"></p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Submission Date</label>
+                                <p id="view_submission_date" class="text-sm text-gray-900"></p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Status</label>
+                                <p id="view_status" class="text-sm text-gray-900"></p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Documents (click to view)</label>
+                                <div id="view_documents" class="text-sm text-gray-900"></div>
+                            </div>
+                            <div id="view_rejection_reason" class="hidden">
+                                <label class="block text-sm font-medium text-gray-700">Rejection Reason</label>
+                                <p id="view_rejection_text" class="text-sm text-gray-900"></p>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Approve Modal -->
-                    <div id="approveModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden">
-                        <div class="bg-white rounded-lg shadow p-6 w-full max-w-md">
-                            <h2 class="text-xl font-bold mb-4">Approve Achievement</h2>
-                            <form method="POST" action="../controller/approveAchievement.php">
-                                <input type="hidden" name="achievement_id" id="approve_achievement_id">
-                                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
-                                <p class="text-gray-700 mb-4">Are you sure you want to approve this achievement?</p>
-                                <div class="flex justify-end space-x-4">
-                                    <button type="button" onclick="closeApproveModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Cancel</button>
-                                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Approve</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-
-                    <!-- Reject Modal -->
-                    <div id="rejectModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden">
-                        <div class="bg-white rounded-lg shadow p-6 w-full max-w-md">
-                            <h2 class="text-xl font-bold mb-4">Reject Achievement</h2>
-                            <form method="POST" action="../controller/rejectAchievement.php">
-                                <input type="hidden" name="achievement_id" id="reject_achievement_id">
-                                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
-                                <div class="mb-4">
-                                    <label for="rejection_reason" class="block text-sm font-medium text-gray-700">Reason for Rejection</label>
-                                    <textarea id="rejection_reason" name="rejection_reason" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500" rows="4"></textarea>
-                                </div>
-                                <div class="flex justify-end space-x-4">
-                                    <button type="button" onclick="closeRejectModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Cancel</button>
-                                    <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">Reject</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-
-                    <!-- Edit Modal -->
-                    <div id="editModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden">
-                        <div class="bg-white rounded-lg shadow p-6 w-full max-w-2xl">
-                            <h2 class="text-xl font-bold mb-4">Edit Achievement</h2>
-                            <form method="POST" action="../controller/handleAchievements.php" enctype="multipart/form-data">
-                                <input type="hidden" name="achievement_id" id="edit_achievement_id">
-                                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
-                                <input type="hidden" name="existing_documents" id="edit_existing_documents">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label for="edit_athlete_name" class="block text-sm font-medium text-gray-700">Athlete Name</label>
-                                        <input type="text" id="edit_athlete_name" name="athlete_name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500">
-                                    </div>
-                                    <div>
-                                        <label for="edit_level_of_competition" class="block text-sm font-medium text-gray-700">Level of Competition</label>
-                                        <select id="edit_level_of_competition" name="level_of_competition" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500">
-                                            <option value="Local">Local (5 pts)</option>
-                                            <option value="Regional">Regional (10 pts)</option>
-                                            <option value="National">National (15 pts)</option>
-                                            <option value="International">International (20 pts)</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label for="edit_performance" class="block text-sm font-medium text-gray-700">Performance</label>
-                                        <select id="edit_performance" name="performance" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500">
-                                            <option value="Winner (Gold)">Winner (Gold - 15 pts)</option>
-                                            <option value="Silver">Silver (10 pts)</option>
-                                            <option value="Bronze">Bronze (5 pts)</option>
-                                            <option value="Participant">Participant (2 pts)</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label for="edit_number_of_events" class="block text-sm font-medium text-gray-700">Number of Events</label>
-                                        <select id="edit_number_of_events" name="number_of_events" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500">
-                                            <option value="1-2">1-2 (5 pts)</option>
-                                            <option value="3-4">3-4 (10 pts)</option>
-                                            <option value="5+">5+ (15 pts)</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label for="edit_leadership_role" class="block text-sm font-medium text-gray-700">Leadership Role</label>
-                                        <select id="edit_leadership_role" name="leadership_role" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500">
-                                            <option value="Team Captain">Team Captain (10 pts)</option>
-                                            <option value="Active Member">Active Member (5 pts)</option>
-                                            <option value="Reserve">Reserve (2 pts)</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label for="edit_sportsmanship" class="block text-sm font-medium text-gray-700">Sportsmanship</label>
-                                        <select id="edit_sportsmanship" name="sportsmanship" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500">
-                                            <option value="No violation">No violation (10 pts)</option>
-                                            <option value="Minor warnings">Minor warnings (5 pts)</option>
-                                            <option value="Major offense">Major offense (0 pts)</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label for="edit_community_impact" class="block text-sm font-medium text-gray-700">Community Impact</label>
-                                        <select id="edit_community_impact" name="community_impact" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500">
-                                            <option value="Yes">Yes (10 pts)</option>
-                                            <option value="No">No (0 pts)</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label for="edit_completeness_of_documents" class="block text-sm font-medium text-gray-700">Completeness of Documents</label>
-                                        <select id="edit_completeness_of_documents" name="completeness_of_documents" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500">
-                                            <option value="Complete and verified">Complete and verified (15 pts)</option>
-                                            <option value="Incomplete or unclear">Incomplete or unclear (5 pts)</option>
-                                            <option value="Not submitted">Not submitted (0 pts)</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label for="edit_documents" class="block text-sm font-medium text-gray-700">Upload Documents</label>
-                                        <input type="file" id="edit_documents" name="documents[]" multiple accept=".pdf,.jpg,.jpeg,.png" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500">
-                                    </div>
-                                </div>
-                                <div class="flex justify-end mt-6 space-x-4">
-                                    <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Cancel</button>
-                                    <button type="submit" class="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700">Update</button>
-                                </div>
-                            </form>
+                        <div class="flex justify-end mt-6">
+                            <button type="button" onclick="closeViewModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Close</button>
                         </div>
                     </div>
                 </div>
+
+                <!-- Document Viewer Modal -->
+                <div id="documentModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden">
+                    <div class="bg-white rounded-lg shadow p-6 w-full max-w-3xl">
+                        <h2 class="text-xl font-bold mb-4">Document Viewer</h2>
+                        <div id="documentContent" class="mb-4 max-h-[60vh] overflow-auto">
+                            <!-- Document content will be loaded here -->
+                        </div>
+                        <div class="flex justify-end space-x-4">
+                            <a id="downloadLink" href="#" download class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Download</a>
+                            <button type="button" onclick="closeDocumentModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Close</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Approve Modal -->
+                <div id="approveModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden">
+                    <div class="bg-white rounded-lg shadow p-6 w-full max-w-md">
+                        <h2 class="text-xl font-bold mb-4">Approve Achievement</h2>
+                        <form method="POST" action="../controller/handleAdminAchievement.php">
+                            <input type="hidden" name="achievement_id" id="approve_achievement_id">
+                            <input type="hidden" name="approve_achievement" value="1">
+                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
+                            <p class="text-gray-700 mb-4">Are you sure you want to approve this achievement?</p>
+                            <div class="flex justify-end space-x-4">
+                                <button type="button" onclick="closeApproveModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Cancel</button>
+                                <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Approve</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Reject Modal -->
+                <div id="rejectModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden">
+                    <div class="bg-white rounded-lg shadow p-6 w-full max-w-md">
+                        <h2 class="text-xl font-bold mb-4">Reject Achievement</h2>
+                        <form method="POST" action="../controller/handleAdminAchievement.php">
+                            <input type="hidden" name="achievement_id" id="reject_achievement_id">
+                            <input type="hidden" name="reject_achievement" value="1">
+                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
+                            <div class="mb-4">
+                                <label for="rejection_reason" class="block text-sm font-medium text-gray-700">Reason for Rejection</label>
+                                <textarea id="rejection_reason" name="rejection_reason" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500" rows="4"></textarea>
+                            </div>
+                            <div class="flex justify-end space-x-4">
+                                <button type="button" onclick="closeRejectModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Cancel</button>
+                                <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">Reject</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Notification -->
+                <?php
+                if (isset($_SESSION['admin_message'])) {
+                    echo '<div class="p-8"><div class="mb-4 p-4 rounded-lg ' . $_SESSION['admin_message_class'] . '">';
+                    echo htmlspecialchars($_SESSION['admin_message']);
+                    echo '</div></div>';
+                    unset($_SESSION['admin_message']);
+                    unset($_SESSION['admin_message_class']);
+                }
+                ?>
             </div>
+        </div>
 
-            <script>
-                // Existing Modal Functions
-                function openApproveModal(id) {
-                    console.log("Opening Approve Modal for achievement_id: " + id);
-                    document.getElementById('approve_achievement_id').value = id;
-                    document.getElementById('approveModal').classList.remove('hidden');
+        <script>
+            function openApproveModal(id) {
+                console.log("Opening Approve Modal for achievement_id: " + id);
+                document.getElementById('approve_achievement_id').value = id;
+                document.getElementById('approveModal').classList.remove('hidden');
+            }
+
+            function closeApproveModal() {
+                document.getElementById('approveModal').classList.add('hidden');
+            }
+
+            function openRejectModal(id) {
+                console.log("Opening Reject Modal for achievement_id: " + id);
+                document.getElementById('reject_achievement_id').value = id;
+                document.getElementById('rejectModal').classList.remove('hidden');
+            }
+
+            function closeRejectModal() {
+                document.getElementById('rejectModal').classList.add('hidden');
+                document.getElementById('rejection_reason').value = '';
+            }
+
+            function openViewModal(id, data) {
+                console.log("Opening View Modal for achievement_id: " + id);
+                let achievement;
+                try {
+                    achievement = JSON.parse(data);
+                } catch (e) {
+                    console.error("Failed to parse achievement data: ", e);
+                    alert("Error loading achievement details.");
+                    return;
                 }
 
-                function closeApproveModal() {
-                    document.getElementById('approveModal').classList.add('hidden');
+                document.getElementById('view_athlete_name').textContent = achievement.athlete_name || 'N/A';
+                document.getElementById('view_level').textContent = achievement.level_of_competition || 'N/A';
+                document.getElementById('view_performance').textContent = achievement.performance || 'N/A';
+                document.getElementById('view_number_of_events').textContent = achievement.number_of_events || 'N/A';
+                document.getElementById('view_leadership_role').textContent = achievement.leadership_role || 'N/A';
+                document.getElementById('view_sportsmanship').textContent = achievement.sportsmanship || 'N/A';
+                document.getElementById('view_community_impact').textContent = achievement.community_impact || 'N/A';
+                document.getElementById('view_completeness_of_documents').textContent = achievement.completeness_of_documents || 'N/A';
+                document.getElementById('view_points').textContent = achievement.total_points || '0';
+                document.getElementById('view_submission_date').textContent = achievement.submission_date || 'N/A';
+                document.getElementById('view_status').textContent = achievement.status || 'Pending';
+
+                const documentsDiv = document.getElementById('view_documents');
+                documentsDiv.innerHTML = '';
+                if (achievement.documents) {
+                    const docs = achievement.documents.split(',');
+                    docs.forEach(doc => {
+                        const ext = doc.split('.').pop().toLowerCase();
+                        const link = document.createElement('a');
+                        link.href = '#';
+                        link.textContent = doc;
+                        link.className = 'text-blue-600 hover:underline block';
+                        link.onclick = () => openDocumentModal(doc, ext);
+                        documentsDiv.appendChild(link);
+                    });
+                } else {
+                    documentsDiv.textContent = 'None';
                 }
 
-                function openRejectModal(id) {
-                    console.log("Opening Reject Modal for achievement_id: " + id);
-                    document.getElementById('reject_achievement_id').value = id;
-                    document.getElementById('rejectModal').classList.remove('hidden');
+                const rejectionDiv = document.getElementById('view_rejection_reason');
+                const rejectionText = document.getElementById('view_rejection_text');
+                if (achievement.status === 'Rejected' && achievement.rejection_reason) {
+                    rejectionDiv.classList.remove('hidden');
+                    rejectionText.textContent = achievement.rejection_reason;
+                } else {
+                    rejectionDiv.classList.add('hidden');
                 }
 
-                function closeRejectModal() {
-                    document.getElementById('rejectModal').classList.add('hidden');
-                    document.getElementById('rejection_reason').value = '';
+                document.getElementById('viewModal').classList.remove('hidden');
+            }
+
+            function closeViewModal() {
+                document.getElementById('viewModal').classList.add('hidden');
+            }
+
+            function openDocumentModal(doc, ext) {
+                console.log("Opening Document Modal for: " + doc);
+                const documentContent = document.getElementById('documentContent');
+                const downloadLink = document.getElementById('downloadLink');
+                const docPath = `../Uploads/${encodeURIComponent(doc)}`;
+                documentContent.innerHTML = '';
+                downloadLink.href = docPath;
+
+                if (['jpg', 'jpeg', 'png'].includes(ext)) {
+                    const img = document.createElement('img');
+                    img.src = docPath;
+                    img.className = 'max-w-full h-auto';
+                    documentContent.appendChild(img);
+                } else if (ext === 'pdf') {
+                    const iframe = document.createElement('iframe');
+                    iframe.src = docPath;
+                    iframe.className = 'w-full h-[50vh]';
+                    documentContent.appendChild(iframe);
+                } else {
+                    documentContent.textContent = 'Preview not available for this file type.';
+                    documentContent.className = 'text-gray-500 text-center';
                 }
 
-                function openViewModal(id, data) {
-                    console.log("Opening View Modal for achievement_id: " + id);
-                    const achievement = JSON.parse(data);
-                    document.getElementById('view_athlete_name').textContent = achievement.athlete_name || 'N/A';
-                    document.getElementById('view_level').textContent = achievement.level_of_competition || 'N/A';
-                    document.getElementById('view_performance').textContent = achievement.performance || 'N/A';
-                    document.getElementById('view_points').textContent = achievement.total_points || '0';
-                    document.getElementById('view_submission_date').textContent = achievement.submission_date || 'N/A';
-                    document.getElementById('view_status').textContent = achievement.status || 'Pending';
+                document.getElementById('documentModal').classList.remove('hidden');
+            }
 
-                    const documentsDiv = document.getElementById('view_documents');
-                    documentsDiv.innerHTML = '';
-                    if (achievement.documents) {
-                        const docs = achievement.documents.split(',');
-                        docs.forEach(doc => {
-                            const ext = doc.split('.').pop().toLowerCase();
-                            const link = document.createElement('a');
-                            link.href = '#';
-                            link.textContent = doc;
-                            link.className = 'text-blue-600 hover:underline block';
-                            link.onclick = () => openDocumentModal(doc, ext);
-                            documentsDiv.appendChild(link);
-                        });
-                    } else {
-                        documentsDiv.textContent = 'None';
-                    }
-
-                    const rejectionDiv = document.getElementById('view_rejection_reason');
-                    const rejectionText = document.getElementById('view_rejection_text');
-                    if (achievement.status === 'Rejected' && achievement.rejection_reason) {
-                        rejectionDiv.classList.remove('hidden');
-                        rejectionText.textContent = achievement.rejection_reason;
-                    } else {
-                        rejectionDiv.classList.add('hidden');
-                    }
-
-                    document.getElementById('viewModal').classList.remove('hidden');
-                }
-
-                function closeViewModal() {
-                    document.getElementById('viewModal').classList.add('hidden');
-                }
-
-                function openDocumentModal(doc, ext) {
-                    console.log("Opening Document Modal for: " + doc);
-                    const documentContent = document.getElementById('documentContent');
-                    const downloadLink = document.getElementById('downloadLink');
-                    const docPath = `../Uploads/${doc}`;
-                    documentContent.innerHTML = '';
-                    downloadLink.href = docPath;
-
-                    if (['jpg', 'jpeg', 'png'].includes(ext)) {
-                        const img = document.createElement('img');
-                        img.src = docPath;
-                        img.className = 'max-w-full h-auto';
-                        documentContent.appendChild(img);
-                    } else if (ext === 'pdf') {
-                        const iframe = document.createElement('iframe');
-                        iframe.src = docPath;
-                        iframe.className = 'w-full h-[50vh]';
-                        documentContent.appendChild(iframe);
-                    } else {
-                        documentContent.textContent = 'Preview not available for this file type.';
-                        documentContent.className = 'text-gray-500 text-center';
-                    }
-
-                    document.getElementById('documentModal').classList.remove('hidden');
-                }
-
-                function closeDocumentModal() {
-                    document.getElementById('documentModal').classList.add('hidden');
-                    document.getElementById('documentContent').innerHTML = '';
-                }
-
-                // New Edit Modal Function
-                function openEditModal(id, data) {
-                    console.log("Opening Edit Modal for achievement_id: " + id);
-                    const achievement = JSON.parse(data);
-                    document.getElementById('edit_achievement_id').value = id;
-                    document.getElementById('edit_athlete_name').value = achievement.athlete_name || '';
-                    document.getElementById('edit_level_of_competition').value = achievement.level_of_competition || 'Local';
-                    document.getElementById('edit_performance').value = achievement.performance || 'Winner (Gold)';
-                    document.getElementById('edit_number_of_events').value = achievement.number_of_events || '1-2';
-                    document.getElementById('edit_leadership_role').value = achievement.leadership_role || 'Team Captain';
-                    document.getElementById('edit_sportsmanship').value = achievement.sportsmanship || 'No violation';
-                    document.getElementById('edit_community_impact').value = achievement.community_impact || 'Yes';
-                    document.getElementById('edit_completeness_of_documents').value = achievement.completeness_of_documents || 'Complete and verified';
-                    document.getElementById('edit_existing_documents').value = achievement.documents || '';
-                    document.getElementById('editModal').classList.remove('hidden');
-                }
-
-                function closeEditModal() {
-                    document.getElementById('editModal').classList.add('hidden');
-                    document.getElementById('edit_achievement_id').value = '';
-                    document.getElementById('edit_athlete_name').value = '';
-                    document.getElementById('edit_existing_documents').value = '';
-                    // Reset other fields as needed
-                }
-            </script>
+            function closeDocumentModal() {
+                document.getElementById('documentModal').classList.add('hidden');
+                document.getElementById('documentContent').innerHTML = '';
+            }
+        </script>
 
 
 
