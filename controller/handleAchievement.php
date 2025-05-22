@@ -195,12 +195,25 @@ if (isset($_POST['edit_achievement'])) {
     // Calculate total points
     $points = calculatePoints($level_of_competition, $performance, $number_of_events, $leadership_role, $sportsmanship, $community_impact, $completeness_of_documents);
 
-    // Handle file uploads
+    // Handle file updates: delete old files and upload new ones
     $upload_dir = '../Uploads/';
     if (!is_dir($upload_dir)) {
         mkdir($upload_dir, 0755, true);
     }
-    $document_paths = $existing_documents ? explode(',', $existing_documents) : [];
+    $document_paths = [];
+    // Delete existing files
+    if ($achievement['documents']) {
+        $old_documents = explode(',', $achievement['documents']);
+        foreach ($old_documents as $doc) {
+            $file_path = $upload_dir . $doc;
+            if (file_exists($file_path)) {
+                if (!unlink($file_path)) {
+                    error_log("Failed to delete old file: $file_path");
+                }
+            }
+        }
+    }
+    // Upload new files
     if (!empty($_FILES['documents']['name'][0])) {
         foreach ($_FILES['documents']['name'] as $key => $name) {
             if ($_FILES['documents']['error'][$key] === UPLOAD_ERR_OK) {

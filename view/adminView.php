@@ -625,6 +625,16 @@ $action = $_GET['action'] ?? '';
                 <!-- Campus Leaderboard -->
                 <section class="p-8">
                     <h2 class="text-xl font-bold mb-4">Campus Leaderboard</h2>
+                    <div class="mb-4">
+                        <form method="GET" action="../view/adminView.php" class="flex items-center gap-4">
+                            <input type="hidden" name="page" value="Achievement">
+                            <label for="leaderboard_status" class="text-sm font-medium text-gray-700">Filter by Status:</label>
+                            <select id="leaderboard_status" name="leaderboard_status" onchange="this.form.submit()" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500">
+                                <option value="undergraduate" <?php echo (!isset($_GET['leaderboard_status']) || $_GET['leaderboard_status'] === 'undergraduate') ? 'selected' : ''; ?>>Undergraduate</option>
+                                <option value="alumni" <?php echo isset($_GET['leaderboard_status']) && $_GET['leaderboard_status'] === 'alumni' ? 'selected' : ''; ?>>Alumni</option>
+                            </select>
+                        </form>
+                    </div>
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
@@ -645,26 +655,27 @@ $action = $_GET['action'] ?? '';
                             if ($conn->connect_error) {
                                 echo '<tr><td colspan="3" class="px-6 py-4 text-sm text-gray-500 text-center">Database connection failed</td></tr>';
                             } else {
-                                $result = $conn->query("CALL GetLeaderboard()");
-                                if ($result) {
-                                    $leaderboard = [];
-                                    while ($row = $result->fetch_assoc()) {
-                                        $leaderboard[] = $row;
-                                    }
-                                    if (count($leaderboard) > 0) {
-                                        foreach ($leaderboard as $index => $athlete) {
-                                            echo '<tr>';
-                                            echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">' . htmlspecialchars($athlete['athlete_name'] ?? 'N/A') . '</td>';
-                                            echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">' . htmlspecialchars($athlete['total_points'] ?? '0') . '</td>';
-                                            echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">' . ($index + 1) . '</td>';
-                                            echo '</tr>';
-                                        }
-                                    } else {
-                                        echo '<tr><td colspan="3" class="px-6 py-4 text-sm text-gray-500 text-center">No leaderboard data available</td></tr>';
+                                $status = isset($_GET['leaderboard_status']) && in_array($_GET['leaderboard_status'], ['undergraduate', 'alumni']) ? $_GET['leaderboard_status'] : 'undergraduate';
+                                $stmt = $conn->prepare("CALL GetLeaderboard(?)");
+                                $stmt->bind_param("s", $status);
+                                $stmt->execute();
+                                $result = $stmt->get_result();
+                                $leaderboard = [];
+                                while ($row = $result->fetch_assoc()) {
+                                    $leaderboard[] = $row;
+                                }
+                                if (count($leaderboard) > 0) {
+                                    foreach ($leaderboard as $index => $athlete) {
+                                        echo '<tr>';
+                                        echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">' . htmlspecialchars($athlete['athlete_name'] ?? 'N/A') . '</td>';
+                                        echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">' . htmlspecialchars($athlete['total_points'] ?? '0') . '</td>';
+                                        echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">' . ($index + 1) . '</td>';
+                                        echo '</tr>';
                                     }
                                 } else {
-                                    echo '<tr><td colspan="3" class="px-6 py-4 text-sm text-gray-500 text-center">Failed to load leaderboard</td></tr>';
+                                    echo '<tr><td colspan="3" class="px-6 py-4 text-sm text-gray-500 text-center">No leaderboard data available for ' . htmlspecialchars($status) . '</td></tr>';
                                 }
+                                $stmt->close();
                                 $conn->close();
                             }
                             ?>
@@ -726,6 +737,11 @@ $action = $_GET['action'] ?? '';
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                             <?php
+                            $host = "localhost";
+                            $username = "root";
+                            $password = "";
+                            $dbname = "SportOfficeDB";
+
                             $conn = new mysqli($host, $username, $password, $dbname);
                             if ($conn->connect_error) {
                                 echo '<tr><td colspan="7" class="px-6 py-4 text-sm text-gray-500 text-center">Database connection failed</td></tr>';
@@ -796,64 +812,64 @@ $action = $_GET['action'] ?? '';
 
                 <!-- View Achievement Modal -->
                 <div id="viewModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden">
-                    <div class="bg-white rounded-lg shadow p-6 w-full max-w-lg">
-                        <h2 class="text-xl font-bold mb-4">Achievement Details</h2>
-                        <div class="space-y-4">
+                    <div class="bg-white rounded-lg shadow p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
+                        <h2 class="text-lg font-bold text-gray-800 mb-4">Achievement Details</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Athlete Name</label>
-                                <p id="view_athlete_name" class="text-sm text-gray-900"></p>
+                                <label class="block text-xs font-medium text-gray-600">Athlete Name</label>
+                                <p id="view_athlete_name" class="text-gray-900 font-medium"></p>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Level of Competition</label>
-                                <p id="view_level" class="text-sm text-gray-900"></p>
+                                <label class="block text-xs font-medium text-gray-600">Level of Competition</label>
+                                <p id="view_level" class="text-gray-900 font-medium"></p>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Performance</label>
-                                <p id="view_performance" class="text-sm text-gray-900"></p>
+                                <label class="block text-xs font-medium text-gray-600">Performance</label>
+                                <p id="view_performance" class="text-gray-900 font-medium"></p>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Number of Events</label>
-                                <p id="view_number_of_events" class="text-sm text-gray-900"></p>
+                                <label class="block text-xs font-medium text-gray-600">Number of Events</label>
+                                <p id="view_number_of_events" class="text-gray-900 font-medium"></p>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Leadership Role</label>
-                                <p id="view_leadership_role" class="text-sm text-gray-900"></p>
+                                <label class="block text-xs font-medium text-gray-600">Leadership Role</label>
+                                <p id="view_leadership_role" class="text-gray-900 font-medium"></p>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Sportsmanship</label>
-                                <p id="view_sportsmanship" class="text-sm text-gray-900"></p>
+                                <label class="block text-xs font-medium text-gray-600">Sportsmanship</label>
+                                <p id="view_sportsmanship" class="text-gray-900 font-medium"></p>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Community Impact</label>
-                                <p id="view_community_impact" class="text-sm text-gray-900"></p>
+                                <label class="block text-xs font-medium text-gray-600">Community Impact</label>
+                                <p id="view_community_impact" class="text-gray-900 font-medium"></p>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Completeness of Documents</label>
-                                <p id="view_completeness_of_documents" class="text-sm text-gray-900"></p>
+                                <label class="block text-xs font-medium text-gray-600">Completeness of Documents</label>
+                                <p id="view_completeness_of_documents" class="text-gray-900 font-medium"></p>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Total Points</label>
-                                <p id="view_points" class="text-sm text-gray-900"></p>
+                                <label class="block text-xs font-medium text-gray-600">Total Points</label>
+                                <p id="view_points" class="text-gray-900 font-medium"></p>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Submission Date</label>
-                                <p id="view_submission_date" class="text-sm text-gray-900"></p>
+                                <label class="block text-xs font-medium text-gray-600">Submission Date</label>
+                                <p id="view_submission_date" class="text-gray-900 font-medium"></p>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Status</label>
-                                <p id="view_status" class="text-sm text-gray-900"></p>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Documents (click to view)</label>
-                                <div id="view_documents" class="text-sm text-gray-900"></div>
+                                <label class="block text-xs font-medium text-gray-600">Status</label>
+                                <p id="view_status" class="text-gray-900 font-medium"></p>
                             </div>
                             <div id="view_rejection_reason" class="hidden">
-                                <label class="block text-sm font-medium text-gray-700">Rejection Reason</label>
-                                <p id="view_rejection_text" class="text-sm text-gray-900"></p>
+                                <label class="block text-xs font-medium text-gray-600">Rejection Reason</label>
+                                <p id="view_rejection_text" class="text-gray-900 font-medium"></p>
                             </div>
                         </div>
-                        <div class="flex justify-end mt-6">
-                            <button type="button" onclick="closeViewModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Close</button>
+                        <div class="mt-4">
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Documents</label>
+                            <div id="view_documents" class="flex flex-wrap gap-2"></div>
+                        </div>
+                        <div class="flex justify-end mt-4">
+                            <button type="button" onclick="closeViewModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 text-sm">Close</button>
                         </div>
                     </div>
                 </div>
@@ -861,176 +877,160 @@ $action = $_GET['action'] ?? '';
                 <!-- Document Viewer Modal -->
                 <div id="documentModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden">
                     <div class="bg-white rounded-lg shadow p-6 w-full max-w-3xl">
-                        <h2 class="text-xl font-bold mb-4">Document Viewer</h2>
+                        <h2 class="text-lg font-bold text-gray-800 mb-4">Document Viewer</h2>
                         <div id="documentContent" class="mb-4 max-h-[60vh] overflow-auto">
                             <!-- Document content will be loaded here -->
                         </div>
                         <div class="flex justify-end space-x-4">
-                            <a id="downloadLink" href="#" download class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Download</a>
-                            <button type="button" onclick="closeDocumentModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Close</button>
+                            <a id="downloadLink" href="#" download class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">Download</a>
+                            <button type="button" onclick="closeDocumentModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 text-sm">Close</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Approve Modal -->
+                <!-- Approve Achievement Modal -->
                 <div id="approveModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden">
                     <div class="bg-white rounded-lg shadow p-6 w-full max-w-md">
-                        <h2 class="text-xl font-bold mb-4">Approve Achievement</h2>
-                        <form method="POST" action="../controller/handleAdminAchievement.php">
+                        <h2 class="text-lg font-bold text-gray-800 mb-4">Approve Achievement</h2>
+                        <p class="text-sm text-gray-600 mb-4">Are you sure you want to approve this achievement?</p>
+                        <form id="approveForm" method="POST" action="../controller/handleAdminAchievement.php">
                             <input type="hidden" name="achievement_id" id="approve_achievement_id">
-                            <input type="hidden" name="approve_achievement" value="1">
-                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
-                            <p class="text-gray-700 mb-4">Are you sure you want to approve this achievement?</p>
-                            <div class="flex justify-end space-x-4">
-                                <button type="button" onclick="closeApproveModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Cancel</button>
-                                <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Approve</button>
-                            </div>
+                            <input type="hidden" name="action" value="approve">
+                            <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm">Confirm</button>
+                            <button type="button" onclick="closeApproveModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 text-sm ml-2">Cancel</button>
                         </form>
                     </div>
                 </div>
 
-                <!-- Reject Modal -->
+                <!-- Reject Achievement Modal -->
                 <div id="rejectModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden">
                     <div class="bg-white rounded-lg shadow p-6 w-full max-w-md">
-                        <h2 class="text-xl font-bold mb-4">Reject Achievement</h2>
-                        <form method="POST" action="../controller/handleAdminAchievement.php">
+                        <h2 class="text-lg font-bold text-gray-800 mb-4">Reject Achievement</h2>
+                        <p class="text-sm text-gray-600 mb-4">Are you sure you want to reject this achievement?</p>
+                        <textarea id="reject_reason" name="reject_reason" class="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4" placeholder="Enter rejection reason (optional)"></textarea>
+                        <form id="rejectForm" method="POST" action="../controller/handleAdminAchievement.php">
                             <input type="hidden" name="achievement_id" id="reject_achievement_id">
-                            <input type="hidden" name="reject_achievement" value="1">
-                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
-                            <div class="mb-4">
-                                <label for="rejection_reason" class="block text-sm font-medium text-gray-700">Reason for Rejection</label>
-                                <textarea id="rejection_reason" name="rejection_reason" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500" rows="4"></textarea>
-                            </div>
-                            <div class="flex justify-end space-x-4">
-                                <button type="button" onclick="closeRejectModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Cancel</button>
-                                <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">Reject</button>
-                            </div>
+                            <input type="hidden" name="action" value="reject">
+                            <input type="hidden" name="reject_reason" id="reject_reason_input">
+                            <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm">Confirm</button>
+                            <button type="button" onclick="closeRejectModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 text-sm ml-2">Cancel</button>
                         </form>
                     </div>
                 </div>
 
-                <!-- Notification -->
-                <?php
-                if (isset($_SESSION['admin_message'])) {
-                    echo '<div class="p-8"><div class="mb-4 p-4 rounded-lg ' . $_SESSION['admin_message_class'] . '">';
-                    echo htmlspecialchars($_SESSION['admin_message']);
-                    echo '</div></div>';
-                    unset($_SESSION['admin_message']);
-                    unset($_SESSION['admin_message_class']);
-                }
-                ?>
-            </div>
-        </div>
+                <script>
+                    function openViewModal(id, data) {
+                        const achievement = JSON.parse(data);
+                        document.getElementById('view_athlete_name').textContent = achievement.athlete_name || 'N/A';
+                        document.getElementById('view_level').textContent = achievement.level_of_competition || 'N/A';
+                        document.getElementById('view_performance').textContent = achievement.performance || 'N/A';
+                        document.getElementById('view_number_of_events').textContent = achievement.number_of_events || 'N/A';
+                        document.getElementById('view_leadership_role').textContent = achievement.leadership_role || 'N/A';
+                        document.getElementById('view_sportsmanship').textContent = achievement.sportsmanship || 'N/A';
+                        document.getElementById('view_community_impact').textContent = achievement.community_impact || 'N/A';
+                        document.getElementById('view_completeness_of_documents').textContent = achievement.completeness_of_documents || 'N/A';
+                        document.getElementById('view_points').textContent = achievement.total_points || '0';
+                        document.getElementById('view_submission_date').textContent = achievement.submission_date || 'N/A';
+                        document.getElementById('view_status').textContent = achievement.status || 'Pending';
 
-        <script>
-            function openApproveModal(id) {
-                console.log("Opening Approve Modal for achievement_id: " + id);
-                document.getElementById('approve_achievement_id').value = id;
-                document.getElementById('approveModal').classList.remove('hidden');
-            }
+                        const rejectionDiv = document.getElementById('view_rejection_reason');
+                        const rejectionText = document.getElementById('view_rejection_text');
+                        if (achievement.status === 'Rejected' && achievement.rejection_reason) {
+                            rejectionText.textContent = achievement.rejection_reason;
+                            rejectionDiv.classList.remove('hidden');
+                        } else {
+                            rejectionText.textContent = '';
+                            rejectionDiv.classList.add('hidden');
+                        }
 
-            function closeApproveModal() {
-                document.getElementById('approveModal').classList.add('hidden');
-            }
+                        const documentsDiv = document.getElementById('view_documents');
+                        documentsDiv.innerHTML = '';
+                        if (achievement.documents) {
+                            const docs = achievement.documents.split(',');
+                            if (docs.length > 0 && docs[0] !== '') {
+                                docs.forEach(doc => {
+                                    const link = document.createElement('a');
+                                    link.href = '#';
+                                    link.textContent = doc;
+                                    link.className = 'inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs hover:bg-blue-200';
+                                    link.onclick = () => openDocumentModal(doc);
+                                    documentsDiv.appendChild(link);
+                                });
+                            } else {
+                                documentsDiv.textContent = 'No documents available';
+                            }
+                        } else {
+                            documentsDiv.textContent = 'No documents available';
+                        }
 
-            function openRejectModal(id) {
-                console.log("Opening Reject Modal for achievement_id: " + id);
-                document.getElementById('reject_achievement_id').value = id;
-                document.getElementById('rejectModal').classList.remove('hidden');
-            }
+                        document.getElementById('viewModal').classList.remove('hidden');
+                    }
 
-            function closeRejectModal() {
-                document.getElementById('rejectModal').classList.add('hidden');
-                document.getElementById('rejection_reason').value = '';
-            }
+                    function closeViewModal() {
+                        document.getElementById('viewModal').classList.add('hidden');
+                        document.getElementById('view_documents').innerHTML = '';
+                        document.getElementById('view_rejection_reason').classList.add('hidden');
+                    }
 
-            function openViewModal(id, data) {
-                console.log("Opening View Modal for achievement_id: " + id);
-                let achievement;
-                try {
-                    achievement = JSON.parse(data);
-                } catch (e) {
-                    console.error("Failed to parse achievement data: ", e);
-                    alert("Error loading achievement details.");
-                    return;
-                }
+                    function openDocumentModal(filename) {
+                        const documentContent = document.getElementById('documentContent');
+                        const downloadLink = document.getElementById('downloadLink');
+                        const filePath = `../Uploads/${filename}`;
+                        const ext = filename.split('.').pop().toLowerCase();
 
-                document.getElementById('view_athlete_name').textContent = achievement.athlete_name || 'N/A';
-                document.getElementById('view_level').textContent = achievement.level_of_competition || 'N/A';
-                document.getElementById('view_performance').textContent = achievement.performance || 'N/A';
-                document.getElementById('view_number_of_events').textContent = achievement.number_of_events || 'N/A';
-                document.getElementById('view_leadership_role').textContent = achievement.leadership_role || 'N/A';
-                document.getElementById('view_sportsmanship').textContent = achievement.sportsmanship || 'N/A';
-                document.getElementById('view_community_impact').textContent = achievement.community_impact || 'N/A';
-                document.getElementById('view_completeness_of_documents').textContent = achievement.completeness_of_documents || 'N/A';
-                document.getElementById('view_points').textContent = achievement.total_points || '0';
-                document.getElementById('view_submission_date').textContent = achievement.submission_date || 'N/A';
-                document.getElementById('view_status').textContent = achievement.status || 'Pending';
+                        documentContent.innerHTML = '';
+                        downloadLink.href = filePath;
 
-                const documentsDiv = document.getElementById('view_documents');
-                documentsDiv.innerHTML = '';
-                if (achievement.documents) {
-                    const docs = achievement.documents.split(',');
-                    docs.forEach(doc => {
-                        const ext = doc.split('.').pop().toLowerCase();
-                        const link = document.createElement('a');
-                        link.href = '#';
-                        link.textContent = doc;
-                        link.className = 'text-blue-600 hover:underline block';
-                        link.onclick = () => openDocumentModal(doc, ext);
-                        documentsDiv.appendChild(link);
+                        if (['jpg', 'jpeg', 'png'].includes(ext)) {
+                            const img = document.createElement('img');
+                            img.src = filePath;
+                            img.alt = filename;
+                            img.className = 'max-w-full h-auto';
+                            documentContent.appendChild(img);
+                        } else if (ext === 'pdf') {
+                            const embed = document.createElement('embed');
+                            embed.src = filePath;
+                            embed.type = 'application/pdf';
+                            embed.className = 'w-full h-[50vh]';
+                            documentContent.appendChild(embed);
+                        } else {
+                            documentContent.textContent = 'Preview not available for this file type.';
+                        }
+
+                        document.getElementById('documentModal').classList.remove('hidden');
+                    }
+
+                    function closeDocumentModal() {
+                        document.getElementById('documentModal').classList.add('hidden');
+                        document.getElementById('documentContent').innerHTML = '';
+                    }
+
+                    function openApproveModal(id) {
+                        console.log('Opening approve modal for ID:', id); // Debug log
+                        document.getElementById('approve_achievement_id').value = id;
+                        document.getElementById('approveModal').classList.remove('hidden');
+                    }
+
+                    function closeApproveModal() {
+                        document.getElementById('approveModal').classList.add('hidden');
+                    }
+
+                    function openRejectModal(id) {
+                        console.log('Opening reject modal for ID:', id); // Debug log
+                        document.getElementById('reject_achievement_id').value = id;
+                        document.getElementById('reject_reason_input').value = '';
+                        document.getElementById('rejectModal').classList.remove('hidden');
+                    }
+
+                    function closeRejectModal() {
+                        document.getElementById('rejectModal').classList.add('hidden');
+                    }
+
+                    // Submit handler for reject form to capture textarea value
+                    document.getElementById('rejectForm').addEventListener('submit', function(e) {
+                        document.getElementById('reject_reason_input').value = document.getElementById('reject_reason').value;
                     });
-                } else {
-                    documentsDiv.textContent = 'None';
-                }
-
-                const rejectionDiv = document.getElementById('view_rejection_reason');
-                const rejectionText = document.getElementById('view_rejection_text');
-                if (achievement.status === 'Rejected' && achievement.rejection_reason) {
-                    rejectionDiv.classList.remove('hidden');
-                    rejectionText.textContent = achievement.rejection_reason;
-                } else {
-                    rejectionDiv.classList.add('hidden');
-                }
-
-                document.getElementById('viewModal').classList.remove('hidden');
-            }
-
-            function closeViewModal() {
-                document.getElementById('viewModal').classList.add('hidden');
-            }
-
-            function openDocumentModal(doc, ext) {
-                console.log("Opening Document Modal for: " + doc);
-                const documentContent = document.getElementById('documentContent');
-                const downloadLink = document.getElementById('downloadLink');
-                const docPath = `../Uploads/${encodeURIComponent(doc)}`;
-                documentContent.innerHTML = '';
-                downloadLink.href = docPath;
-
-                if (['jpg', 'jpeg', 'png'].includes(ext)) {
-                    const img = document.createElement('img');
-                    img.src = docPath;
-                    img.className = 'max-w-full h-auto';
-                    documentContent.appendChild(img);
-                } else if (ext === 'pdf') {
-                    const iframe = document.createElement('iframe');
-                    iframe.src = docPath;
-                    iframe.className = 'w-full h-[50vh]';
-                    documentContent.appendChild(iframe);
-                } else {
-                    documentContent.textContent = 'Preview not available for this file type.';
-                    documentContent.className = 'text-gray-500 text-center';
-                }
-
-                document.getElementById('documentModal').classList.remove('hidden');
-            }
-
-            function closeDocumentModal() {
-                document.getElementById('documentModal').classList.add('hidden');
-                document.getElementById('documentContent').innerHTML = '';
-            }
-        </script>
+                </script>
 
 
 

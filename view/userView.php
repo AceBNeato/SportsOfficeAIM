@@ -1144,6 +1144,16 @@
             <!-- Campus Leaderboard Section -->
             <div class="bg-white rounded-lg shadow p-6 mb-6">
                 <h2 class="text-xl font-bold mb-4">Campus Leaderboard</h2>
+                <div class="mb-4">
+                    <form method="GET" action="../view/userView.php" class="flex items-center gap-4">
+                        <input type="hidden" name="page" value="Achievement">
+                        <label for="leaderboard_status" class="text-sm font-medium text-gray-700">Filter by Status:</label>
+                        <select id="leaderboard_status" name="leaderboard_status" onchange="this.form.submit()" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <option value="undergraduate" <?php echo (!isset($_GET['leaderboard_status']) || $_GET['leaderboard_status'] === 'undergraduate') ? 'selected' : ''; ?>>Undergraduate</option>
+                            <option value="alumni" <?php echo isset($_GET['leaderboard_status']) && $_GET['leaderboard_status'] === 'alumni' ? 'selected' : ''; ?>>Alumni</option>
+                        </select>
+                    </form>
+                </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
@@ -1164,26 +1174,27 @@
                         if ($conn->connect_error) {
                             echo '<tr><td colspan="3" class="px-6 py-4 text-sm text-gray-500 text-center">Database connection failed</td></tr>';
                         } else {
-                            $result = $conn->query("CALL GetLeaderboard()");
-                            if ($result) {
-                                $leaderboard = [];
-                                while ($row = $result->fetch_assoc()) {
-                                    $leaderboard[] = $row;
-                                }
-                                if (count($leaderboard) > 0) {
-                                    foreach ($leaderboard as $index => $athlete) {
-                                        echo '<tr>';
-                                        echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">' . htmlspecialchars($athlete['athlete_name'] ?? 'N/A') . '</td>';
-                                        echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">' . htmlspecialchars($athlete['total_points'] ?? '0') . '</td>';
-                                        echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">' . ($index + 1) . '</td>';
-                                        echo '</tr>';
-                                    }
-                                } else {
-                                    echo '<tr><td colspan="3" class="px-6 py-4 text-sm text-gray-500 text-center">No leaderboard data available</td></tr>';
+                            $status = isset($_GET['leaderboard_status']) && in_array($_GET['leaderboard_status'], ['undergraduate', 'alumni']) ? $_GET['leaderboard_status'] : 'undergraduate';
+                            $stmt = $conn->prepare("CALL GetLeaderboard(?)");
+                            $stmt->bind_param("s", $status);
+                            $stmt->execute();
+                            $result = $stmt->get_result();
+                            $leaderboard = [];
+                            while ($row = $result->fetch_assoc()) {
+                                $leaderboard[] = $row;
+                            }
+                            if (count($leaderboard) > 0) {
+                                foreach ($leaderboard as $index => $athlete) {
+                                    echo '<tr>';
+                                    echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">' . htmlspecialchars($athlete['athlete_name'] ?? 'N/A') . '</td>';
+                                    echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">' . htmlspecialchars($athlete['total_points'] ?? '0') . '</td>';
+                                    echo '<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">' . ($index + 1) . '</td>';
+                                    echo '</tr>';
                                 }
                             } else {
-                                echo '<tr><td colspan="3" class="px-6 py-4 text-sm text-gray-500 text-center">Failed to load leaderboard</td></tr>';
+                                echo '<tr><td colspan="3" class="px-6 py-4 text-sm text-gray-500 text-center">No leaderboard data available for ' . htmlspecialchars($status) . '</td></tr>';
                             }
+                            $stmt->close();
                             $conn->close();
                         }
                         ?>
@@ -1373,16 +1384,28 @@
                                 </select>
                             </div>
                             <div>
-                                <label for="edit_documents" class="block text-sm font-medium text-gray-700">Upload New Documents (optional)</label>
+                                <label for="edit_documents" class="block text-sm font-medium text-gray-700">Upload New Documents (optional, replaces existing)</label>
                                 <input type="file" id="edit_documents" name="documents[]" multiple accept=".pdf,.jpg,.jpeg,.png" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
                                 <p id="existing_documents_list" class="text-sm text-gray-500 mt-1"></p>
                             </div>
                         </div>
                         <div class="flex justify-end space-x-4">
                             <button type="button" id="cancelEdit" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400">Cancel</button>
-                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Update Achievement</button>
+                            <button type="button" id="saveChanges" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Save Changes</button>
                         </div>
                     </form>
+                </div>
+            </div>
+
+            <!-- Confirm Edit Modal -->
+            <div id="confirmEditModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden">
+                <div class="bg-white rounded-lg shadow p-6 w-full max-w-md">
+                    <h2 class="text-xl font-bold mb-4">Confirm Update</h2>
+                    <p class="text-gray-700 mb-4">Are you sure you want to update this achievement?</p>
+                    <div class="flex justify-end space-x-4">
+                        <button type="button" id="cancelConfirmEdit" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400">Cancel</button>
+                        <button type="button" id="confirmEdit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Confirm</button>
+                    </div>
                 </div>
             </div>
 
@@ -1522,6 +1545,19 @@
                 document.getElementById('existing_documents_list').textContent = '';
             });
 
+            // Open/Close Confirm Edit Modal
+            document.getElementById('saveChanges').addEventListener('click', function() {
+                document.getElementById('confirmEditModal').classList.remove('hidden');
+            });
+
+            document.getElementById('cancelConfirmEdit').addEventListener('click', function() {
+                document.getElementById('confirmEditModal').classList.add('hidden');
+            });
+
+            document.getElementById('confirmEdit').addEventListener('click', function() {
+                document.getElementById('editAchievementForm').submit();
+            });
+
             // Open/Close Delete Modal
             document.querySelectorAll('.deleteAchievementBtn').forEach(button => {
                 button.addEventListener('click', function() {
@@ -1535,11 +1571,12 @@
                 document.getElementById('delete_achievement_id').value = '';
             });
 
-            // Automatically close the modal after a successful submission
+            // Automatically close modals after a successful submission
             <?php if (isset($_SESSION['achievement_message']) && $_SESSION['message_class'] === 'bg-green-100'): ?>
             setTimeout(function() {
                 document.getElementById('achievementModal').classList.add('hidden');
                 document.getElementById('editAchievementModal').classList.add('hidden');
+                document.getElementById('confirmEditModal').classList.add('hidden');
                 document.getElementById('deleteAchievementModal').classList.add('hidden');
                 document.getElementById('achievementForm').reset();
                 document.getElementById('editAchievementForm').reset();

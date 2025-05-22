@@ -214,3 +214,62 @@
 
 )
 
+[22-May-2025 14:57:16 Europe/Berlin] Session contents: Array
+(
+    [csrf_token] => cf632c6647a336b72adad789ed7de2d07b5b805ab50494aafb3515a136b75a80
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1747918625
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+[22-May-2025 15:36:21 Europe/Berlin] Session contents: Array
+(
+    [csrf_token] => 5f45a4f2a1d6ceef681d98f45187b2e57981ae3c4faac94b7d024cf58ff545f3
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1747920964
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+[22-May-2025 15:36:21 Europe/Berlin] Invalid CSRF token: received=not set, expected=5f45a4f2a1d6ceef681d98f45187b2e57981ae3c4faac94b7d024cf58ff545f3
