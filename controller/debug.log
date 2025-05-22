@@ -819,3 +819,427 @@ Session Data: Array
 Input Data: submission_id=10, description='ajweasdhabdakgbdkasdjkchchchgcgchchgcabduojkadwewwqwqwqwqwqwxfgxsahdasgashgdhgavshdahdagdhaqavahsdsavdahsd', is_resubmission=0
 File Data: name=DATA DEFINITION COMMANDS.pdf, size=46703, type=application/pdf, error=0
 Update Successful: submission_id=10, is_resubmission=0
+Session Data: Array
+(
+    [csrf_token] => 11e3c995992fb8f01ef9eb4d2935481d79c794f2cbeb8016c2a097f1c85bc463
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 29
+            [student_id] => 2023-00066
+            [email] => aumicaroz00066@usep.edu.ph
+            [password] => $2y$10$sYzYyMPp.GfsmvPypwlDW.HSPG83Q0I6.x3FXOzPEdjc4pNccIEme
+            [address] => Unknown
+            [role] => user
+            [full_name] => Arthur Dale Enrique U. Micaroz
+            [year_section] => 2IT-BSIT
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747949637
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 4
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 2IT-BSIT
+        )
+
+)
+
+Input Data: submission_id=9, description='ok love isahajhvsjsvhvjasasdasd', is_resubmission=0
+Update Successful: submission_id=9, is_resubmission=0
+Session Data: Array
+(
+    [csrf_token] => 11e3c995992fb8f01ef9eb4d2935481d79c794f2cbeb8016c2a097f1c85bc463
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 29
+            [student_id] => 2023-00066
+            [email] => aumicaroz00066@usep.edu.ph
+            [password] => $2y$10$sYzYyMPp.GfsmvPypwlDW.HSPG83Q0I6.x3FXOzPEdjc4pNccIEme
+            [address] => Unknown
+            [role] => user
+            [full_name] => Arthur Dale Enrique U. Micaroz
+            [year_section] => 2IT-BSIT
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747949724
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 4
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 2IT-BSIT
+        )
+
+)
+
+Input Data: submission_id=10, description='ajweasdhabdakgbdkasdjkchchchgcgchchgcabduojkadwewwqwqwqwqwqwxfgxss hvahvdhashdvhasvhdahsvdahdasgashgdhgavshdahdagdhaqavahsdsavdahsd', is_resubmission=0
+File Data: name=STS.docx, size=75764, type=application/vnd.openxmlformats-officedocument.wordprocessingml.document, error=0
+Update Successful: submission_id=10, is_resubmission=0
+Session Data: Array
+(
+    [csrf_token] => 11e3c995992fb8f01ef9eb4d2935481d79c794f2cbeb8016c2a097f1c85bc463
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 29
+            [student_id] => 2023-00066
+            [email] => aumicaroz00066@usep.edu.ph
+            [password] => $2y$10$sYzYyMPp.GfsmvPypwlDW.HSPG83Q0I6.x3FXOzPEdjc4pNccIEme
+            [address] => Unknown
+            [role] => user
+            [full_name] => Arthur Dale Enrique U. Micaroz
+            [year_section] => 2IT-BSIT
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747950254
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 4
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 2IT-BSIT
+        )
+
+)
+
+Input Data: submission_id=10, description='ajweasdhabdakgbdkasdjkchchchgcgchchgcabduojkadwewwqwqwqwqwqwxfgxss hvahvdhashdvhasvhdahsvdahdasgashgdhgavshdahdagdhaqavahsdsavdahsd', is_resubmission=0
+Update Successful: submission_id=10, is_resubmission=0
+Session Data: Array
+(
+    [csrf_token] => 11e3c995992fb8f01ef9eb4d2935481d79c794f2cbeb8016c2a097f1c85bc463
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 29
+            [student_id] => 2023-00066
+            [email] => aumicaroz00066@usep.edu.ph
+            [password] => $2y$10$sYzYyMPp.GfsmvPypwlDW.HSPG83Q0I6.x3FXOzPEdjc4pNccIEme
+            [address] => Unknown
+            [role] => user
+            [full_name] => Arthur Dale Enrique U. Micaroz
+            [year_section] => 2IT-BSIT
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747950259
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 4
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 2IT-BSIT
+        )
+
+)
+
+Input Data: submission_id=11, description='yawa ka pistefsadsfsfdsfdsfbsrws eeaccgcgcbewscbbvbsagshhasdbv', is_resubmission=0
+Update Successful: submission_id=11, is_resubmission=0
+Session Data: Array
+(
+    [csrf_token] => 11e3c995992fb8f01ef9eb4d2935481d79c794f2cbeb8016c2a097f1c85bc463
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 29
+            [student_id] => 2023-00066
+            [email] => aumicaroz00066@usep.edu.ph
+            [password] => $2y$10$sYzYyMPp.GfsmvPypwlDW.HSPG83Q0I6.x3FXOzPEdjc4pNccIEme
+            [address] => Unknown
+            [role] => user
+            [full_name] => Arthur Dale Enrique U. Micaroz
+            [year_section] => 2IT-BSIT
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747950264
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 4
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 2IT-BSIT
+        )
+
+)
+
+Input Data: submission_id=10, description='ajweasdhabdakgbdkasdjkchchchgcgchchgcabduojkadwewwqwqwqwqwqwxfgxss hvahvdhashdvhasvhdahsvdahdasgashgdhgavshdahdagdhaqavahsdsavdahsd', is_resubmission=0
+File Data: name=STS.docx, size=75764, type=application/vnd.openxmlformats-officedocument.wordprocessingml.document, error=0
+Update Successful: submission_id=10, is_resubmission=0
+Session Data: Array
+(
+    [csrf_token] => 11e3c995992fb8f01ef9eb4d2935481d79c794f2cbeb8016c2a097f1c85bc463
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 29
+            [student_id] => 2023-00066
+            [email] => aumicaroz00066@usep.edu.ph
+            [password] => $2y$10$sYzYyMPp.GfsmvPypwlDW.HSPG83Q0I6.x3FXOzPEdjc4pNccIEme
+            [address] => Unknown
+            [role] => user
+            [full_name] => Arthur Dale Enrique U. Micaroz
+            [year_section] => 2IT-BSIT
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747950486
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 4
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 2IT-BSIT
+        )
+
+)
+
+Input Data: submission_id=10, description='ajweasdhabdakgbdkasdjkchchchgcgchchgcabduojkadwewwqwqwqwqwqwxfgxss hvahvdhashdvhasvhdahsvdahdasgashgdhgavshdahdagdhaqavahsdsavdahsd', is_resubmission=0
+Update Successful: submission_id=10, is_resubmission=0
+Session Data: Array
+(
+    [csrf_token] => 11e3c995992fb8f01ef9eb4d2935481d79c794f2cbeb8016c2a097f1c85bc463
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 29
+            [student_id] => 2023-00066
+            [email] => aumicaroz00066@usep.edu.ph
+            [password] => $2y$10$sYzYyMPp.GfsmvPypwlDW.HSPG83Q0I6.x3FXOzPEdjc4pNccIEme
+            [address] => Unknown
+            [role] => user
+            [full_name] => Arthur Dale Enrique U. Micaroz
+            [year_section] => 2IT-BSIT
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747950492
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 4
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 2IT-BSIT
+        )
+
+)
+
+Input Data: submission_id=11, description='yawa ka pistefsadsfsfdsfdsfbsrws eeaccgcgcbewscbbvbsagshhasdbv', is_resubmission=0
+Update Successful: submission_id=11, is_resubmission=0
+Session Data: Array
+(
+    [csrf_token] => 11e3c995992fb8f01ef9eb4d2935481d79c794f2cbeb8016c2a097f1c85bc463
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 29
+            [student_id] => 2023-00066
+            [email] => aumicaroz00066@usep.edu.ph
+            [password] => $2y$10$sYzYyMPp.GfsmvPypwlDW.HSPG83Q0I6.x3FXOzPEdjc4pNccIEme
+            [address] => Unknown
+            [role] => user
+            [full_name] => Arthur Dale Enrique U. Micaroz
+            [year_section] => 2IT-BSIT
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747950496
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 4
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 2IT-BSIT
+        )
+
+)
+
+Input Data: submission_id=10, description='ajweasdhabdakgbdkasdjkchchchgcgchchgcabduojkadwewwqwqwqwqwqwxfgxss hvahvdhashdvhasvhdahsvdahdasgashgdhgavshdahdagdhaqavahsdsavdahsd', is_resubmission=0
+File Data: name=0c57311a-d7ef-4d4b-96ee-c160f43fa7e1.jpg, size=29569, type=image/jpeg, error=0
+Update Successful: submission_id=10, is_resubmission=0
+Session Data: Array
+(
+    [csrf_token] => 322b4624381578d6c91b237d74ba5bae286e501ead238ca6bb1a1e102dbfeba1
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 29
+            [student_id] => 2023-00066
+            [email] => aumicaroz00066@usep.edu.ph
+            [password] => $2y$10$sYzYyMPp.GfsmvPypwlDW.HSPG83Q0I6.x3FXOzPEdjc4pNccIEme
+            [address] => Unknown
+            [role] => user
+            [full_name] => Arthur Dale Enrique U. Micaroz
+            [year_section] => 2IT-BSIT
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747951228
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 2
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 2IT-BSIT
+        )
+
+    [message] => Your document has been submitted successfully!
+)
+
+Input Data: submission_id=13, description='mahal kita pero alama mo on puta', is_resubmission=0
+Update Successful: submission_id=13, is_resubmission=0
+Session Data: Array
+(
+    [csrf_token] => ba38f11ff6e6a3b28a1fda034a9bf7222bb989ee0e5b5454861bc2fac694b7c7
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 29
+            [student_id] => 2023-00066
+            [email] => aumicaroz00066@usep.edu.ph
+            [password] => $2y$10$sYzYyMPp.GfsmvPypwlDW.HSPG83Q0I6.x3FXOzPEdjc4pNccIEme
+            [address] => Unknown
+            [role] => user
+            [full_name] => Arthur Dale Enrique U. Micaroz
+            [year_section] => 2IT-BSIT
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747951909
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 2IT-BSIT
+        )
+
+    [message] => Your document has been submitted successfully!
+)
+
+Input Data: submission_id=16, description='bajhbsdjjabsjdjahbdhasda', is_resubmission=0
+Update Successful: submission_id=16, is_resubmission=0
+Session Data: Array
+(
+    [csrf_token] => d4232abb0d4efb3c90df4561ba400e8975cdc1d478b288e998c250d7a96acf07
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 29
+            [student_id] => 2023-00066
+            [email] => aumicaroz00066@usep.edu.ph
+            [password] => $2y$10$sYzYyMPp.GfsmvPypwlDW.HSPG83Q0I6.x3FXOzPEdjc4pNccIEme
+            [address] => Unknown
+            [role] => user
+            [full_name] => Arthur Dale Enrique U. Micaroz
+            [year_section] => 2IT-BSIT
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747951965
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 2
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 2IT-BSIT
+        )
+
+)
+
+Input Data: submission_id=16, description='bajhbsdjjabsjdjahbdhasda', is_resubmission=0
+File Data: name=DATA DEFINITION COMMANDS.pdf, size=46703, type=application/pdf, error=0
+Update Successful: submission_id=16, is_resubmission=0
+Session Data: Array
+(
+    [csrf_token] => d4232abb0d4efb3c90df4561ba400e8975cdc1d478b288e998c250d7a96acf07
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 29
+            [student_id] => 2023-00066
+            [email] => aumicaroz00066@usep.edu.ph
+            [password] => $2y$10$sYzYyMPp.GfsmvPypwlDW.HSPG83Q0I6.x3FXOzPEdjc4pNccIEme
+            [address] => Unknown
+            [role] => user
+            [full_name] => Arthur Dale Enrique U. Micaroz
+            [year_section] => 2IT-BSIT
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747952216
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 2IT-BSIT
+        )
+
+    [message] => Your document has been submitted successfully!
+)
+
+Input Data: submission_id=17, description='sdzgdjgxjfcrfxghtuh', is_resubmission=0
+File Data: name=STS.docx, size=75764, type=application/vnd.openxmlformats-officedocument.wordprocessingml.document, error=0
+Update Successful: submission_id=17, is_resubmission=0
+Session Data: Array
+(
+    [csrf_token] => 8650d9435269197b714853bec702b40b0a4ac85bf1b3e1eb451f26bfb6332559
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 29
+            [student_id] => 2023-00066
+            [email] => aumicaroz00066@usep.edu.ph
+            [password] => $2y$10$sYzYyMPp.GfsmvPypwlDW.HSPG83Q0I6.x3FXOzPEdjc4pNccIEme
+            [address] => Unknown
+            [role] => user
+            [full_name] => Arthur Dale Enrique U. Micaroz
+            [year_section] => 2IT-BSIT
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747952275
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 2
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 2IT-BSIT
+        )
+
+)
+
+Input Data: submission_id=17, description='sdzgdjgxjfcrfxghtuh', is_resubmission=0
+Update Successful: submission_id=17, is_resubmission=0

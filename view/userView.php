@@ -2431,7 +2431,6 @@
                 </script>
             </div>
 
-
             <!-- Edit Submission Modal -->
             <div id="editSubmissionModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 transition-opacity duration-300 hidden" role="dialog" aria-labelledby="edit-modal-title">
                 <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-5xl mx-4 sm:p-8 transform transition-all duration-300 scale-100" aria-modal="true">
@@ -2445,7 +2444,7 @@
                         </button>
                     </div>
 
-                    <form id="editSubmissionForm" action="../controller/update_submission.php" method="POST" enctype="multipart/form-data">
+                    <form id="editSubmissionForm" action="../controller/update_submission.php" method="POST" enctype="multipart/form-data" onsubmit="return validateEditForm()">
                         <input type="hidden" name="submission_id" id="edit_submission_id">
                         <input type="hidden" name="is_resubmission" id="is_resubmission" value="0">
                         <div class="flex flex-col xl:flex-row gap-10">
@@ -2547,13 +2546,16 @@
                                                 class="py-3 px-10 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg text-base font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed">
                                             Save Changes
                                         </button>
-                                    </div>
-                                    <div id="resubmit_button_container" class="hidden">
                                         <button type="button" id="resubmit_button"
-                                                class="w-full py-3 px-10 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg text-base font-semibold hover:from-green-700 hover:to-green-800 transition-all duration-200 shadow-lg focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2">
-                                            Resubmit Document
+                                                class="py-3 px-10 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg text-base font-semibold hover:from-green-700 hover:to-green-800 transition-all duration-200 shadow-lg focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed hidden"
+                                                onclick="resubmitSubmission()">
+                                            Resubmit
                                         </button>
-                                        <p class="text-sm text-gray-500 mt-2 text-center">Click to submit this document for review again</p>
+                                        <button type="button" id="delete_submission_button"
+                                                class="py-3 px-10 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg text-base font-semibold hover:from-red-700 hover:to-red-800 transition-all duration-200 shadow-lg focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2"
+                                                onclick="deleteSubmission()">
+                                            Delete Submission
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -2564,37 +2566,207 @@
                 </div>
             </div>
 
+            <!-- Success Modal -->
+            <div id="successModal" class="fixed inset-0 z-60 flex items-center justify-center bg-black bg-opacity-70 transition-opacity duration-300 hidden">
+                <div class="bg-white rounded-lg p-6 max-w-sm mx-4 shadow-xl transform transition-all duration-300 scale-100">
+                    <div class="flex items-center gap-3 mb-4">
+                        <svg class="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        <h3 class="text-lg font-bold text-gray-900">Success</h3>
+                    </div>
+                    <p id="successModalMessage" class="text-base text-gray-600">Your submission was deleted successfully.</p>
+                </div>
+            </div>
+
             <script>
                 // Document type radio button toggle
                 document.querySelectorAll('input[name="document_type"]').forEach(radio => {
                     radio.addEventListener('change', function() {
-                        document.getElementById('otherTypeContainer').classList.toggle('hidden', this.value !== 'other');
+                        const otherTypeContainer = document.getElementById('otherTypeContainer');
+                        otherTypeContainer.classList.toggle('hidden', this.value !== 'other');
+                        if (this.value !== 'other') {
+                            document.getElementById('other_type').value = ''; // Clear other type input when not selected
+                        }
                     });
                 });
 
-                // Update the openEditModal function to handle resubmission
+                // Client-side form validation for edit
+                function validateEditForm() {
+                    const description = document.getElementById('edit_description').value.trim();
+                    const documentTypeSection = document.getElementById('documentTypeSection');
+                    const otherTypeInput = document.getElementById('other_type');
+                    const fileInput = document.getElementById('uploaded_file');
+                    const errorMessage = document.getElementById('form_error_message');
+
+                    // Reset error states
+                    errorMessage.classList.add('hidden');
+                    document.getElementById('edit_desc_warning').classList.add('hidden');
+                    document.getElementById('edit_file_warning').classList.add('hidden');
+
+                    // Validate description
+                    if (description.length < 10) {
+                        document.getElementById('edit_desc_warning').classList.remove('hidden');
+                        errorMessage.textContent = 'Description must be at least 10 characters long.';
+                        errorMessage.classList.remove('hidden');
+                        return false;
+                    }
+
+                    // Validate document type for rejected documents
+                    if (!documentTypeSection.classList.contains('hidden')) {
+                        const isOtherType = document.getElementById('document_type_other').checked;
+                        if (isOtherType && !otherTypeInput.value.trim()) {
+                            errorMessage.textContent = 'Please specify a document type.';
+                            errorMessage.classList.remove('hidden');
+                            return false;
+                        }
+                    }
+
+                    // Validate file (if uploaded)
+                    if (fileInput.files.length > 0) {
+                        const file = fileInput.files[0];
+                        const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'image/jpeg', 'image/png'];
+                        const maxSize = 5 * 1024 * 1024; // 5MB
+                        if (!validTypes.includes(file.type)) {
+                            document.getElementById('edit_file_warning').classList.remove('hidden');
+                            errorMessage.textContent = 'Invalid file type. Please upload PDF, DOC, DOCX, JPG, or PNG.';
+                            errorMessage.classList.remove('hidden');
+                            return false;
+                        }
+                        if (file.size > maxSize) {
+                            document.getElementById('edit_file_warning').classList.remove('hidden');
+                            errorMessage.textContent = 'File size exceeds 5MB limit.';
+                            errorMessage.classList.remove('hidden');
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }
+
+                // Show success modal
+                function showSuccessModal(message) {
+                    const successModal = document.getElementById('successModal');
+                    const successMessage = document.getElementById('successModalMessage');
+                    successMessage.textContent = message;
+                    successModal.classList.remove('hidden');
+                    setTimeout(() => {
+                        successModal.classList.add('hidden');
+                        window.location.reload(); // Reload the page after modal closes
+                    }, 2000); // Display for 2 seconds
+                }
+
+                // Resubmit submission function with AJAX
+                async function resubmitSubmission() {
+                    const submissionId = document.getElementById('edit_submission_id').value;
+                    const errorMessage = document.getElementById('form_error_message');
+
+                    if (!submissionId) {
+                        errorMessage.textContent = 'No submission ID found.';
+                        errorMessage.classList.remove('hidden');
+                        return;
+                    }
+
+                    if (confirm('Are you sure you want to resubmit this submission?')) {
+                        try {
+                            const response = await fetch('../controller/resubmit_submission.php', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                                body: `id=${encodeURIComponent(submissionId)}`
+                            });
+                            const result = await response.json();
+
+                            if (result.success) {
+                                closeModal('editSubmissionModal');
+                                showSuccessModal('Submission resubmitted successfully');
+                            } else {
+                                errorMessage.textContent = result.message;
+                                errorMessage.classList.remove('hidden');
+                            }
+                        } catch (e) {
+                            console.error('Error resubmitting submission:', e);
+                            errorMessage.textContent = 'An error occurred while resubmitting. Please try again.';
+                            errorMessage.classList.remove('hidden');
+                        }
+                    }
+                }
+
+                // Delete submission function with AJAX
+                async function deleteSubmission() {
+                    const submissionId = document.getElementById('edit_submission_id').value;
+                    const errorMessage = document.getElementById('form_error_message');
+
+                    if (!submissionId) {
+                        errorMessage.textContent = 'No submission ID found.';
+                        errorMessage.classList.remove('hidden');
+                        return;
+                    }
+
+                    if (confirm('Are you sure you want to delete this submission? This action cannot be undone.')) {
+                        try {
+                            const response = await fetch('../controller/delete_submission.php', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                                body: `id=${encodeURIComponent(submissionId)}`
+                            });
+                            const result = await response.json();
+
+                            if (result.success) {
+                                closeModal('editSubmissionModal');
+                                showSuccessModal('Your submission was deleted successfully');
+                            } else {
+                                errorMessage.textContent = result.message;
+                                errorMessage.classList.remove('hidden');
+                            }
+                        } catch (e) {
+                            console.error('Error deleting submission:', e);
+                            errorMessage.textContent = 'An error occurred while deleting. Please try again.';
+                            errorMessage.classList.remove('hidden');
+                        }
+                    }
+                }
+
+                // Update the openEditModal function to handle button visibility
                 function openEditModal(id, documentType, otherType, description, fileName, status, submissionDate) {
                     const modal = document.getElementById('editSubmissionModal');
-                    const statusValue = typeof status === 'string' ? status : JSON.parse(status);
-                    const isRejected = statusValue.toLowerCase() === 'rejected';
-                    const isPending = statusValue.toLowerCase() === 'pending';
+                    const errorMessage = document.getElementById('form_error_message');
+                    const submitButton = document.getElementById('edit_submit_button');
+                    const resubmitButton = document.getElementById('resubmit_button');
+
+                    // Reset modal state
+                    errorMessage.classList.add('hidden');
+                    document.getElementById('edit_desc_warning').classList.add('hidden');
+                    document.getElementById('edit_file_warning').classList.add('hidden');
+                    document.getElementById('uploaded_file').value = ''; // Clear file input
+                    document.getElementById('file_info').classList.add('hidden');
 
                     try {
-                        document.getElementById('edit_submission_id').value = typeof id === 'string' ? id : JSON.parse(id);
-                        document.getElementById('edit_description').value = typeof description === 'string' ? description : JSON.parse(description);
-                        document.getElementById('edit_submission_date').textContent = typeof submissionDate === 'string' ? submissionDate : JSON.parse(submissionDate);
+                        // Parse inputs safely
+                        const submissionId = typeof id === 'string' ? id : String(id);
+                        const docType = typeof documentType === 'string' ? documentType : String(documentType);
+                        const otherTypeValue = typeof otherType === 'string' ? otherType : (otherType ? String(otherType) : '');
+                        const desc = typeof description === 'string' ? description : String(description);
+                        const subDate = typeof submissionDate === 'string' ? submissionDate : String(submissionDate);
+                        const statusValue = typeof status === 'string' ? status : String(status);
+
+                        // Set form values
+                        document.getElementById('edit_submission_id').value = submissionId;
+                        document.getElementById('edit_description').value = desc;
+                        document.getElementById('edit_submission_date').textContent = subDate;
+
+                        // Determine if document is rejected
+                        const isRejected = statusValue.toLowerCase() === 'rejected';
+
+                        // Show/hide resubmit button based on status
+                        resubmitButton.classList.toggle('hidden', !isRejected);
 
                         // Handle document type display
-                        const docType = typeof documentType === 'string' ? documentType : JSON.parse(documentType);
-                        const otherTypeValue = otherType ? (typeof otherType === 'string' ? otherType : JSON.parse(otherType)) : '';
-
                         if (isRejected) {
-                            // Show document type selection for rejected documents
                             document.getElementById('documentTypeSection').classList.remove('hidden');
                             document.getElementById('documentTypeDisplay').classList.add('hidden');
 
-                            // Set initial values
-                            if (otherTypeValue && otherTypeValue !== '') {
+                            // Set document type radio buttons
+                            if (otherTypeValue && otherTypeValue.trim() !== '') {
                                 document.getElementById('document_type_other').checked = true;
                                 document.getElementById('otherTypeContainer').classList.remove('hidden');
                                 document.getElementById('other_type').value = otherTypeValue;
@@ -2603,7 +2775,6 @@
                                 document.getElementById('otherTypeContainer').classList.add('hidden');
                             }
                         } else {
-                            // Show document type display for non-rejected documents
                             document.getElementById('documentTypeSection').classList.add('hidden');
                             document.getElementById('documentTypeDisplay').classList.remove('hidden');
                             document.getElementById('edit_document_type_display').textContent = docType;
@@ -2616,29 +2787,48 @@
                             'rejected': 'bg-red-100 text-red-800'
                         };
                         const statusDisplay = document.getElementById('edit_status_display');
-                        statusDisplay.textContent = statusValue;
+                        statusDisplay.textContent = statusValue.charAt(0).toUpperCase() + statusValue.slice(1).toLowerCase();
                         statusDisplay.className = `text-sm px-3 py-1.5 rounded-full font-semibold ${statusClasses[statusValue.toLowerCase()] || 'bg-gray-100 text-gray-800'}`;
 
-                        // Show/hide resubmit button container (show for both rejected and pending statuses)
-                        document.getElementById('resubmit_button_container').classList.toggle('hidden', !(isRejected || isPending));
-                        document.getElementById('is_resubmission').value = '0';
-
+                        // Show modal
+                        modal.classList.remove('hidden');
                     } catch (e) {
-                        console.error('Error parsing JSON data for edit modal:', e);
+                        console.error('Error processing modal data:', e);
+                        errorMessage.textContent = 'An error occurred while loading the form. Please try again.';
+                        errorMessage.classList.remove('hidden');
                     }
-
-                    // Set up resubmit button handler
-                    document.getElementById('resubmit_button').onclick = function() {
-                        document.getElementById('is_resubmission').value = '1';
-                        document.getElementById('editSubmissionForm').submit();
-                    };
-
-                    modal.classList.remove('hidden');
                 }
 
+                // Close modal function
                 function closeModal(modalId) {
-                    document.getElementById(modalId).classList.add('hidden');
+                    const modal = document.getElementById(modalId);
+                    modal.classList.add('hidden');
+                    // Reset form
+                    document.getElementById('editSubmissionForm').reset();
+                    document.getElementById('documentTypeSection').classList.add('hidden');
+                    document.getElementById('documentTypeDisplay').classList.remove('hidden');
+                    document.getElementById('form_error_message').classList.add('hidden');
+                    document.getElementById('edit_desc_warning').classList.add('hidden');
+                    document.getElementById('edit_file_warning').classList.add('hidden');
+                    // Reset buttons
+                    const submitButton = document.getElementById('edit_submit_button');
+                    submitButton.textContent = 'Save Changes';
+                    submitButton.className = 'py-3 px-10 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg text-base font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed';
+                    document.getElementById('resubmit_button').classList.add('hidden');
+                    document.getElementById('is_resubmission').value = '0';
                 }
+
+                // File upload feedback
+                document.getElementById('uploaded_file').addEventListener('change', function() {
+                    const fileInfo = document.getElementById('file_info');
+                    const fileName = document.getElementById('file_name');
+                    if (this.files.length > 0) {
+                        fileName.textContent = this.files[0].name;
+                        fileInfo.classList.remove('hidden');
+                    } else {
+                        fileInfo.classList.add('hidden');
+                    }
+                });
             </script>
 
 
