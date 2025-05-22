@@ -2432,7 +2432,6 @@
             </div>
 
 
-
             <!-- Edit Submission Modal -->
             <div id="editSubmissionModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 transition-opacity duration-300 hidden" role="dialog" aria-labelledby="edit-modal-title">
                 <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-5xl mx-4 sm:p-8 transform transition-all duration-300 scale-100" aria-modal="true">
@@ -2548,12 +2547,14 @@
                                                 class="py-3 px-10 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg text-base font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed">
                                             Save Changes
                                         </button>
+                                    </div>
+                                    <div id="resubmit_button_container" class="hidden">
                                         <button type="button" id="resubmit_button"
-                                                class="py-3 px-10 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg text-base font-semibold hover:from-green-700 hover:to-green-800 transition-all duration-200 shadow-lg focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 hidden">
+                                                class="w-full py-3 px-10 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg text-base font-semibold hover:from-green-700 hover:to-green-800 transition-all duration-200 shadow-lg focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2">
                                             Resubmit Document
                                         </button>
+                                        <p class="text-sm text-gray-500 mt-2 text-center">Click to submit this document for review again</p>
                                     </div>
-
                                 </div>
                             </div>
                         </div>
@@ -2574,17 +2575,18 @@
                 // Update the openEditModal function to handle resubmission
                 function openEditModal(id, documentType, otherType, description, fileName, status, submissionDate) {
                     const modal = document.getElementById('editSubmissionModal');
-                    const isRejected = status.toLowerCase() === 'rejected';
+                    const statusValue = typeof status === 'string' ? status : JSON.parse(status);
+                    const isRejected = statusValue.toLowerCase() === 'rejected';
+                    const isPending = statusValue.toLowerCase() === 'pending';
 
                     try {
-                        document.getElementById('edit_submission_id').value = JSON.parse(id);
-                        document.getElementById('edit_description').value = JSON.parse(description);
-                        document.getElementById('edit_submission_date').textContent = JSON.parse(submissionDate);
+                        document.getElementById('edit_submission_id').value = typeof id === 'string' ? id : JSON.parse(id);
+                        document.getElementById('edit_description').value = typeof description === 'string' ? description : JSON.parse(description);
+                        document.getElementById('edit_submission_date').textContent = typeof submissionDate === 'string' ? submissionDate : JSON.parse(submissionDate);
 
                         // Handle document type display
-                        const docType = JSON.parse(documentType);
-                        const otherTypeValue = JSON.parse(otherType);
-                        const statusValue = JSON.parse(status);
+                        const docType = typeof documentType === 'string' ? documentType : JSON.parse(documentType);
+                        const otherTypeValue = otherType ? (typeof otherType === 'string' ? otherType : JSON.parse(otherType)) : '';
 
                         if (isRejected) {
                             // Show document type selection for rejected documents
@@ -2617,8 +2619,8 @@
                         statusDisplay.textContent = statusValue;
                         statusDisplay.className = `text-sm px-3 py-1.5 rounded-full font-semibold ${statusClasses[statusValue.toLowerCase()] || 'bg-gray-100 text-gray-800'}`;
 
-                        // Show/hide resubmit button
-                        document.getElementById('resubmit_button').classList.toggle('hidden', !isRejected);
+                        // Show/hide resubmit button container (show for both rejected and pending statuses)
+                        document.getElementById('resubmit_button_container').classList.toggle('hidden', !(isRejected || isPending));
                         document.getElementById('is_resubmission').value = '0';
 
                     } catch (e) {
@@ -2633,8 +2635,11 @@
 
                     modal.classList.remove('hidden');
                 }
-            </script>
 
+                function closeModal(modalId) {
+                    document.getElementById(modalId).classList.add('hidden');
+                }
+            </script>
 
 
 
@@ -2899,7 +2904,7 @@
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
-                                window.location.href = '../SportsOfficeAIM/view/userView.php?page=Track';
+                                window.location.href = '../view/userView.php?page=Track';
                             } else {
                                 errorMessage.textContent = data.message || 'An error occurred';
                                 errorMessage.classList.remove('hidden');
