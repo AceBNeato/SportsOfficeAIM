@@ -1608,3 +1608,75 @@ Approve Request - POST Data: Array
 )
 
 Approve Request - Session ID: h6dabk81k5h9ara4fons34m94u
+Approve Request - Session: Array
+(
+    [csrf_token] => 7826ee1d91fe0aa2e308b2c647de7ec36bf2fe1a8fea55626796e05a4a6dbc02
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1747918569
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Approve Request - POST Data: Array
+(
+    [approval_id] => 2
+    [action] => approve
+)
+
+Approve Request - Session ID: k0jbrjapjrp0k6fdf9qccjp0kv
+Approve Request - Session: Array
+(
+    [csrf_token] => 37a9cc52f2955d78946b746326ea78281ab101c386c96d00ddbcb576a3c4813d
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1747921130
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Approve Request - POST Data: Array
+(
+    [approval_id] => 3
+    [action] => approve
+)
+
+Approve Request - Session ID: 75pu40ol0uf525aj5vdcup9ghl

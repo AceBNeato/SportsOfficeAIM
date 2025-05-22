@@ -275,22 +275,19 @@ END //
 DELIMITER ;
 
 
-
 DELIMITER //
-
-CREATE PROCEDURE GetLeaderboard()
+CREATE PROCEDURE GetLeaderboard(IN userStatus VARCHAR(20))
 BEGIN
     SELECT
-        athlete_name,
-        SUM(total_points) AS total_points
-    FROM achievements
-    WHERE status = 'Approved'
-    GROUP BY athlete_name
+        a.athlete_name,
+        SUM(a.total_points) AS total_points
+    FROM achievements a
+    JOIN users u ON a.user_id = u.id
+    WHERE a.status = 'Approved' AND u.status = userStatus
+    GROUP BY a.user_id, a.athlete_name
     ORDER BY total_points DESC;
 END //
-
 DELIMITER ;
-
 
 
 
