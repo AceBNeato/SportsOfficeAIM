@@ -273,3 +273,915 @@
 )
 
 [22-May-2025 15:36:21 Europe/Berlin] Invalid CSRF token: received=not set, expected=5f45a4f2a1d6ceef681d98f45187b2e57981ae3c4faac94b7d024cf58ff545f3
+[22-May-2025 16:42:31 Europe/Berlin] Session contents: Array
+(
+    [csrf_token] => d3c38bc57d5e40471116a961080e74ea90a60d7341136f7acefba1bd49cc4491
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1747924947
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+[22-May-2025 16:42:31 Europe/Berlin] Invalid CSRF token: received=not set, expected=d3c38bc57d5e40471116a961080e74ea90a60d7341136f7acefba1bd49cc4491
+[22-May-2025 16:49:26 Europe/Berlin] Session contents: Array
+(
+    [csrf_token] => 56e115b7bb00d93a24961805b4f5402d86f1c7d4102ab963e80a3f4b840dde92
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1747925356
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+[22-May-2025 16:49:26 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'achievement_name' in 'field list' in C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php:55
+Stack trace:
+#0 C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php(55): mysqli->prepare('SELECT user_id,...')
+#1 {main}
+  thrown in C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php on line 55
+[22-May-2025 16:49:33 Europe/Berlin] Session contents: Array
+(
+    [csrf_token] => 56e115b7bb00d93a24961805b4f5402d86f1c7d4102ab963e80a3f4b840dde92
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1747925356
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+[22-May-2025 16:49:33 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'achievement_name' in 'field list' in C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php:55
+Stack trace:
+#0 C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php(55): mysqli->prepare('SELECT user_id,...')
+#1 {main}
+  thrown in C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php on line 55
+[22-May-2025 16:49:40 Europe/Berlin] Session contents: Array
+(
+    [csrf_token] => 56e115b7bb00d93a24961805b4f5402d86f1c7d4102ab963e80a3f4b840dde92
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1747925356
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+[22-May-2025 16:49:41 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'achievement_name' in 'field list' in C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php:55
+Stack trace:
+#0 C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php(55): mysqli->prepare('SELECT user_id,...')
+#1 {main}
+  thrown in C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php on line 55
+[22-May-2025 16:52:33 Europe/Berlin] Session contents: Array
+(
+    [csrf_token] => d7e9d36fb07aa06039e6e52a33c8d917338c9fb1dd4bd9f1347f73020f0d9380
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1747925546
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+[22-May-2025 16:52:33 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'achievement_name' in 'field list' in C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php:55
+Stack trace:
+#0 C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php(55): mysqli->prepare('SELECT user_id,...')
+#1 {main}
+  thrown in C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php on line 55
+[22-May-2025 16:52:38 Europe/Berlin] Session contents: Array
+(
+    [csrf_token] => d7e9d36fb07aa06039e6e52a33c8d917338c9fb1dd4bd9f1347f73020f0d9380
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1747925546
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+[22-May-2025 16:52:38 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'achievement_name' in 'field list' in C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php:55
+Stack trace:
+#0 C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php(55): mysqli->prepare('SELECT user_id,...')
+#1 {main}
+  thrown in C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php on line 55
+[22-May-2025 16:54:35 Europe/Berlin] Session contents: Array
+(
+    [csrf_token] => d7e9d36fb07aa06039e6e52a33c8d917338c9fb1dd4bd9f1347f73020f0d9380
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1747925664
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+[22-May-2025 16:54:35 Europe/Berlin] Invalid CSRF token: received=not set, expected=d7e9d36fb07aa06039e6e52a33c8d917338c9fb1dd4bd9f1347f73020f0d9380
+[22-May-2025 16:59:31 Europe/Berlin] Session contents: Array
+(
+    [csrf_token] => d7e9d36fb07aa06039e6e52a33c8d917338c9fb1dd4bd9f1347f73020f0d9380
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1747925675
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [admin_message] => Invalid CSRF token.
+    [admin_message_class] => bg-red-100
+)
+
+[22-May-2025 16:59:31 Europe/Berlin] Invalid CSRF token: received=not set, expected=d7e9d36fb07aa06039e6e52a33c8d917338c9fb1dd4bd9f1347f73020f0d9380
+[22-May-2025 17:02:00 Europe/Berlin] Session contents: Array
+(
+    [csrf_token] => 7adf181dac8371785015c06065bba318c148246dace992a8dd05b3385ce8eefa
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1747926114
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+[22-May-2025 17:02:00 Europe/Berlin] Invalid CSRF token: received=not set, expected=7adf181dac8371785015c06065bba318c148246dace992a8dd05b3385ce8eefa
+[22-May-2025 17:02:10 Europe/Berlin] Session contents: Array
+(
+    [csrf_token] => 7adf181dac8371785015c06065bba318c148246dace992a8dd05b3385ce8eefa
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1747926120
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [admin_message] => Invalid CSRF token.
+    [admin_message_class] => bg-red-100
+)
+
+[22-May-2025 17:02:10 Europe/Berlin] Invalid CSRF token: received=not set, expected=7adf181dac8371785015c06065bba318c148246dace992a8dd05b3385ce8eefa
+[22-May-2025 17:02:23 Europe/Berlin] Session contents: Array
+(
+    [csrf_token] => 5ae2d5188de19b96124324c0d0ecd92bbe82e1805959568291d3f92bfa89611e
+)
+
+[22-May-2025 17:02:23 Europe/Berlin] Admin not logged in: admin_id=not set, user_role=not set
+[22-May-2025 17:02:31 Europe/Berlin] Session contents: Array
+(
+    [csrf_token] => 17b60acfd49e1a3892e13cf38aeb1da7f00530b4db374fd868882a04b497816d
+    [admin_message] => Admin not logged in.
+    [admin_message_class] => bg-red-100
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1747926146
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+[22-May-2025 17:02:31 Europe/Berlin] Invalid CSRF token: received=not set, expected=17b60acfd49e1a3892e13cf38aeb1da7f00530b4db374fd868882a04b497816d
+[22-May-2025 17:09:23 Europe/Berlin] Session contents: Array
+(
+    [csrf_token] => 4d0dbac991578353603f8f26a942e1247085729b76bd6761ffae9b5b10cf9bd4
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1747926478
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+[22-May-2025 17:09:23 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'achievement_name' in 'field list' in C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php:53
+Stack trace:
+#0 C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php(53): mysqli->prepare('SELECT user_id,...')
+#1 {main}
+  thrown in C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php on line 53
+[22-May-2025 17:09:30 Europe/Berlin] Session contents: Array
+(
+    [csrf_token] => 4d0dbac991578353603f8f26a942e1247085729b76bd6761ffae9b5b10cf9bd4
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1747926478
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+[22-May-2025 17:09:30 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'achievement_name' in 'field list' in C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php:53
+Stack trace:
+#0 C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php(53): mysqli->prepare('SELECT user_id,...')
+#1 {main}
+  thrown in C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php on line 53
+[22-May-2025 17:09:34 Europe/Berlin] Session contents: Array
+(
+    [csrf_token] => 4d0dbac991578353603f8f26a942e1247085729b76bd6761ffae9b5b10cf9bd4
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1747926571
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+[22-May-2025 17:09:34 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'achievement_name' in 'field list' in C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php:53
+Stack trace:
+#0 C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php(53): mysqli->prepare('SELECT user_id,...')
+#1 {main}
+  thrown in C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php on line 53
+[22-May-2025 17:09:34 Europe/Berlin] Session contents: Array
+(
+    [csrf_token] => 4d0dbac991578353603f8f26a942e1247085729b76bd6761ffae9b5b10cf9bd4
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1747926571
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+[22-May-2025 17:09:34 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'achievement_name' in 'field list' in C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php:53
+Stack trace:
+#0 C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php(53): mysqli->prepare('SELECT user_id,...')
+#1 {main}
+  thrown in C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php on line 53
+[22-May-2025 17:12:40 Europe/Berlin] Session contents: Array
+(
+    [csrf_token] => 4d0dbac991578353603f8f26a942e1247085729b76bd6761ffae9b5b10cf9bd4
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1747926756
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+[22-May-2025 17:12:40 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'achievement_name' in 'field list' in C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php:55
+Stack trace:
+#0 C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php(55): mysqli->prepare('SELECT user_id,...')
+#1 {main}
+  thrown in C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php on line 55
+[22-May-2025 17:12:44 Europe/Berlin] Session contents: Array
+(
+    [csrf_token] => 4d0dbac991578353603f8f26a942e1247085729b76bd6761ffae9b5b10cf9bd4
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1747926756
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+[22-May-2025 17:12:44 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'achievement_name' in 'field list' in C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php:55
+Stack trace:
+#0 C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php(55): mysqli->prepare('SELECT user_id,...')
+#1 {main}
+  thrown in C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php on line 55
+[22-May-2025 17:15:29 Europe/Berlin] Session contents: Array
+(
+    [csrf_token] => 4d0dbac991578353603f8f26a942e1247085729b76bd6761ffae9b5b10cf9bd4
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1747926925
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+[22-May-2025 17:15:29 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'achievement_name' in 'field list' in C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php:55
+Stack trace:
+#0 C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php(55): mysqli->prepare('SELECT user_id,...')
+#1 {main}
+  thrown in C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php on line 55
+[22-May-2025 17:15:29 Europe/Berlin] Session contents: Array
+(
+    [csrf_token] => 4d0dbac991578353603f8f26a942e1247085729b76bd6761ffae9b5b10cf9bd4
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1747926925
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+[22-May-2025 17:15:29 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'achievement_name' in 'field list' in C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php:55
+Stack trace:
+#0 C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php(55): mysqli->prepare('SELECT user_id,...')
+#1 {main}
+  thrown in C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php on line 55
+[22-May-2025 17:16:09 Europe/Berlin] Session contents: Array
+(
+    [csrf_token] => 4d0dbac991578353603f8f26a942e1247085729b76bd6761ffae9b5b10cf9bd4
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1747926966
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+[22-May-2025 17:16:09 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'achievement_name' in 'field list' in C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php:53
+Stack trace:
+#0 C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php(53): mysqli->prepare('SELECT user_id,...')
+#1 {main}
+  thrown in C:\xampp\htdocs\SportsOfficeAIM\controller\handleAdminAchievement.php on line 53
+[22-May-2025 17:18:04 Europe/Berlin] Session contents: Array
+(
+    [csrf_token] => 4d0dbac991578353603f8f26a942e1247085729b76bd6761ffae9b5b10cf9bd4
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1747926966
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+[22-May-2025 17:18:04 Europe/Berlin] Missing action or achievement_id: action=not set, achievement_id=not set
+[22-May-2025 17:18:13 Europe/Berlin] Session contents: Array
+(
+    [csrf_token] => 4d0dbac991578353603f8f26a942e1247085729b76bd6761ffae9b5b10cf9bd4
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1747927084
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [admin_message] => Invalid request.
+    [admin_message_class] => bg-red-100
+)
+
+[22-May-2025 17:24:26 Europe/Berlin] Session contents: Array
+(
+    [csrf_token] => fb954a0d2b6acf8946fec466e028987023364cba64240ba7e8a5869311f19bb5
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1747927450
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+[22-May-2025 17:25:07 Europe/Berlin] Session contents: Array
+(
+    [csrf_token] => 4e719b2bb31ca9ca759d64a8d5dbefac75712180da1f33921036fd88ec31d9d3
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1747927499
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+[22-May-2025 17:25:07 Europe/Berlin] Session contents: Array
+(
+    [csrf_token] => 4e719b2bb31ca9ca759d64a8d5dbefac75712180da1f33921036fd88ec31d9d3
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1747927507
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [admin_message] => Achievement approved successfully!
+    [admin_message_class] => bg-green-100
+)
+
+[22-May-2025 17:25:07 Europe/Berlin] Achievement ID 5 is not Pending: Approved
+[22-May-2025 17:28:29 Europe/Berlin] Session contents: Array
+(
+    [csrf_token] => 71dcc1acb92977e4ecfbd93ed33f21dc0c9c9a5f3be1f0578d106cfc5d2a0ceb
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$zXXPnzY0qtmwuhkDCh/bxeltv4/0zwphYVELg8RGLcRWqKxnWF6K6
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747927701
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 3
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+[22-May-2025 17:28:29 Europe/Berlin] Admin not logged in: admin_id=not set, user_role=user
+[22-May-2025 17:28:29 Europe/Berlin] Session contents: Array
+(
+    [csrf_token] => 71dcc1acb92977e4ecfbd93ed33f21dc0c9c9a5f3be1f0578d106cfc5d2a0ceb
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00410
+            [email] => gdgarcia00410@usep.edu.ph
+            [password] => $2y$10$zXXPnzY0qtmwuhkDCh/bxeltv4/0zwphYVELg8RGLcRWqKxnWF6K6
+            [address] => Unknown
+            [role] => user
+            [full_name] => Gian Glen Vincent D. Garcia
+            [year_section] => 
+            [sport] => Table Tennis
+            [campus] => Tagum
+            [last_activity] => 1747927709
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 3
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [admin_message] => Admin not logged in.
+    [admin_message_class] => bg-red-100
+)
+
+[22-May-2025 17:28:29 Europe/Berlin] Admin not logged in: admin_id=not set, user_role=user
+[22-May-2025 17:30:28 Europe/Berlin] Session contents: Array
+(
+    [csrf_token] => 592e27bee46c53ae6aac76fc85650757c5a1697772181bcc71036d1cf7338491
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1747927820
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
