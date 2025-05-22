@@ -367,7 +367,7 @@
 
 
 
-                <!-- Right Column - Notifications -->
+
                 <!-- Right Column - Notifications -->
                 <div class="w-full md:w-1/2 h-[calc(100vh-150px)]">
                     <div class="bg-white rounded-lg shadow h-full flex flex-col">
@@ -489,16 +489,57 @@
 
                             notifications.forEach((notification, index) => {
                                 const notificationElement = document.createElement('div');
-                                notificationElement.className = 'p-3 bg-gray-50 rounded border-l-4 border-blue-500 flex justify-between items-start';
-                                notificationElement.innerHTML = `
-                                        <div>
-                                            <p class="text-sm">${notification.message}</p>
-                                            <p class="text-xs text-gray-500 mt-1 timestamp" data-timestamp="${notification.timestamp}"></p>
-                                        </div>
-                                        <button class="text-gray-400 hover:text-gray-600 delete-notification" data-index="${index}">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    `;
+                                let className = 'p-3 rounded border-l-4 flex justify-between items-start';
+                                let statusStyle = '';
+
+                                // Determine status based on message content
+                                if (notification.message.includes('approved')) {
+                                    statusStyle = 'bg-green-50 border-green-500';
+                                    notificationElement.innerHTML = `
+                    <div>
+                        <p class="text-sm font-semibold text-green-700">${notification.message}</p>
+                        <p class="text-xs text-green-500 mt-1 timestamp" data-timestamp="${notification.timestamp}"><i class="fas fa-check-circle mr-1"></i></p>
+                    </div>
+                    <button class="text-green-400 hover:text-green-600 delete-notification" data-index="${index}">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                                } else if (notification.message.includes('rejected')) {
+                                    statusStyle = 'bg-red-50 border-red-500';
+                                    notificationElement.innerHTML = `
+                    <div>
+                        <p class="text-sm font-semibold text-red-700">${notification.message}</p>
+                        <p class="text-xs text-red-500 mt-1 timestamp" data-timestamp="${notification.timestamp}"><i class="fas fa-times-circle mr-1"></i></p>
+                    </div>
+                    <button class="text-red-400 hover:text-red-600 delete-notification" data-index="${index}">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                                } else if (notification.message.includes('submitted')) {
+                                    statusStyle = 'bg-yellow-50 border-yellow-500';
+                                    notificationElement.innerHTML = `
+                    <div>
+                        <p class="text-sm font-semibold text-yellow-700">${notification.message}</p>
+                        <p class="text-xs text-yellow-500 mt-1 timestamp" data-timestamp="${notification.timestamp}"><i class="fas fa-hourglass-start mr-1"></i></p>
+                    </div>
+                    <button class="text-yellow-400 hover:text-yellow-600 delete-notification" data-index="${index}">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                                } else {
+                                    statusStyle = 'bg-gray-50 border-blue-500';
+                                    notificationElement.innerHTML = `
+                    <div>
+                        <p class="text-sm">${notification.message}</p>
+                        <p class="text-xs text-gray-500 mt-1 timestamp" data-timestamp="${notification.timestamp}"></p>
+                    </div>
+                    <button class="text-gray-400 hover:text-gray-600 delete-notification" data-index="${index}">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                                }
+
+                                notificationElement.className = `${className} ${statusStyle}`;
                                 notificationsContainer.appendChild(notificationElement);
 
                                 const timestampElement = notificationElement.querySelector('.timestamp');

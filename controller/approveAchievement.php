@@ -40,23 +40,50 @@ if (!$achievement_id) {
     exit();
 }
 
+// Fetch achievement details to get user_id and additional info
+$stmt = $conn->prepare("SELECT user_id, total_points, achievement_name FROM achievements WHERE achievement_id = ?");
+$stmt->bind_param("i", $achievement_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$achievement = $result->fetch_assoc();
+$stmt->close();
+
+if (!$achievement) {
+    $_SESSION['admin_message'] = "Achievement not found.";
+    $_SESSION['admin_message_class'] = "bg-red-100";
+    header("Location: ../view/adminView.php?page=Achievement");
+    exit();
+}
+
+$user_id = (int)$achievement['user_id'];
+$points = (int)$achievement['total_points'];
+$achievement_name = $achievement['achievement_name'] ?? 'Achievement #' . $achievement_id;
+
+// Update achievement status
 $stmt = $conn->prepare("UPDATE achievements SET status = 'Approved' WHERE achievement_id = ?");
 $stmt->bind_param("i", $achievement_id);
-if ($stmt->execute()) {
-    // Update leaderboard
-    $stmt_points = $conn->prepare("SELECT user_id, total_points FROM achievements WHERE achievement_id = ?");
-    $stmt_points->bind_param("i", $achievement_id);
-    $stmt_points->execute();
-    $result = $stmt_points->get_result();
-    $achievement = $result->fetch_assoc();
-    $user_id = $achievement['user_id'];
-    $points = $achievement['total_points'];
+$success = $stmt->execute();
+$stmt->close();
 
+if ($success) {
+    // Update leaderboard
     $stmt_leaderboard = $conn->prepare("INSERT INTO leaderboard (user_id, total_points) VALUES (?, ?) ON DUPLICATE KEY UPDATE total_points = total_points + ?");
     $stmt_leaderboard->bind_param("iii", $user_id, $points, $points);
     $stmt_leaderboard->execute();
     $stmt_leaderboard->close();
-    $stmt_points->close();
+
+    // Create notification for the user
+    $message = "Your achievement '$achievement_name' (ID: $achievement_id) has been approved! You earned $points points.";
+    $stmt_notify = $conn->prepare("INSERT INTO notifications (user_id, message, timestamp, is_read) VALUES (?, ?, NOW(), FALSE)");
+    $stmt_notify->bind_param("is", $user_id, $message);
+    $notify_success = $stmt_notify->execute();
+    $stmt_notify->close();
+
+    if ($notify_success) {
+        error_log("approveAchievement.php: Notified user_id=$user_id for approved achievement_id=$achievement_id");
+    } else {
+        error_log("approveAchievement.php: Failed to create notification for user_id=$user_id");
+    }
 
     $_SESSION['admin_message'] = "Achievement approved successfully!";
     $_SESSION['admin_message_class'] = "bg-green-100";
@@ -64,7 +91,6 @@ if ($stmt->execute()) {
     $_SESSION['admin_message'] = "Failed to approve achievement.";
     $_SESSION['admin_message_class'] = "bg-red-100";
 }
-$stmt->close();
 
 $conn->close();
 header("Location: ../view/adminView.php?page=Achievement");
