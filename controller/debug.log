@@ -64,3 +64,170 @@ Approve Request - POST Data: Array
 )
 
 Approve Request - Session ID: ult0kmb3qb6doo8c9d3457r97b
+Session Data: Array
+(
+    [csrf_token] => 783d6e22e8f7f0f2a6c4dae56748d3b9267aa3609d6118f77097f81d953edf9a
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 4
+            [student_id] => 2023-00075
+            [email] => crsaguran00075@usep.edu.ph
+            [password] => $2y$10$y8fu2DYMOpM1PiC57acH5e9SH/lFTjDTEhlB1/WxaSPI5KZFIlCQm
+            [address] => Unknown
+            [role] => user
+            [full_name] => Clarissa Saguran
+            [year_section] => 
+            [sport] => Tennis
+            [campus] => Tagum
+            [last_activity] => 1747969647
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 2
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Input Data: submission_id=10, description='df sdfs dfd fd f', is_resubmission=0
+File Data: name=grok_report.pdf, size=228805, type=application/pdf, error=0
+Update Successful: submission_id=10, is_resubmission=0
+Approve Request - Session: Array
+(
+    [csrf_token] => 9b7a2bab118c46c6d184a6066ef08ef51cc7b9986987629832d898c81443f1b3
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1747970931
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Approve Request - POST Data: Array
+(
+    [approval_id] => 1
+    [action] => approve
+)
+
+Approve Request - Session ID: dgtvl25or5ougur6nm5f9qbojh
+Session Data: Array
+(
+    [csrf_token] => 0b3c938c7c2dfef6420e729907670d607a655bbada26ab3fc6190cdc6ea8a798
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00066
+            [email] => aumicaroz00066@usep.edu.ph
+            [password] => $2y$10$V..sTUbmGhs6R6QFVMV0CuCDHh/gsjipiUGe2lB2mWhp2BGdswYj.
+            [address] => Unknown
+            [role] => user
+            [full_name] => Arthur Dale Micaroz
+            [year_section] => 
+            [sport] => Athletics
+            [campus] => Tagum
+            [last_activity] => 1747971028
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+    [message] => Your document has been submitted successfully!
+)
+
+Input Data: submission_id=1, description='adiasd ains fkan fakdf nskd fls', is_resubmission=0
+File Data: name=SPORTS-AND-CULTURAL-MANAGEMENT-SYSTEM.docx-2.pdf, size=1106142, type=application/pdf, error=0
+Update Successful: submission_id=1, is_resubmission=0
+Session Data: Array
+(
+    [csrf_token] => 93a7f91fa18634a57024b0af251692d3da13b33efc27ed805a37f193bec20955
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00066
+            [email] => aumicaroz00066@usep.edu.ph
+            [password] => $2y$10$V..sTUbmGhs6R6QFVMV0CuCDHh/gsjipiUGe2lB2mWhp2BGdswYj.
+            [address] => Unknown
+            [role] => user
+            [full_name] => Arthur Dale Micaroz
+            [year_section] => 
+            [sport] => Athletics
+            [campus] => Tagum
+            [last_activity] => 1747971851
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+CSRF Validation Failed
+Session Data: Array
+(
+    [csrf_token] => 93a7f91fa18634a57024b0af251692d3da13b33efc27ed805a37f193bec20955
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 2023-00066
+            [email] => aumicaroz00066@usep.edu.ph
+            [password] => $2y$10$V..sTUbmGhs6R6QFVMV0CuCDHh/gsjipiUGe2lB2mWhp2BGdswYj.
+            [address] => Unknown
+            [role] => user
+            [full_name] => Arthur Dale Micaroz
+            [year_section] => 
+            [sport] => Athletics
+            [campus] => Tagum
+            [last_activity] => 1747972069
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+            [has_profile_image] => 1
+            [document_count] => 1
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Input Data: submission_id=1, description='adiasd ains fkan fakdf nskd fls', is_resubmission=0
+File Data: name=grok_report.pdf, size=228805, type=application/pdf, error=0
+Update Successful: submission_id=1, is_resubmission=0
