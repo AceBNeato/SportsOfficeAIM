@@ -741,7 +741,7 @@ $action = $_GET['action'] ?? '';
                             <select id="sport" name="sport" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500">
                                 <option value="">All</option>
                                 <?php
-                                $sports = ['Basketball', 'Volleyball', 'Football', 'Swimming', 'Track and Field', 'Tennis', 'Badminton'];
+                                $sports = ['Basketball', 'Volleyball', 'Football', 'Swimming', 'Track and Field', 'Tennis', 'Table Tennis','Badminton'];
                                 foreach ($sports as $sport) {
                                     echo '<option value="' . htmlspecialchars($sport) . '" ' . (isset($_GET['sport']) && $_GET['sport'] === $sport ? 'selected' : '') . '>' . htmlspecialchars($sport) . '</option>';
                                 }
@@ -1398,470 +1398,845 @@ $action = $_GET['action'] ?? '';
 
 
 
-        <?php elseif ($currentPage === 'Approved Docs'): ?>
-        <?php
-        // Database configuration (using your existing Database class)
-        $conn = Database::getInstance();
+                <?php
+                elseif ($currentPage === 'Approved Docs'):
+                // Database configuration (Fallback if Database class is not available)
+                if (!class_exists('Database')) {
+                    $conn = new mysqli("localhost", "root", "", "SportOfficeDB");
+                    if ($conn->connect_error) {
+                        die("Connection failed: " . $conn->connect_error);
+                    }
+                    $conn->set_charset("utf8mb4");
+                } else {
+                    $conn = Database::getInstance();
+                }
 
-        // Search users function
-        function searchUsersEval($searchTerm, $conn) {
-            $searchTerm = '%' . $conn->real_escape_string(trim($searchTerm)) . '%';
-            $stmt = $conn->prepare("
-            SELECT id, student_id, full_name
+                // Search users function with status, sport, and campus filters
+                function searchUsersEval($searchTerm, $statusFilter, $sportFilter, $campusFilter, $conn) {
+                    $searchTerm = '%' . $conn->real_escape_string(trim($searchTerm)) . '%';
+                    $statusFilter = $conn->real_escape_string(trim($statusFilter));
+                    $sportFilter = $conn->real_escape_string(trim($sportFilter));
+                    $campusFilter = $conn->real_escape_string(trim($campusFilter));
+
+                    $query = "
+            SELECT id, student_id, full_name, sport, campus, status
             FROM users
-            WHERE student_id LIKE ? OR full_name LIKE ?
-        ");
-            if (!$stmt) {
-                error_log("Prepare failed: " . $conn->error);
-                return [];
-            }
-            $stmt->bind_param("ss", $searchTerm, $searchTerm);
-            $stmt->execute();
-            $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-            $stmt->close();
-            return $result;
-        }
+            WHERE (student_id LIKE ? OR full_name LIKE ?)
+        ";
+                    $params = [$searchTerm, $searchTerm];
+                    $types = "ss";
 
-        // Get search term from GET request
-        $searchTerm = isset($_GET['search']) ? trim($_GET['search']) : '';
-        $users = searchUsersEval($searchTerm, $conn);
+                    if (!empty($statusFilter)) {
+                        $query .= " AND status = ?";
+                        $params[] = $statusFilter;
+                        $types .= "s";
+                    }
+                    if (!empty($sportFilter)) {
+                        $query .= " AND sport = ?";
+                        $params[] = $sportFilter;
+                        $types .= "s";
+                    }
+                    if (!empty($campusFilter)) {
+                        $query .= " AND campus = ?";
+                        $params[] = $campusFilter;
+                        $types .= "s";
+                    }
 
-        // Fetch all submissions for displayed users to avoid N+1 queries
-        $userIds = array_column($users, 'id');
-        $submissionsByUser = [];
-        if (!empty($userIds)) {
-            $placeholders = implode(',', array_fill(0, count($userIds), '?'));
-            $stmt = $conn->prepare("
+                    $stmt = $conn->prepare($query);
+                    if (!$stmt) {
+                        error_log("Prepare failed: " . $conn->error);
+                        return [];
+                    }
+
+                    $stmt->bind_param($types, ...$params);
+                    $stmt->execute();
+                    $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+                    $stmt->close();
+                    return $result;
+                }
+
+                // Get search term and filters from GET request
+                $searchTerm = isset($_GET['search']) ? trim($_GET['search']) : '';
+                $statusFilter = isset($_GET['status_filter']) ? trim($_GET['status_filter']) : '';
+                $sportFilter = isset($_GET['sports_filter']) ? trim($_GET['sports_filter']) : '';
+                $campusFilter = isset($_GET['campus_filter']) ? trim($_GET['campus_filter']) : '';
+                $users = searchUsersEval($searchTerm, $statusFilter, $sportFilter, $campusFilter, $conn);
+
+                // Fetch only approved submissions for displayed users
+                $userIds = array_column($users, 'id');
+                $submissionsByUser = [];
+                if (!empty($userIds)) {
+                    $placeholders = implode(',', array_fill(0, count($userIds), '?'));
+                    $stmt = $conn->prepare("
             SELECT id, user_id, document_type, submission_date, status, file_name, other_type, comments
             FROM submissions
-            WHERE user_id IN ($placeholders)
+            WHERE user_id IN ($placeholders) AND status = 'approved'
             ORDER BY submission_date DESC
         ");
-            if ($stmt) {
-                $stmt->bind_param(str_repeat('i', count($userIds)), ...$userIds);
-                $stmt->execute();
-                $allSubmissions = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-                $stmt->close();
+                    if ($stmt) {
+                        $stmt->bind_param(str_repeat('i', count($userIds)), ...$userIds);
+                        $stmt->execute();
+                        $allSubmissions = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+                        $stmt->close();
 
-                // Group submissions by user_id
-                foreach ($allSubmissions as $sub) {
-                    $submissionsByUser[$sub['user_id']][] = $sub;
+                        foreach ($allSubmissions as $sub) {
+                            $submissionsByUser[$sub['user_id']][] = $sub;
+                        }
+                    } else {
+                        error_log("Prepare failed: " . $conn->error);
+                    }
                 }
-            } else {
-                error_log("Prepare failed: " . $conn->error);
-            }
-        }
-        ?>
 
-            <div class="w-full px-4 mt-4">
-                <!-- Search Form -->
-                <form method="GET" action="" class="flex flex-row items-center gap-2 w-full">
-                    <input type="hidden" name="page" value="Evaluation"/>
-                    <input type="text" name="search" placeholder="Search Student..."
-                           value="<?php echo htmlspecialchars($searchTerm); ?>"
-                           class="flex-1 min-w-0 border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
-                    <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded whitespace-nowrap flex items-center justify-center">
-                        <span class="hidden sm:inline">Search</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                    </button>
-                </form>
-            </div>
+                // Count approved submissions for the table display
+                $approvedCounts = [];
+                foreach ($submissionsByUser as $userId => $subs) {
+                    $approvedCounts[$userId] = count($subs);
+                }
 
-            <div class="w-full px-4 sm:px-8 lg:px-25 mx-auto mt-6">
-                <?php if (count($users) > 0): ?>
-                    <div class="space-y-4">
-                        <?php foreach ($users as $user): ?>
-                            <?php
-                            $userId = $user['id'];
-                            $submissions = $submissionsByUser[$userId] ?? [];
-                            $pendingSubmissions = array_filter($submissions, fn($sub) => $sub['status'] === 'pending');
-                            ?>
-                            <div class="userFile cursor-pointer" data-student-id="<?php echo htmlspecialchars($user['student_id']); ?>"
-                                 data-full-name="<?php echo htmlspecialchars($user['full_name']); ?>"
-                                 data-submissions='<?php echo htmlspecialchars(json_encode($submissions, JSON_HEX_APOS | JSON_HEX_QUOT)); ?>'>
-                                <div class="flex items-center bg-white shadow-md rounded-lg px-5 py-4 hover:bg-gray-50 transition-colors duration-200">
-                                    <div class="bg-blue-100 p-3 rounded-lg mr-4">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                        </svg>
-                                    </div>
-                                    <div class="flex-grow">
-                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div>
-                                                <div class="text-xs font-semibold text-gray-500">Name</div>
-                                                <div class="text-gray-800 font-medium"><?php echo htmlspecialchars($user['full_name']); ?></div>
-                                            </div>
-                                            <div>
-                                                <div class="text-xs font-semibold text-gray-500">Pending Submissions</div>
-                                                <div class="text-gray-800"><?php echo count($pendingSubmissions); ?> Document<?php echo count($pendingSubmissions) !== 1 ? 's' : ''; ?></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- View Icon -->
-                                    <div class="ml-4">
-                                        <button class="view-details-btn" title="View Details" aria-label="View submission details">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 hover:text-blue-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </div>
+                // Sample sports options (adjust based on your database)
+                $sportsOptions = ['Basketball', 'Volleyball', 'Football', 'Swimming', 'Others'];
+                ?>
+
+                <div class="w-full px-4 sm:px-6 lg:px-8 mt-6">
+                    <!-- Search and Filter Form -->
+                    <form method="GET" action="" class="flex flex-col sm:flex-row items-center gap-4 w-full mb-6">
+                        <input type="hidden" name="page" value="Approved Docs"/>
+                        <div class="flex-1 min-w-[200px] w-full sm:w-auto">
+                            <input type="text" name="search" placeholder="Search by Student ID or Name..."
+                                   value="<?php echo htmlspecialchars($searchTerm); ?>"
+                                   class="w-full border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm text-sm">
+                        </div>
+                        <select name="status_filter" class="w-full sm:w-auto px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm text-sm">
+                            <option value="">All Statuses</option>
+                            <option value="undergraduate" <?php echo $statusFilter === 'undergraduate' ? 'selected' : ''; ?>>Undergraduate</option>
+                            <option value="alumni" <?php echo $statusFilter === 'alumni' ? 'selected' : ''; ?>>Alumni</option>
+                        </select>
+                        <select name="sports_filter" class="w-full sm:w-auto px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm text-sm">
+                            <option value="">All Sports</option>
+                            <?php foreach ($sportsOptions as $sport): ?>
+                                <option value="<?php echo htmlspecialchars($sport); ?>" <?php echo $sportFilter === $sport ? 'selected' : ''; ?>><?php echo htmlspecialchars($sport); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <select name="campus_filter" class="w-full sm:w-auto px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm text-sm">
+                            <option value="">All Campuses</option>
+                            <option value="Tagum" <?php echo $campusFilter === 'Tagum' ? 'selected' : ''; ?>>Tagum</option>
+                            <option value="Mabini" <?php echo $campusFilter === 'Mabini' ? 'selected' : ''; ?>>Mabini</option>
+                        </select>
+                        <button type="submit" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm transition-colors duration-200 text-sm">
+                            <span>Search</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </button>
+                    </form>
+
+                    <!-- Approved Documents Table -->
+                    <div class="w-full overflow-x-auto bg-white rounded-lg shadow-md">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Name</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Student ID</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Approved Documents</th>
+                                <th scope="col" class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                            <?php if (count($users) > 0): ?>
+                                <?php foreach ($users as $user): ?>
+                                    <?php
+                                    $userId = $user['id'];
+                                    $approvedCount = $approvedCounts[$userId] ?? 0;
+                                    $submissions = $submissionsByUser[$userId] ?? [];
+                                    ?>
+                                    <tr class="hover:bg-gray-50 transition-colors duration-200">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><?php echo htmlspecialchars($user['full_name']); ?></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?php echo htmlspecialchars($user['student_id']); ?></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?php echo $approvedCount; ?> Document<?php echo $approvedCount !== 1 ? 's' : ''; ?></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <button class="view-details-btn text-blue-600 hover:text-blue-800"
+                                                    title="View Details"
+                                                    aria-label="View submission details"
+                                                    data-student-id="<?php echo htmlspecialchars($user['student_id']); ?>"
+                                                    data-full-name="<?php echo htmlspecialchars($user['full_name']); ?>"
+                                                    data-submissions='<?php echo htmlspecialchars(json_encode($submissions, JSON_HEX_APOS | JSON_HEX_QUOT)); ?>'>
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                </svg>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">
+                                        <div class="font-semibold mb-2">No approved documents found</div>
+                                        <div class="text-sm text-gray-400">Try adjusting your search criteria or filters</div>
+                                    </td>
+                                </tr>
+                            <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Add CSRF token input (for potential future use) -->
+                <input type="hidden" id="csrf_token" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
+
+                <!-- Evaluation Modal -->
+                <div id="evaluationModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden" role="dialog" aria-labelledby="evaluationModalTitle" aria-modal="true">
+                    <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-3xl mx-4">
+                        <div class="relative mb-4">
+                            <h2 id="evaluationModalTitle" class="text-lg font-semibold text-gray-800">View Approved Submissions</h2>
+                            <button onclick="closeModal('evaluationModal')" class="absolute top-0 right-0 text-gray-400 hover:text-gray-600 transition-colors" aria-label="Close modal">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="mb-4">
+                            <p class="text-sm text-gray-700"><strong>Student ID:</strong> <span id="modal_student_id"></span></p>
+                            <p class="text-sm text-gray-700"><strong>Name:</strong> <span id="modal_full_name"></span></p>
+                        </div>
+                        <div id="submissions_list" class="space-y-4 max-h-96 overflow-y-auto">
+                            <!-- Submissions will be populated by JavaScript -->
+                        </div>
+                        <div class="mt-4 flex justify-center">
+                            <button onclick="closeModal('evaluationModal')" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- File View Modal -->
+                <div id="fileViewModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden" role="dialog" aria-labelledby="fileViewModalTitle" aria-modal="true">
+                    <div class="bg-white rounded-2xl shadow-2xl p-4 w-[95vw] max-w-[1440px] h-[95vh] max-h-[1080px] border border-gray-200 flex flex-col">
+                        <div class="modal-header relative mb-2">
+                            <h2 id="fileViewModalTitle" class="text-lg font-semibold text-gray-800">View Approved File</h2>
+                            <button onclick="closeModal('fileViewModal')" class="modal-close-btn absolute top-0 right-0 text-gray-400 hover:text-gray-600 transition-colors" aria-label="Close modal">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div id="fileViewPreview" class="w-full h-full flex-1 bg-gray-50 rounded-lg overflow-hidden"></div>
+                        <div class="modal-footer mt-2 flex justify-center gap-2 bg-gray-100 p-2 rounded-b-2xl">
+                            <a id="fileDownloadLink" href="#" class="action-btn bg-red-600 hover:bg-red-700 text-white py-1 px-3 rounded-lg flex items-center gap-1 transition-colors duration-200 focus:outline-none hidden">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                </svg>
+                                Download
+                            </a>
+                            <button onclick="closeModal('fileViewModal')" class="action-btn bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded-lg flex items-center gap-1 transition-colors duration-200 focus:outline-none">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    // Ensure the script runs after the DOM is fully loaded
+                    document.addEventListener('DOMContentLoaded', function() {
+                        // Handle view details button clicks
+                        const viewDetailsButtons = document.querySelectorAll('.view-details-btn');
+                        if (!viewDetailsButtons.length) {
+                            console.error('No view-details-btn elements found in the DOM');
+                        }
+
+                        viewDetailsButtons.forEach(button => {
+                            button.addEventListener('click', function(event) {
+                                event.preventDefault(); // Prevent any default behavior
+                                console.log('View Details button clicked for student ID:', this.getAttribute('data-student-id'));
+
+                                const studentId = this.getAttribute('data-student-id');
+                                const fullName = this.getAttribute('data-full-name');
+                                let submissions = this.getAttribute('data-submissions');
+
+                                // Log the raw submissions data for debugging
+                                console.log('Raw submissions data:', submissions);
+
+                                // Ensure submissions is valid JSON
+                                try {
+                                    submissions = JSON.parse(submissions || '[]');
+                                    console.log('Parsed submissions:', submissions);
+                                } catch (e) {
+                                    console.error('Error parsing submissions JSON:', e);
+                                    submissions = [];
+                                }
+
+                                // Update modal content
+                                const modalStudentId = document.getElementById('modal_student_id');
+                                const modalFullName = document.getElementById('modal_full_name');
+                                if (modalStudentId && modalFullName) {
+                                    modalStudentId.textContent = studentId || 'N/A';
+                                    modalFullName.textContent = fullName || 'N/A';
+                                } else {
+                                    console.error('Modal student ID or full name elements not found');
+                                }
+
+                                // Populate submissions list
+                                const submissionsList = document.getElementById('submissions_list');
+                                if (!submissionsList) {
+                                    console.error('Submissions list element not found');
+                                    return;
+                                }
+                                submissionsList.innerHTML = '';
+
+                                if (!Array.isArray(submissions) || submissions.length === 0) {
+                                    console.log('No approved submissions to display');
+                                    submissionsList.innerHTML = '<p class="text-sm text-gray-500">No approved submissions found for this student.</p>';
+                                } else {
+                                    submissions.forEach(sub => {
+                                        console.log('Processing submission:', sub);
+                                        const submissionDiv = document.createElement('div');
+                                        submissionDiv.className = 'bg-gray-50 p-4 rounded-lg shadow-sm';
+                                        submissionDiv.innerHTML = `
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm text-gray-700"><strong>Document Type:</strong> ${sub.document_type || 'N/A'}${sub.other_type ? ` (${sub.other_type})` : ''}</p>
+                                <p class="text-sm text-gray-700"><strong>Submission Date:</strong> ${sub.submission_date ? new Date(sub.submission_date).toLocaleDateString() : 'N/A'}</p>
+                                <p class="text-sm text-gray-700"><strong>Status:</strong> Approved</p>
                             </div>
-                        <?php endforeach; ?>
-                    </div>
-                <?php else: ?>
-                    <div class="text-center py-10">
-                        <div class="text-gray-500 font-semibold mb-2">No evaluations found</div>
-                        <div class="text-sm text-gray-400">Try adjusting your search criteria</div>
-                    </div>
-                <?php endif; ?>
-            </div>
-
-            <!-- Add CSRF token input here -->
-        <input type="hidden" id="csrf_token" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
-
-
-            <!-- Evaluation Modal -->
-            <div id="evaluationModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden" role="dialog" aria-labelledby="evaluationModalTitle" aria-modal="true">
-                <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-3xl mx-4">
-                    <div class="relative mb-4">
-                        <h2 id="evaluationModalTitle" class="text-lg font-semibold text-gray-800">Evaluate Submissions</h2>
-                        <button onclick="closeModal('evaluationModal')" class="absolute top-0 right-0 text-gray-400 hover:text-gray-600 transition-colors" aria-label="Close modal">
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="mb-4">
-                        <p class="text-sm text-gray-700"><strong>Student ID:</strong> <span id="modal_student_id"></span></p>
-                        <p class="text-sm text-gray-700"><strong>Name:</strong> <span id="modal_full_name"></span></p>
-                    </div>
-                    <div id="submissions_list" class="space-y-4 max-h-96 overflow-y-auto"></div>
-                    <div class="mt-4 flex justify-center">
-                        <button onclick="closeModal('evaluationModal')" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors">
-                            Close
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- File View Modal -->
-            <!-- File View Modal -->
-            <div id="fileViewModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden" role="dialog" aria-labelledby="fileViewModalTitle" aria-modal="true">
-                <div class="bg-white rounded-2xl shadow-2xl p-4 w-[95vw] max-w-[1440px] h-[95vh] max-h-[1080px] border border-gray-200 flex flex-col">
-                    <div class="modal-header relative mb-2">
-                        <h2 id="fileViewModalTitle" class="text-lg font-semibold text-gray-800">View File</h2>
-                        <button onclick="closeModal('fileViewModal')" class="modal-close-btn absolute top-0 right-0 text-gray-400 hover:text-gray-600 transition-colors" aria-label="Close modal">
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                            </svg>
-                        </button>
-                    </div>
-                    <div id="fileViewPreview" class="w-full h-full flex-1 bg-gray-50 rounded-lg overflow-hidden">
-
-                    </div>
-                    <div class="modal-footer mt-2 flex justify-center gap-2 bg-gray-100 p-2 rounded-b-2xl">
-                        <a id="fileDownloadLink" href="#" class="action-btn bg-red-600 hover:bg-red-700 text-white py-1 px-3 rounded-lg flex items-center gap-1 transition-colors duration-200 focus:outline-none hidden">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                            </svg>
-                            Download
-                        </a>
-                        <button onclick="closeModal('fileViewModal')" class="action-btn bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded-lg flex items-center gap-1 transition-colors duration-200 focus:outline-none">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                            </svg>
-                            Close
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div id="approveModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden" role="dialog" aria-labelledby="approveModalTitle" aria-modal="true">
-                <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4">
-                    <div class="relative mb-4">
-                        <h2 id="approveModalTitle" class="text-lg font-semibold text-gray-800">Confirm Approval</h2>
-                        <button onclick="closeModal('approveModal')" class="absolute top-0 right-0 text-gray-400 hover:text-gray-600 transition-colors" aria-label="Close modal">
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                            </svg>
-                        </button>
-                    </div>
-                    <p class="text-sm text-gray-700 mb-4">Are you sure you want to approve this submission?</p>
-                    <div class="flex justify-end space-x-2">
-                        <button onclick="closeModal('approveModal')" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md text-sm hover:bg-gray-400 transition-colors">
-                            Cancel
-                        </button>
-                        <button id="confirmApprove" class="px-4 py-2 bg-green-500 text-white rounded-md text-sm hover:bg-green-600 transition-colors">
-                            Confirm
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-
-            <div id="rejectModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden" role="dialog" aria-labelledby="rejectModalTitle" aria-modal="true">
-                <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4">
-                    <div class="relative mb-4">
-                        <h2 id="rejectModalTitle" class="text-lg font-semibold text-gray-800">Confirm Rejection</h2>
-                        <button onclick="closeModal('rejectModal')" class="absolute top-0 right-0 text-gray-400 hover:text-gray-600 transition-colors" aria-label="Close modal">
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                            </svg>
-                        </button>
-                    </div>
-                    <p class="text-sm text-gray-700 mb-4">Are you sure you want to reject this submission?</p>
-                    <div class="mb-4">
-                        <label for="rejectComments" class="text-sm text-gray-700">Comments (optional):</label>
-                        <textarea id="rejectComments" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-400" rows="4"></textarea>
-                    </div>
-                    <div class="flex justify-end space-x-2">
-                        <button onclick="closeModal('rejectModal')" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md text-sm hover:bg-gray-400 transition-colors">
-                            Cancel
-                        </button>
-                        <button id="confirmReject" class="px-4 py-2 bg-red-500 text-white rounded-md text-sm hover:bg-red-600 transition-colors">
-                            Confirm
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-
-
-
-
-
-        <?php elseif ($currentPage === 'Evaluation'): ?>
-        <?php
-        // Database configuration (using your existing Database class)
-        $conn = Database::getInstance();
-
-        // Search users function
-        function searchUsersEval($searchTerm, $conn) {
-            $searchTerm = '%' . $conn->real_escape_string(trim($searchTerm)) . '%';
-            $stmt = $conn->prepare("
-            SELECT id, student_id, full_name
-            FROM users
-            WHERE student_id LIKE ? OR full_name LIKE ?
-        ");
-            if (!$stmt) {
-                error_log("Prepare failed: " . $conn->error);
-                return [];
-            }
-            $stmt->bind_param("ss", $searchTerm, $searchTerm);
-            $stmt->execute();
-            $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-            $stmt->close();
-            return $result;
-        }
-
-        // Get search term from GET request
-        $searchTerm = isset($_GET['search']) ? trim($_GET['search']) : '';
-        $users = searchUsersEval($searchTerm, $conn);
-
-        // Fetch all submissions for displayed users to avoid N+1 queries
-        $userIds = array_column($users, 'id');
-        $submissionsByUser = [];
-        if (!empty($userIds)) {
-            $placeholders = implode(',', array_fill(0, count($userIds), '?'));
-            $stmt = $conn->prepare("
-            SELECT id, user_id, document_type, submission_date, status, file_name, other_type, comments
-            FROM submissions
-            WHERE user_id IN ($placeholders)
-            ORDER BY submission_date DESC
-        ");
-            if ($stmt) {
-                $stmt->bind_param(str_repeat('i', count($userIds)), ...$userIds);
-                $stmt->execute();
-                $allSubmissions = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-                $stmt->close();
-
-                // Group submissions by user_id
-                foreach ($allSubmissions as $sub) {
-                    $submissionsByUser[$sub['user_id']][] = $sub;
-                }
-            } else {
-                error_log("Prepare failed: " . $conn->error);
-            }
-        }
-        ?>
-
-        <div class="w-full px-4 mt-4">
-            <!-- Search Form -->
-            <form method="GET" action="" class="flex flex-row items-center gap-2 w-full">
-                <input type="hidden" name="page" value="Evaluation"/>
-                <input type="text" name="search" placeholder="Search Student..."
-                       value="<?php echo htmlspecialchars($searchTerm); ?>"
-                       class="flex-1 min-w-0 border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
-                <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded whitespace-nowrap flex items-center justify-center">
-                    <span class="hidden sm:inline">Search</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                </button>
-            </form>
-        </div>
-
-        <div class="w-full px-4 sm:px-8 lg:px-25 mx-auto mt-6">
-            <?php if (count($users) > 0): ?>
-                <div class="space-y-4">
-                    <?php foreach ($users as $user): ?>
-                        <?php
-                        $userId = $user['id'];
-                        $submissions = $submissionsByUser[$userId] ?? [];
-                        $pendingSubmissions = array_filter($submissions, fn($sub) => $sub['status'] === 'pending');
-                        ?>
-                        <div class="userFile cursor-pointer" data-student-id="<?php echo htmlspecialchars($user['student_id']); ?>"
-                             data-full-name="<?php echo htmlspecialchars($user['full_name']); ?>"
-                             data-submissions='<?php echo htmlspecialchars(json_encode($submissions, JSON_HEX_APOS | JSON_HEX_QUOT)); ?>'>
-                            <div class="flex items-center bg-white shadow-md rounded-lg px-5 py-4 hover:bg-gray-50 transition-colors duration-200">
-                                <div class="bg-blue-100 p-3 rounded-lg mr-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                    </svg>
-                                </div>
-                                <div class="flex-grow">
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div>
-                                            <div class="text-xs font-semibold text-gray-500">Name</div>
-                                            <div class="text-gray-800 font-medium"><?php echo htmlspecialchars($user['full_name']); ?></div>
-                                        </div>
-                                        <div>
-                                            <div class="text-xs font-semibold text-gray-500">Pending Submissions</div>
-                                            <div class="text-gray-800"><?php echo count($pendingSubmissions); ?> Document<?php echo count($pendingSubmissions) !== 1 ? 's' : ''; ?></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- View Icon -->
-                                <div class="ml-4">
-                                    <button class="view-details-btn" title="View Details" aria-label="View submission details">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 hover:text-blue-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                        </svg>
-                                    </button>
-                                </div>
+                            <div>
+                                <p class="text-sm text-gray-700"><strong>File Name:</strong> ${sub.file_name || 'N/A'}</p>
+                                <p class="text-sm text-gray-700"><strong>Comments:</strong> ${sub.comments || 'None'}</p>
                             </div>
                         </div>
-                    <?php endforeach; ?>
-                </div>
-            <?php else: ?>
-                <div class="text-center py-10">
-                    <div class="text-gray-500 font-semibold mb-2">No evaluations found</div>
-                    <div class="text-sm text-gray-400">Try adjusting your search criteria</div>
-                </div>
-            <?php endif; ?>
-        </div>
+                        <div class="mt-2 flex justify-end gap-2">
+                            <button class="view-file-btn bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-sm transition-colors"
+                                    data-file-name="${sub.file_name || ''}"
+                                    data-submission-id="${sub.id || ''}">
+                                View File
+                            </button>
+                        </div>
+                    `;
+                                        submissionsList.appendChild(submissionDiv);
+                                    });
+                                }
 
-        <!-- Add CSRF token input here -->
-    <input type="hidden" id="csrf_token" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
+                                // Show the evaluation modal
+                                const modal = document.getElementById('evaluationModal');
+                                if (modal) {
+                                    console.log('Showing evaluation modal');
+                                    modal.classList.remove('hidden');
+                                } else {
+                                    console.error('Evaluation modal not found in the DOM');
+                                }
+                            });
+                        });
 
+                        // Handle file view button clicks
+                        document.addEventListener('click', function(e) {
+                            if (e.target.classList.contains('view-file-btn')) {
+                                console.log('View File button clicked for file:', e.target.getAttribute('data-file-name'));
+                                const fileName = e.target.getAttribute('data-file-name');
+                                const fileViewPreview = document.getElementById('fileViewPreview');
+                                const fileDownloadLink = document.getElementById('fileDownloadLink');
+                                const uploadPath = '<?php echo UPLOAD_BASE_PATH; ?>'.replace(/.*\/public_html/, '');
+                                const filePath = uploadPath + fileName;
 
-        <!-- Evaluation Modal -->
-        <div id="evaluationModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden" role="dialog" aria-labelledby="evaluationModalTitle" aria-modal="true">
-            <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-3xl mx-4">
-                <div class="relative mb-4">
-                    <h2 id="evaluationModalTitle" class="text-lg font-semibold text-gray-800">Evaluate Submissions</h2>
-                    <button onclick="closeModal('evaluationModal')" class="absolute top-0 right-0 text-gray-400 hover:text-gray-600 transition-colors" aria-label="Close modal">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                    </button>
-                </div>
-                <div class="mb-4">
-                    <p class="text-sm text-gray-700"><strong>Student ID:</strong> <span id="modal_student_id"></span></p>
-                    <p class="text-sm text-gray-700"><strong>Name:</strong> <span id="modal_full_name"></span></p>
-                </div>
-                <div id="submissions_list" class="space-y-4 max-h-96 overflow-y-auto"></div>
-                <div class="mt-4 flex justify-center">
-                    <button onclick="closeModal('evaluationModal')" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors">
-                        Close
-                    </button>
-                </div>
-            </div>
-        </div>
+                                if (!fileViewPreview || !fileDownloadLink) {
+                                    console.error('File view preview or download link elements not found');
+                                    return;
+                                }
 
-        <!-- File View Modal -->
-        <!-- File View Modal -->
-        <div id="fileViewModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden" role="dialog" aria-labelledby="fileViewModalTitle" aria-modal="true">
-            <div class="bg-white rounded-2xl shadow-2xl p-4 w-[95vw] max-w-[1440px] h-[95vh] max-h-[1080px] border border-gray-200 flex flex-col">
-                <div class="modal-header relative mb-2">
-                    <h2 id="fileViewModalTitle" class="text-lg font-semibold text-gray-800">View File</h2>
-                    <button onclick="closeModal('fileViewModal')" class="modal-close-btn absolute top-0 right-0 text-gray-400 hover:text-gray-600 transition-colors" aria-label="Close modal">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                    </button>
-                </div>
-                <div id="fileViewPreview" class="w-full h-full flex-1 bg-gray-50 rounded-lg overflow-hidden">
+                                fileViewPreview.innerHTML = '';
+                                fileDownloadLink.setAttribute('href', filePath);
+                                fileDownloadLink.classList.remove('hidden');
 
-                </div>
-                <div class="modal-footer mt-2 flex justify-center gap-2 bg-gray-100 p-2 rounded-b-2xl">
-                    <a id="fileDownloadLink" href="#" class="action-btn bg-red-600 hover:bg-red-700 text-white py-1 px-3 rounded-lg flex items-center gap-1 transition-colors duration-200 focus:outline-none hidden">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                        </svg>
-                        Download
-                    </a>
-                    <button onclick="closeModal('fileViewModal')" class="action-btn bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded-lg flex items-center gap-1 transition-colors duration-200 focus:outline-none">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                        Close
-                    </button>
-                </div>
-            </div>
-        </div>
-        <div id="approveModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden" role="dialog" aria-labelledby="approveModalTitle" aria-modal="true">
-            <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4">
-                <div class="relative mb-4">
-                    <h2 id="approveModalTitle" class="text-lg font-semibold text-gray-800">Confirm Approval</h2>
-                    <button onclick="closeModal('approveModal')" class="absolute top-0 right-0 text-gray-400 hover:text-gray-600 transition-colors" aria-label="Close modal">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                    </button>
-                </div>
-                <p class="text-sm text-gray-700 mb-4">Are you sure you want to approve this submission?</p>
-                <div class="flex justify-end space-x-2">
-                    <button onclick="closeModal('approveModal')" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md text-sm hover:bg-gray-400 transition-colors">
-                        Cancel
-                    </button>
-                    <button id="confirmApprove" class="px-4 py-2 bg-green-500 text-white rounded-md text-sm hover:bg-green-600 transition-colors">
-                        Confirm
-                    </button>
-                </div>
-            </div>
-        </div>
+                                const ext = fileName.split('.').pop().toLowerCase();
+                                if (['jpg', 'jpeg', 'png'].includes(ext)) {
+                                    const img = document.createElement('img');
+                                    img.src = filePath;
+                                    img.alt = fileName;
+                                    img.className = 'max-w-full h-auto';
+                                    fileViewPreview.appendChild(img);
+                                } else if (ext === 'pdf') {
+                                    const embed = document.createElement('embed');
+                                    embed.src = filePath;
+                                    embed.type = 'application/pdf';
+                                    embed.className = 'w-full h-full';
+                                    fileViewPreview.appendChild(embed);
+                                } else {
+                                    fileViewPreview.innerHTML = '<p class="text-center text-gray-500">Preview not available for this file type.</p>';
+                                }
+
+                                // Show the file view modal
+                                const fileModal = document.getElementById('fileViewModal');
+                                if (fileModal) {
+                                    fileModal.classList.remove('hidden');
+                                } else {
+                                    console.error('File view modal not found in the DOM');
+                                }
+                            }
+                        });
+
+                        // Close modal function
+                        function closeModal(modalId) {
+                            const modal = document.getElementById(modalId);
+                            if (modal) {
+                                modal.classList.add('hidden');
+                            } else {
+                                console.error(`Modal with ID ${modalId} not found`);
+                            }
+                        }
+                    });
+                </script>
 
 
-        <div id="rejectModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden" role="dialog" aria-labelledby="rejectModalTitle" aria-modal="true">
-            <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4">
-                <div class="relative mb-4">
-                    <h2 id="rejectModalTitle" class="text-lg font-semibold text-gray-800">Confirm Rejection</h2>
-                    <button onclick="closeModal('rejectModal')" class="absolute top-0 right-0 text-gray-400 hover:text-gray-600 transition-colors" aria-label="Close modal">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                    </button>
+
+
+
+                <?php elseif ($currentPage === 'Evaluation'): ?>
+                <?php
+                // Database configuration (using your existing Database class)
+                $conn = Database::getInstance();
+
+                // Search users function with status, sport, and campus filters
+                function searchUsersEval($searchTerm, $statusFilter, $sportFilter, $campusFilter, $conn) {
+                    $searchTerm = '%' . $conn->real_escape_string(trim($searchTerm)) . '%';
+                    $statusFilter = $conn->real_escape_string(trim($statusFilter));
+                    $sportFilter = $conn->real_escape_string(trim($sportFilter));
+                    $campusFilter = $conn->real_escape_string(trim($campusFilter));
+
+                    $query = "
+            SELECT id, student_id, full_name, sport, campus, status
+            FROM users
+            WHERE (student_id LIKE ? OR full_name LIKE ?)
+        ";
+                    $params = [$searchTerm, $searchTerm];
+                    $types = "ss";
+
+                    if (!empty($statusFilter)) {
+                        $query .= " AND status = ?";
+                        $params[] = $statusFilter;
+                        $types .= "s";
+                    }
+                    if (!empty($sportFilter)) {
+                        $query .= " AND sport = ?";
+                        $params[] = $sportFilter;
+                        $types .= "s";
+                    }
+                    if (!empty($campusFilter)) {
+                        $query .= " AND campus = ?";
+                        $params[] = $campusFilter;
+                        $types .= "s";
+                    }
+
+                    $stmt = $conn->prepare($query);
+                    if (!$stmt) {
+                        error_log("Prepare failed: " . $conn->error);
+                        return [];
+                    }
+
+                    $stmt->bind_param($types, ...$params);
+                    $stmt->execute();
+                    $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+                    $stmt->close();
+                    return $result;
+                }
+
+                // Get search term and filters from GET request
+                $searchTerm = isset($_GET['search']) ? trim($_GET['search']) : '';
+                $statusFilter = isset($_GET['status_filter']) ? trim($_GET['status_filter']) : '';
+                $sportFilter = isset($_GET['sports_filter']) ? trim($_GET['sports_filter']) : '';
+                $campusFilter = isset($_GET['campus_filter']) ? trim($_GET['campus_filter']) : '';
+                $users = searchUsersEval($searchTerm, $statusFilter, $sportFilter, $campusFilter, $conn);
+
+                // Fetch all submissions for displayed users, excluding approved ones
+                $userIds = array_column($users, 'id');
+                $submissionsByUser = [];
+                if (!empty($userIds)) {
+                    $placeholders = implode(',', array_fill(0, count($userIds), '?'));
+                    $stmt = $conn->prepare("
+            SELECT id, user_id, document_type, submission_date, status, file_name, other_type, comments
+            FROM submissions
+            WHERE user_id IN ($placeholders) AND status != 'approved'
+            ORDER BY submission_date DESC
+        ");
+                    if ($stmt) {
+                        $stmt->bind_param(str_repeat('i', count($userIds)), ...$userIds);
+                        $stmt->execute();
+                        $allSubmissions = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+                        $stmt->close();
+
+                        // Group submissions by user_id
+                        foreach ($allSubmissions as $sub) {
+                            $submissionsByUser[$sub['user_id']][] = $sub;
+                        }
+                    } else {
+                        error_log("Prepare failed: " . $conn->error);
+                    }
+                }
+
+                // Sample sports options (adjust based on your database)
+                $sportsOptions = ['Basketball', 'Volleyball', 'Football', 'Swimming', 'Others'];
+                ?>
+
+                <div class="w-full px-4 mt-4">
+                    <!-- Search and Filter Form -->
+                    <form method="GET" action="" class="flex flex-col sm:flex-row items-center gap-4 w-full mb-6">
+                        <input type="hidden" name="page" value="Evaluation"/>
+                        <div class="flex-1 min-w-[200px] w-full sm:w-auto">
+                            <input type="text" name="search" placeholder="Search by Student ID or Name..."
+                                   value="<?php echo htmlspecialchars($searchTerm); ?>"
+                                   class="w-full border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm text-sm">
+                        </div>
+                        <select name="status_filter" class="w-full sm:w-auto px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm text-sm">
+                            <option value="">All Statuses</option>
+                            <option value="undergraduate" <?php echo $statusFilter === 'undergraduate' ? 'selected' : ''; ?>>Undergraduate</option>
+                            <option value="alumni" <?php echo $statusFilter === 'alumni' ? 'selected' : ''; ?>>Alumni</option>
+                        </select>
+                        <select name="sports_filter" class="w-full sm:w-auto px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm text-sm">
+                            <option value="">All Sports</option>
+                            <?php foreach ($sportsOptions as $sport): ?>
+                                <option value="<?php echo htmlspecialchars($sport); ?>" <?php echo $sportFilter === $sport ? 'selected' : ''; ?>><?php echo htmlspecialchars($sport); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <select name="campus_filter" class="w-full sm:w-auto px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm text-sm">
+                            <option value="">All Campuses</option>
+                            <option value="Tagum" <?php echo $campusFilter === 'Tagum' ? 'selected' : ''; ?>>Tagum</option>
+                            <option value="Mabini" <?php echo $campusFilter === 'Mabini' ? 'selected' : ''; ?>>Mabini</option>
+                        </select>
+                        <button type="submit" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm transition-colors duration-200 text-sm">
+                            <span>Search</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </button>
+                    </form>
                 </div>
-                <p class="text-sm text-gray-700 mb-4">Are you sure you want to reject this submission?</p>
-                <div class="mb-4">
-                    <label for="rejectComments" class="text-sm text-gray-700">Comments (optional):</label>
-                    <textarea id="rejectComments" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-400" rows="4"></textarea>
+
+                <div class="w-full px-4 sm:px-8 lg:px-25 mx-auto mt-6">
+                    <?php if (count($users) > 0): ?>
+                        <div class="space-y-4">
+                            <?php foreach ($users as $user): ?>
+                                <?php
+                                $userId = $user['id'];
+                                $submissions = $submissionsByUser[$userId] ?? [];
+                                $pendingSubmissions = array_filter($submissions, fn($sub) => $sub['status'] === 'pending');
+                                ?>
+                                <div class="userFile cursor-pointer" data-student-id="<?php echo htmlspecialchars($user['student_id']); ?>"
+                                     data-full-name="<?php echo htmlspecialchars($user['full_name']); ?>"
+                                     data-submissions='<?php echo htmlspecialchars(json_encode($submissions, JSON_HEX_APOS | JSON_HEX_QUOT)); ?>'>
+                                    <div class="flex items-center bg-white shadow-md rounded-lg px-5 py-4 hover:bg-gray-50 transition-colors duration-200">
+                                        <div class="bg-blue-100 p-3 rounded-lg mr-4">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            </svg>
+                                        </div>
+                                        <div class="flex-grow">
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div>
+                                                    <div class="text-xs font-semibold text-gray-500">Name</div>
+                                                    <div class="text-gray-800 font-medium"><?php echo htmlspecialchars($user['full_name']); ?></div>
+                                                </div>
+                                                <div>
+                                                    <div class="text-xs font-semibold text-gray-500">Pending Submissions</div>
+                                                    <div class="text-gray-800"><?php echo count($pendingSubmissions); ?> Document<?php echo count($pendingSubmissions) !== 1 ? 's' : ''; ?></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- View Icon -->
+                                        <div class="ml-4">
+                                            <button class="view-details-btn" title="View Details" aria-label="View submission details">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 hover:text-blue-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php else: ?>
+                        <div class="text-center py-10">
+                            <div class="text-gray-500 font-semibold mb-2">No evaluations found</div>
+                            <div class="text-sm text-gray-400">Try adjusting your search criteria or filters</div>
+                        </div>
+                    <?php endif; ?>
                 </div>
-                <div class="flex justify-end space-x-2">
-                    <button onclick="closeModal('rejectModal')" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md text-sm hover:bg-gray-400 transition-colors">
-                        Cancel
-                    </button>
-                    <button id="confirmReject" class="px-4 py-2 bg-red-500 text-white rounded-md text-sm hover:bg-red-600 transition-colors">
-                        Confirm
-                    </button>
+
+                <!-- Add CSRF token input here -->
+                <input type="hidden" id="csrf_token" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token ?? ''); ?>">
+
+                <!-- Evaluation Modal -->
+                <div id="evaluationModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden" role="dialog" aria-labelledby="evaluationModalTitle" aria-modal="true">
+                    <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-3xl mx-4">
+                        <div class="relative mb-4">
+                            <h2 id="evaluationModalTitle" class="text-lg font-semibold text-gray-800">Evaluate Submissions</h2>
+                            <button onclick="closeModal('evaluationModal')" class="absolute top-0 right-0 text-gray-400 hover:text-gray-600 transition-colors" aria-label="Close modal">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="mb-4">
+                            <p class="text-sm text-gray-700"><strong>Student ID:</strong> <span id="modal_student_id"></span></p>
+                            <p class="text-sm text-gray-700"><strong>Name:</strong> <span id="modal_full_name"></span></p>
+                        </div>
+                        <div id="submissions_list" class="space-y-4 max-h-96 overflow-y-auto"></div>
+                        <div class="mt-4 flex justify-center">
+                            <button onclick="closeModal('evaluationModal')" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors">
+                                Close
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
+
+                <!-- File View Modal -->
+                <div id="fileViewModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden" role="dialog" aria-labelledby="fileViewModalTitle" aria-modal="true">
+                    <div class="bg-white rounded-2xl shadow-2xl p-4 w-[95vw] max-w-[1440px] h-[95vh] max-h-[1080px] border border-gray-200 flex flex-col">
+                        <div class="modal-header relative mb-2">
+                            <h2 id="fileViewModalTitle" class="text-lg font-semibold text-gray-800">View File</h2>
+                            <button onclick="closeModal('fileViewModal')" class="modal-close-btn absolute top-0 right-0 text-gray-400 hover:text-gray-600 transition-colors" aria-label="Close modal">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div id="fileViewPreview" class="w-full h-full flex-1 bg-gray-50 rounded-lg overflow-hidden"></div>
+                        <div class="modal-footer mt-2 flex justify-center gap-2 bg-gray-100 p-2 rounded-b-2xl">
+                            <a id="fileDownloadLink" href="#" class="action-btn bg-red-600 hover:bg-red-700 text-white py-1 px-3 rounded-lg flex items-center gap-1 transition-colors duration-200 focus:outline-none hidden">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                </svg>
+                                Download
+                            </a>
+                            <button onclick="closeModal('fileViewModal')" class="action-btn bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded-lg flex items-center gap-1 transition-colors duration-200 focus:outline-none">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="approveModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden" role="dialog" aria-labelledby="approveModalTitle" aria-modal="true">
+                    <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4">
+                        <div class="relative mb-4">
+                            <h2 id="approveModalTitle" class="text-lg font-semibold text-gray-800">Confirm Approval</h2>
+                            <button onclick="closeModal('approveModal')" class="absolute top-0 right-0 text-gray-400 hover:text-gray-600 transition-colors" aria-label="Close modal">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <p class="text-sm text-gray-700 mb-4">Are you sure you want to approve this submission?</p>
+                        <div class="flex justify-end space-x-2">
+                            <button onclick="closeModal('approveModal')" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md text-sm hover:bg-gray-400 transition-colors">
+                                Cancel
+                            </button>
+                            <button id="confirmApprove" class="px-4 py-2 bg-green-500 text-white rounded-md text-sm hover:bg-green-600 transition-colors">
+                                Confirm
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="rejectModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 hidden" role="dialog" aria-labelledby="rejectModalTitle" aria-modal="true">
+                    <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4">
+                        <div class="relative mb-4">
+                            <h2 id="rejectModalTitle" class="text-lg font-semibold text-gray-800">Confirm Rejection</h2>
+                            <button onclick="closeModal('rejectModal')" class="absolute top-0 right-0 text-gray-400 hover:text-gray-600 transition-colors" aria-label="Close modal">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <p class="text-sm text-gray-700 mb-4">Are you sure you want to reject this submission?</p>
+                        <div class="mb-4">
+                            <label for="rejectComments" class="text-sm text-gray-700">Comments (optional):</label>
+                            <textarea id="rejectComments" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-400" rows="4"></textarea>
+                        </div>
+                        <div class="flex justify-end space-x-2">
+                            <button onclick="closeModal('rejectModal')" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md text-sm hover:bg-gray-400 transition-colors">
+                                Cancel
+                            </button>
+                            <button id="confirmReject" class="px-4 py-2 bg-red-500 text-white rounded-md text-sm hover:bg-red-600 transition-colors">
+                                Confirm
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const userFiles = document.querySelectorAll('.userFile');
+                        userFiles.forEach(userFile => {
+                            userFile.addEventListener('click', function() {
+                                const studentId = this.getAttribute('data-student-id');
+                                const fullName = this.getAttribute('data-full-name');
+                                let submissions = this.getAttribute('data-submissions');
+
+                                try {
+                                    submissions = JSON.parse(submissions || '[]');
+                                } catch (e) {
+                                    console.error('Failed to parse submissions:', e);
+                                    submissions = [];
+                                }
+
+                                const modalStudentId = document.getElementById('modal_student_id');
+                                const modalFullName = document.getElementById('modal_full_name');
+                                const submissionsList = document.getElementById('submissions_list');
+                                const modal = document.getElementById('evaluationModal');
+
+                                if (modalStudentId && modalFullName && submissionsList && modal) {
+                                    modalStudentId.textContent = studentId || 'N/A';
+                                    modalFullName.textContent = fullName || 'N/A';
+                                    submissionsList.innerHTML = '';
+
+                                    if (submissions.length === 0) {
+                                        submissionsList.innerHTML = '<p class="text-sm text-gray-500">No pending submissions found.</p>';
+                                    } else {
+                                        submissions.forEach(sub => {
+                                            const div = document.createElement('div');
+                                            div.className = 'bg-gray-50 p-4 rounded-lg shadow-sm';
+                                            div.innerHTML = `
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <p class="text-sm text-gray-700"><strong>Document Type:</strong> ${sub.document_type || 'N/A'}${sub.other_type ? ` (${sub.other_type})` : ''}</p>
+                                        <p class="text-sm text-gray-700"><strong>Submission Date:</strong> ${sub.submission_date ? new Date(sub.submission_date).toLocaleDateString() : 'N/A'}</p>
+                                        <p class="text-sm text-gray-700"><strong>Status:</strong> ${sub.status || 'N/A'}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-700"><strong>File Name:</strong> ${sub.file_name || 'N/A'}</p>
+                                        <p class="text-sm text-gray-700"><strong>Comments:</strong> ${sub.comments || 'None'}</p>
+                                    </div>
+                                </div>
+                                <div class="mt-2 flex justify-end gap-2">
+                                    <button class="view-file-btn bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-sm transition-colors"
+                                            data-file-name="${sub.file_name || ''}"
+                                            data-submission-id="${sub.id || ''}">
+                                        View File
+                                    </button>
+                                    ${sub.status === 'pending' ? `
+                                        <button class="approve-btn bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md text-sm transition-colors"
+                                                data-submission-id="${sub.id || ''}">
+                                            Approve
+                                        </button>
+                                        <button class="reject-btn bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm transition-colors"
+                                                data-submission-id="${sub.id || ''}">
+                                            Reject
+                                        </button>
+                                    ` : ''}
+                                </div>
+                            `;
+                                            submissionsList.appendChild(div);
+                                        });
+                                    }
+
+                                    modal.classList.remove('hidden');
+                                }
+                            });
+                        });
+
+                        // Handle file view button clicks
+                        document.addEventListener('click', function(e) {
+                            if (e.target.classList.contains('view-file-btn')) {
+                                const fileName = e.target.getAttribute('data-file-name');
+                                const fileViewPreview = document.getElementById('fileViewPreview');
+                                const fileDownloadLink = document.getElementById('fileDownloadLink');
+                                const fileModal = document.getElementById('fileViewModal');
+                                const uploadPath = '<?php echo UPLOAD_BASE_PATH; ?>'.replace(/.*\/public_html/, '');
+                                const filePath = uploadPath + fileName;
+
+                                if (fileViewPreview && fileDownloadLink && fileModal) {
+                                    fileViewPreview.innerHTML = '';
+                                    fileDownloadLink.setAttribute('href', filePath);
+                                    fileDownloadLink.classList.remove('hidden');
+
+                                    const ext = fileName.split('.').pop().toLowerCase();
+                                    if (['jpg', 'jpeg', 'png'].includes(ext)) {
+                                        const img = document.createElement('img');
+                                        img.src = filePath;
+                                        img.alt = fileName;
+                                        img.className = 'max-w-full h-auto';
+                                        fileViewPreview.appendChild(img);
+                                    } else if (ext === 'pdf') {
+                                        const embed = document.createElement('embed');
+                                        embed.src = filePath;
+                                        embed.type = 'application/pdf';
+                                        embed.className = 'w-full h-full';
+                                        fileViewPreview.appendChild(embed);
+                                    } else {
+                                        fileViewPreview.innerHTML = '<p class="text-center text-gray-500">Preview not available for this file type.</p>';
+                                    }
+
+                                    fileModal.classList.remove('hidden');
+                                }
+                            }
+                        });
+
+                        // Handle approve button clicks
+                        document.addEventListener('click', function(e) {
+                            if (e.target.classList.contains('approve-btn')) {
+                                const submissionId = e.target.getAttribute('data-submission-id');
+                                document.getElementById('approveModal').classList.remove('hidden');
+                                document.getElementById('confirmApprove').onclick = function() {
+                                    // AJAX call to approve submission
+                                    fetch('approve_submission.php', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                                        body: `submission_id=${encodeURIComponent(submissionId)}&csrf_token=${encodeURIComponent(document.getElementById('csrf_token').value)}`
+                                    })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            if (data.success) {
+                                                alert('Submission approved successfully');
+                                                location.reload();
+                                            } else {
+                                                alert('Failed to approve submission: ' + (data.message || 'Unknown error'));
+                                            }
+                                        })
+                                        .catch(error => console.error('Error:', error));
+                                    closeModal('approveModal');
+                                };
+                            }
+                        });
+
+                        // Handle reject button clicks
+                        document.addEventListener('click', function(e) {
+                            if (e.target.classList.contains('reject-btn')) {
+                                const submissionId = e.target.getAttribute('data-submission-id');
+                                document.getElementById('rejectModal').classList.remove('hidden');
+                                document.getElementById('confirmReject').onclick = function() {
+                                    const comments = document.getElementById('rejectComments').value;
+                                    fetch('reject_submission.php', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                                        body: `submission_id=${encodeURIComponent(submissionId)}&comments=${encodeURIComponent(comments)}&csrf_token=${encodeURIComponent(document.getElementById('csrf_token').value)}`
+                                    })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            if (data.success) {
+                                                alert('Submission rejected successfully');
+                                                location.reload();
+                                            } else {
+                                                alert('Failed to reject submission: ' + (data.message || 'Unknown error'));
+                                            }
+                                        })
+                                        .catch(error => console.error('Error:', error));
+                                    closeModal('rejectModal');
+                                    document.getElementById('rejectComments').value = '';
+                                };
+                            }
+                        });
+
+                        // Close modal function
+                        function closeModal(modalId) {
+                            const modal = document.getElementById(modalId);
+                            if (modal) modal.classList.add('hidden');
+                        }
+                    });
+                </script>
 
 
 

@@ -1792,7 +1792,7 @@
                                                 </svg>
                                             </div>
                                             <span class="upload-instruction">Click to upload or drag and drop</span>
-                                            <span class="upload-requirements">PDF, DOC, DOCX, JPG, PNG (Max 5MB)</span>
+                                            <span class="upload-requirements">PDF (Max 25MB)</span>
                                         </label>
                                         <div id="file_info" class="file-info hidden">
                                             <span class="file-info-label">Selected file:</span> <span id="file_name"></span>
