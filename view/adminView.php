@@ -1395,11 +1395,13 @@ $action = $_GET['action'] ?? '';
 
 
 
-
-
-
                 <?php
-                elseif ($currentPage === 'Approved Docs'):
+                // Define UPLOAD_BASE_PATH globally
+                define('UPLOAD_BASE_PATH', $_SERVER['DOCUMENT_ROOT'] . '/Uploads/');
+                ?>
+
+                <?php elseif ($currentPage === 'Approved Docs'): ?>
+                <?php
                 // Database configuration (Fallback if Database class is not available)
                 if (!class_exists('Database')) {
                     $conn = new mysqli("localhost", "root", "", "SportOfficeDB");
@@ -1640,27 +1642,37 @@ $action = $_GET['action'] ?? '';
                 </div>
 
                 <script>
-                    // Ensure the script runs after the DOM is fully loaded
                     document.addEventListener('DOMContentLoaded', function() {
+                        console.log('DOM loaded, initializing Approved Docs script');
+
+                        // Close modal function
+                        function closeModal(modalId) {
+                            const modal = document.getElementById(modalId);
+                            if (modal) {
+                                modal.classList.add('hidden');
+                                console.log(`Closed modal: ${modalId}`);
+                            } else {
+                                console.error(`Modal with ID ${modalId} not found`);
+                            }
+                        }
+
                         // Handle view details button clicks
                         const viewDetailsButtons = document.querySelectorAll('.view-details-btn');
                         if (!viewDetailsButtons.length) {
-                            console.error('No view-details-btn elements found in the DOM');
+                            console.warn('No view-details-btn elements found in the DOM');
                         }
 
                         viewDetailsButtons.forEach(button => {
                             button.addEventListener('click', function(event) {
-                                event.preventDefault(); // Prevent any default behavior
+                                event.preventDefault();
                                 console.log('View Details button clicked for student ID:', this.getAttribute('data-student-id'));
 
                                 const studentId = this.getAttribute('data-student-id');
                                 const fullName = this.getAttribute('data-full-name');
                                 let submissions = this.getAttribute('data-submissions');
 
-                                // Log the raw submissions data for debugging
                                 console.log('Raw submissions data:', submissions);
 
-                                // Ensure submissions is valid JSON
                                 try {
                                     submissions = JSON.parse(submissions || '[]');
                                     console.log('Parsed submissions:', submissions);
@@ -1669,7 +1681,6 @@ $action = $_GET['action'] ?? '';
                                     submissions = [];
                                 }
 
-                                // Update modal content
                                 const modalStudentId = document.getElementById('modal_student_id');
                                 const modalFullName = document.getElementById('modal_full_name');
                                 if (modalStudentId && modalFullName) {
@@ -1679,7 +1690,6 @@ $action = $_GET['action'] ?? '';
                                     console.error('Modal student ID or full name elements not found');
                                 }
 
-                                // Populate submissions list
                                 const submissionsList = document.getElementById('submissions_list');
                                 if (!submissionsList) {
                                     console.error('Submissions list element not found');
@@ -1696,30 +1706,29 @@ $action = $_GET['action'] ?? '';
                                         const submissionDiv = document.createElement('div');
                                         submissionDiv.className = 'bg-gray-50 p-4 rounded-lg shadow-sm';
                                         submissionDiv.innerHTML = `
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <p class="text-sm text-gray-700"><strong>Document Type:</strong> ${sub.document_type || 'N/A'}${sub.other_type ? ` (${sub.other_type})` : ''}</p>
-                                <p class="text-sm text-gray-700"><strong>Submission Date:</strong> ${sub.submission_date ? new Date(sub.submission_date).toLocaleDateString() : 'N/A'}</p>
-                                <p class="text-sm text-gray-700"><strong>Status:</strong> Approved</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <p class="text-sm text-gray-700"><strong>Document Type:</strong> ${sub.document_type || 'N/A'}${sub.other_type ? ` (${sub.other_type})` : ''}</p>
+                                    <p class="text-sm text-gray-700"><strong>Submission Date:</strong> ${sub.submission_date ? new Date(sub.submission_date).toLocaleDateString() : 'N/A'}</p>
+                                    <p class="text-sm text-gray-700"><strong>Status:</strong> Approved</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-700"><strong>File Name:</strong> ${sub.file_name || 'N/A'}</p>
+                                    <p class="text-sm text-gray-700"><strong>Comments:</strong> ${sub.comments || 'None'}</p>
+                                </div>
                             </div>
-                            <div>
-                                <p class="text-sm text-gray-700"><strong>File Name:</strong> ${sub.file_name || 'N/A'}</p>
-                                <p class="text-sm text-gray-700"><strong>Comments:</strong> ${sub.comments || 'None'}</p>
+                            <div class="mt-2 flex justify-end gap-2">
+                                <button class="view-file-btn bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-sm transition-colors"
+                                        data-file-name="${sub.file_name || ''}"
+                                        data-submission-id="${sub.id || ''}">
+                                    View File
+                                </button>
                             </div>
-                        </div>
-                        <div class="mt-2 flex justify-end gap-2">
-                            <button class="view-file-btn bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-sm transition-colors"
-                                    data-file-name="${sub.file_name || ''}"
-                                    data-submission-id="${sub.id || ''}">
-                                View File
-                            </button>
-                        </div>
-                    `;
+                        `;
                                         submissionsList.appendChild(submissionDiv);
                                     });
                                 }
 
-                                // Show the evaluation modal
                                 const modal = document.getElementById('evaluationModal');
                                 if (modal) {
                                     console.log('Showing evaluation modal');
@@ -1730,15 +1739,17 @@ $action = $_GET['action'] ?? '';
                             });
                         });
 
-                        // Handle file view button clicks
-                        document.addEventListener('click', function(e) {
+                        // Handle file view button clicks with event delegation
+                        document.body.addEventListener('click', function(e) {
                             if (e.target.classList.contains('view-file-btn')) {
                                 console.log('View File button clicked for file:', e.target.getAttribute('data-file-name'));
                                 const fileName = e.target.getAttribute('data-file-name');
                                 const fileViewPreview = document.getElementById('fileViewPreview');
                                 const fileDownloadLink = document.getElementById('fileDownloadLink');
-                                const uploadPath = '<?php echo UPLOAD_BASE_PATH; ?>'.replace(/.*\/public_html/, '');
+                                const uploadPath = '<?php echo str_replace($_SERVER['DOCUMENT_ROOT'], '', UPLOAD_BASE_PATH); ?>';
                                 const filePath = uploadPath + fileName;
+
+                                console.log('File path:', filePath);
 
                                 if (!fileViewPreview || !fileDownloadLink) {
                                     console.error('File view preview or download link elements not found');
@@ -1751,43 +1762,35 @@ $action = $_GET['action'] ?? '';
 
                                 const ext = fileName.split('.').pop().toLowerCase();
                                 if (['jpg', 'jpeg', 'png'].includes(ext)) {
+                                    console.log('Rendering image:', filePath);
                                     const img = document.createElement('img');
                                     img.src = filePath;
                                     img.alt = fileName;
                                     img.className = 'max-w-full h-auto';
                                     fileViewPreview.appendChild(img);
                                 } else if (ext === 'pdf') {
+                                    console.log('Rendering PDF:', filePath);
                                     const embed = document.createElement('embed');
                                     embed.src = filePath;
                                     embed.type = 'application/pdf';
                                     embed.className = 'w-full h-full';
                                     fileViewPreview.appendChild(embed);
                                 } else {
+                                    console.log('Unsupported file type:', ext);
                                     fileViewPreview.innerHTML = '<p class="text-center text-gray-500">Preview not available for this file type.</p>';
                                 }
 
-                                // Show the file view modal
                                 const fileModal = document.getElementById('fileViewModal');
                                 if (fileModal) {
+                                    console.log('Showing file view modal');
                                     fileModal.classList.remove('hidden');
                                 } else {
                                     console.error('File view modal not found in the DOM');
                                 }
                             }
                         });
-
-                        // Close modal function
-                        function closeModal(modalId) {
-                            const modal = document.getElementById(modalId);
-                            if (modal) {
-                                modal.classList.add('hidden');
-                            } else {
-                                console.error(`Modal with ID ${modalId} not found`);
-                            }
-                        }
                     });
                 </script>
-
 
 
 
