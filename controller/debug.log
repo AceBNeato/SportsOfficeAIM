@@ -231,3 +231,39 @@ Session Data: Array
 Input Data: submission_id=1, description='adiasd ains fkan fakdf nskd fls', is_resubmission=0
 File Data: name=grok_report.pdf, size=228805, type=application/pdf, error=0
 Update Successful: submission_id=1, is_resubmission=0
+Approve Request - Session: Array
+(
+    [csrf_token] => 0e8091bf57bfc64debe0543a544c4fd82cb690b76826bffda14f354b9709a146
+    [logged_in] => 1
+    [user] => Array
+        (
+            [id] => 1
+            [student_id] => 
+            [email] => admin@usep.edu.ph
+            [password] => admin123
+            [address] => Tagum City
+            [role] => admin
+            [full_name] => Gian Glen Vincent Garcia
+            [year_section] => 
+            [sport] => 
+            [campus] => 
+            [last_activity] => 1773582241
+            [ip_address] => ::1
+            [user_agent] => Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36
+            [has_profile_image] => 
+        )
+
+    [submissions] => Array
+        (
+            [year_section] => 
+        )
+
+)
+
+Approve Request - POST Data: Array
+(
+    [approval_id] => 1
+    [action] => approve
+)
+
+Approve Request - Session ID: ch98bv7rjsp5t9oub5mbq0tln0
