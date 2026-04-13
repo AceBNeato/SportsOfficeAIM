@@ -163,8 +163,44 @@ if (!$conn->query($sql)) {
     error_log("Achievements leaderboard created or already exists");
 }
 
+// Create stored procedures with DEFINER
+$conn->query("DROP PROCEDURE IF EXISTS find_user_by_email");
+$conn->query("CREATE DEFINER=`root`@`localhost` PROCEDURE `find_user_by_email`(IN user_email VARCHAR(255))
+BEGIN
+    SELECT id, email, password, 'admin' AS role, full_name, address FROM admins WHERE email = user_email
+    UNION
+    SELECT id, email, password, 'user' AS role, full_name, address FROM users WHERE email = user_email;
+END");
 
+$conn->query("DROP PROCEDURE IF EXISTS AddAdminIfAllowed");
+$conn->query("CREATE DEFINER=`root`@`localhost` PROCEDURE `AddAdminIfAllowed`(
+    IN p_full_name VARCHAR(255),
+    IN p_address VARCHAR(255),
+    IN p_email VARCHAR(255),
+    IN p_password VARCHAR(255),
+    IN p_status ENUM('undergraduate', 'alumni')
+)
+BEGIN
+    DECLARE admin_count INT DEFAULT 0;
+    SELECT COUNT(*) INTO admin_count FROM admins;
+    IF admin_count < 2 THEN
+        IF NOT EXISTS (SELECT 1 FROM admins WHERE email = p_email) THEN
+            INSERT INTO admins (full_name, address, email, password, status)
+            VALUES (p_full_name, p_address, p_email, p_password, p_status);
+            SELECT 'Admin created successfully' AS result;
+        ELSE
+            SELECT 'Admin already exists' AS result;
+        END IF;
+    ELSE
+        SELECT 'Admin limit reached' AS result;
+    END IF;
+END");
 
+$conn->query("DROP PROCEDURE IF EXISTS GetTotalStudents");
+$conn->query("CREATE DEFINER=`root`@`localhost` PROCEDURE `GetTotalStudents`()
+BEGIN
+    SELECT COUNT(*) AS total FROM users;
+END");
 
 // 11. Insert sample admin
 $fullName = "Gian Glen Vincent Garcia";

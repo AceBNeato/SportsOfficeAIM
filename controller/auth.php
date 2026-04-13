@@ -1,11 +1,9 @@
 <?php
-session_start();
-
 // Enable error reporting for debugging
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Secure session configuration
+// Secure session configuration - MUST be before session_start()
 ini_set('session.use_strict_mode', 1);
 ini_set('session.cookie_httponly', 1);
 if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
@@ -13,20 +11,26 @@ if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
 }
 ini_set('session.cookie_samesite', 'Strict');
 
+session_start();
+
 // Database configuration
 $host = 'localhost';
 $db = 'SportOfficeDB';
 $user = 'root';
 $pass = '';
 
-// Establish connection
-$conn = new mysqli($host, $user, $pass, $db);
+// Establish connection (create DB if not exists)
+$conn = new mysqli($host, $user, $pass);
 if ($conn->connect_error) {
     error_log("Connection failed: " . $conn->connect_error);
     $_SESSION['login_error'] = "System error. Please try again later.";
     header("Location: ../view/loginView.php");
     exit;
 }
+
+// Create database if it doesn't exist
+$conn->query("CREATE DATABASE IF NOT EXISTS $db");
+$conn->select_db($db);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Validate CSRF token
